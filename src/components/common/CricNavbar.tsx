@@ -23,15 +23,9 @@ export const CricNavbar: React.FC = () => {
           <Link
             to="/"
             className={`flex items-center gap-1.5 transition-all ${
-              isActive('/') ? 'text-cyan-400 border-b-2 border-cyan-400 pb-1 font-extrabold' : 'hover:text-cyan-300'
-            }`}
-          >
-            <Home className="w-4 h-4" /> Home
-          </Link>
-          <Link
-            to="/control"
-            className={`flex items-center gap-1.5 transition-all ${
-              location.pathname === '/control' ? 'text-cyan-400 border-b-2 border-cyan-400 pb-1 font-extrabold' : 'hover:text-cyan-300'
+              location.pathname === '/' || location.pathname === '/control'
+                ? 'text-cyan-400 border-b-2 border-cyan-400 pb-1 font-extrabold'
+                : 'hover:text-cyan-300'
             }`}
           >
             <Sliders className="w-4 h-4 text-emerald-400" /> Control Studio

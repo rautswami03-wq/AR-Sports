@@ -1,11 +1,10 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { Routes, Route } from 'react-router-dom';
-import { LandingPage } from './components/public/LandingPage';
 import { ControlStudio } from './components/control/ControlStudio';
 import { OverlayStage } from './components/control/OverlayStage';
 import { ThemeLinksPage } from './components/control/ThemeLinksPage';
 import { TournamentPage } from './components/control/TournamentPage';
 import { TourMatchPage } from './components/control/TourMatchPage';
 export default function App() {
-    return (_jsxs(Routes, { children: [_jsx(Route, { path: "/", element: _jsx(LandingPage, {}) }), _jsx(Route, { path: "/control", element: _jsx(ControlStudio, {}) }), _jsx(Route, { path: "/tournament", element: _jsx(TournamentPage, {}) }), _jsx(Route, { path: "/tournament/:id", element: _jsx(TourMatchPage, {}) }), _jsx(Route, { path: "/theme_links", element: _jsx(ThemeLinksPage, {}) }), _jsx(Route, { path: "/themes", element: _jsx(ThemeLinksPage, {}) }), _jsx(Route, { path: "/overlay", element: _jsx("div", { className: "w-full h-full bg-transparent overflow-hidden flex items-center justify-center", children: _jsx(OverlayStage, {}) }) })] }));
+    return (_jsxs(Routes, { children: [_jsx(Route, { path: "/", element: _jsx(ControlStudio, {}) }), _jsx(Route, { path: "/control", element: _jsx(ControlStudio, {}) }), _jsx(Route, { path: "/tournament", element: _jsx(TournamentPage, {}) }), _jsx(Route, { path: "/tournament/:id", element: _jsx(TourMatchPage, {}) }), _jsx(Route, { path: "/theme_links", element: _jsx(ThemeLinksPage, {}) }), _jsx(Route, { path: "/themes", element: _jsx(ThemeLinksPage, {}) }), _jsx(Route, { path: "/overlay", element: _jsx("div", { className: "w-full h-full bg-transparent overflow-hidden flex items-center justify-center", children: _jsx(OverlayStage, {}) }) })] }));
 }
