@@ -229,8 +229,9 @@ export const useScoringStore = create<ScoringState>()(
           timestamp: new Date().toISOString(),
         };
 
-        set((state) => {
-          const match = useMatchStore.getState().currentMatch;
+        // Mutate match state through the match store (which has immer)
+        useMatchStore.setState((state) => {
+          const match = state.currentMatch;
           if (!match) return;
           const innings = match.innings[match.currentInningsIndex];
           if (!innings) return;
@@ -317,15 +318,8 @@ export const useScoringStore = create<ScoringState>()(
           innings.partnership.runs += event.totalRuns;
           innings.partnership.balls += event.isLegalDelivery ? 1 : 0;
 
-          // Update match
+          // Update match timestamp
           match.updatedAt = new Date().toISOString();
-        });
-
-        // Also update the match store
-        useMatchStore.setState((state) => {
-          if (state.currentMatch) {
-            state.currentMatch.updatedAt = new Date().toISOString();
-          }
         });
       },
 
@@ -375,12 +369,12 @@ export const useScoringStore = create<ScoringState>()(
       canRedo: () => get().redoStack.length > 0,
 
       rotateOver: () => {
-        const match = useMatchStore.getState().currentMatch;
-        if (!match) return;
-        const innings = match.innings[match.currentInningsIndex];
-        if (!innings) return;
+        useMatchStore.setState((state) => {
+          const match = state.currentMatch;
+          if (!match) return;
+          const innings = match.innings[match.currentInningsIndex];
+          if (!innings) return;
 
-        set((state) => {
           // Mark current over as maiden if applicable
           const currentOver = innings.overs[innings.overs.length - 1];
           if (currentOver) {
@@ -411,12 +405,12 @@ export const useScoringStore = create<ScoringState>()(
       addWicket: (params) => {
         saveForUndo();
 
-        const match = useMatchStore.getState().currentMatch;
-        if (!match) return;
-        const innings = match.innings[match.currentInningsIndex];
-        if (!innings) return;
+        useMatchStore.setState((state) => {
+          const match = state.currentMatch;
+          if (!match) return;
+          const innings = match.innings[match.currentInningsIndex];
+          if (!innings) return;
 
-        set((state) => {
           // Increment wickets
           innings.totalWickets += 1;
 
@@ -460,12 +454,12 @@ export const useScoringStore = create<ScoringState>()(
       },
 
       addBatterToInnings: (playerId, _playerName) => {
-        const match = useMatchStore.getState().currentMatch;
-        if (!match) return;
-        const innings = match.innings[match.currentInningsIndex];
-        if (!innings) return;
+        useMatchStore.setState((state) => {
+          const match = state.currentMatch;
+          if (!match) return;
+          const innings = match.innings[match.currentInningsIndex];
+          if (!innings) return;
 
-        set((state) => {
           const batter: BatterInnings = {
             playerId,
             runs: 0,
@@ -488,12 +482,12 @@ export const useScoringStore = create<ScoringState>()(
       },
 
       swapStrike: () => {
-        const match = useMatchStore.getState().currentMatch;
-        if (!match) return;
-        const innings = match.innings[match.currentInningsIndex];
-        if (!innings) return;
+        useMatchStore.setState((state) => {
+          const match = state.currentMatch;
+          if (!match) return;
+          const innings = match.innings[match.currentInningsIndex];
+          if (!innings) return;
 
-        set((state) => {
           const activeBatters = innings.batters.filter((b) => !b.isOut);
           if (activeBatters.length >= 2) {
             activeBatters.forEach((b) => (b.isOnStrike = !b.isOnStrike));
@@ -502,12 +496,12 @@ export const useScoringStore = create<ScoringState>()(
       },
 
       addBowlerToInnings: (playerId, _playerName) => {
-        const match = useMatchStore.getState().currentMatch;
-        if (!match) return;
-        const innings = match.innings[match.currentInningsIndex];
-        if (!innings) return;
+        useMatchStore.setState((state) => {
+          const match = state.currentMatch;
+          if (!match) return;
+          const innings = match.innings[match.currentInningsIndex];
+          if (!innings) return;
 
-        set((state) => {
           if (!innings.bowlers.find((b) => b.playerId === playerId)) {
             const bowler: BowlerInnings = {
               playerId,

@@ -1,0 +1,113 @@
+@import "tailwindcss";
+
+@layer base {
+  html,
+  body,
+  #root {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: transparent;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    user-select: none;
+  }
+}
+
+/* Hardware accelerated 60fps rendering wrapper */
+.broadcast-canvas {
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  background: transparent;
+  transform-origin: top left;
+  will-change: transform;
+}
+
+/* Glassmorphic broadcast background */
+.glass-panel {
+  background: rgba(15, 23, 42, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.glass-panel-dark {
+  background: rgba(9, 13, 22, 0.94);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85);
+}
+
+.glass-panel-accent {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.92) 100%);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(56, 189, 248, 0.1);
+}
+
+/* Broadcast Typography Sheen */
+.text-broadcast-gold {
+  background: linear-gradient(180deg, #FFFFFF 0%, #FDE047 60%, #EAB308 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.8));
+}
+
+.text-broadcast-silver {
+  background: linear-gradient(180deg, #FFFFFF 0%, #E2E8F0 50%, #94A3B8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-broadcast-crimson {
+  background: linear-gradient(180deg, #FFFFFF 0%, #FCA5A5 50%, #EF4444 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 6px rgba(225, 29, 72, 0.6));
+}
+
+/* Shiny metallic line shimmer keyframes */
+@keyframes sheen-sweep {
+  0% {
+    transform: translateX(-100%) skewX(-25deg);
+  }
+  100% {
+    transform: translateX(200%) skewX(-25deg);
+  }
+}
+
+.animate-sheen {
+  position: relative;
+  overflow: hidden;
+}
+
+.animate-sheen::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.25) 50%, transparent 100%);
+  animation: sheen-sweep 3.5s infinite linear;
+}
+
+/* Glowing Border Pulse */
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(56, 189, 248, 0.8);
+  }
+}
+
+.glow-pulse-blue {
+  animation: glow-pulse 2s infinite ease-in-out;
+}

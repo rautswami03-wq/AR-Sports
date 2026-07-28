@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  background: transparent;
+  font-family: Inter, sans-serif;
+}
+
+.overlay {
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+}
+
+.scorebug {
+  position: absolute;
+  bottom: 40px;
+  left: 40px;
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  padding: 20px 30px;
+  background: #121212ee;
+  border-radius: 18px;
+  color: white;
+}
+
+.team {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.team img {
+  width: 55px;
+  height: 55px;
+}

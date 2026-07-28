@@ -1,22 +1,38 @@
 {
-  "name": "ar-sports-studio",
-  "version": "0.1.0",
+  "name": "ar-sports-studio-pro",
   "private": true,
-  "description": "AR Sports Studio Pro - Professional Cricket Broadcast Platform",
+  "version": "1.0.0",
+  "type": "module",
   "scripts": {
-    "dev": "turbo run dev",
-    "build": "turbo run build",
-    "lint": "turbo run lint",
-    "type-check": "turbo run type-check",
-    "clean": "turbo run clean",
-    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\""
+    "dev": "vite",
+    "backend": "npm --prefix apps/backend run dev",
+    "build": "tsc && vite build",
+    "build:backend": "npm --prefix apps/backend run build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext ts,tsx",
+    "format": "prettier --write ."
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.85.3",
+    "clsx": "^2.1.1",
+    "firebase": "^12.1.0",
+    "framer-motion": "^12.0.0",
+    "lucide-react": "^0.540.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-router-dom": "^7.8.2",
+    "zustand": "^5.0.7"
   },
   "devDependencies": {
-    "prettier": "^3.2.5",
-    "turbo": "^2.1.0"
-  },
-  "packageManager": "pnpm@9.7.0",
-  "engines": {
-    "node": ">=20.0.0"
+    "@tailwindcss/vite": "^4.3.3",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
+    "@vitejs/plugin-react": "^5.0.0",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^9.34.0",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.12",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.3"
   }
 }

@@ -1,0 +1,92 @@
+{
+  "users": [
+    {
+      "id": "usr_1",
+      "email": "admin@cricscorer.in",
+      "name": "Studio Admin"
+    }
+  ],
+  "matches": [
+    {
+      "id": "match_live_001",
+      "streamKey": "obs_key_8849102",
+      "title": "CHAMPIONSHIP FINAL - IND VS AUS",
+      "tournament": "T20 WORLD TROPHY 2026",
+      "teamA": {
+        "id": "IND",
+        "shortName": "IND",
+        "fullName": "India",
+        "primaryColor": "#00529B",
+        "secondaryColor": "#FF9933",
+        "score": 184,
+        "wickets": 4,
+        "overs": 18,
+        "balls": 4
+      },
+      "teamB": {
+        "id": "AUS",
+        "shortName": "AUS",
+        "fullName": "Australia",
+        "primaryColor": "#FFD700",
+        "secondaryColor": "#006400",
+        "score": 162,
+        "wickets": 6,
+        "overs": 20,
+        "balls": 0
+      },
+      "currentInnings": 1,
+      "recentBalls": [
+        "1",
+        "4",
+        "0",
+        "6",
+        "W",
+        "2"
+      ],
+      "activeOverlays": {
+        "scoreBug": true,
+        "battingLowerThird": false,
+        "bowlingLowerThird": false,
+        "battingScorecard": false,
+        "bowlingScorecard": false,
+        "matchSummary": false,
+        "partnership": false,
+        "playingXI": false,
+        "toss": false,
+        "pointsTable": false
+      },
+      "activeAnimation": null,
+      "updatedAt": "2026-07-28T09:07:55.749Z"
+    }
+  ],
+  "tournaments": [
+    {
+      "id": "tourn_001",
+      "name": "T20 WORLD TROPHY 2026",
+      "teams": [
+        "IND",
+        "AUS",
+        "ENG",
+        "SA"
+      ],
+      "pointsTable": [
+        {
+          "teamId": "IND",
+          "played": 5,
+          "won": 5,
+          "lost": 0,
+          "points": 10,
+          "nrr": "+2.14"
+        },
+        {
+          "teamId": "AUS",
+          "played": 5,
+          "won": 4,
+          "lost": 1,
+          "points": 8,
+          "nrr": "+1.45"
+        }
+      ]
+    }
+  ]
+}

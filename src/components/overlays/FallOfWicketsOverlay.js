@@ -1,0 +1,8 @@
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { useBroadcastStore } from '../../store/useBroadcastStore';
+import { FullCardBase } from '../common/FullCardBase';
+export const FallOfWicketsOverlay = () => {
+    const { matchDetails, teamA, teamB, battingTeamId } = useBroadcastStore();
+    const battingTeam = battingTeamId === teamA.id ? teamA : teamB;
+    return (_jsx(FullCardBase, { title: `${battingTeam.fullName} - FALL OF WICKETS`, subtitle: `TOTAL WICKETS: ${battingTeam.wickets}`, tournament: matchDetails.tournament, children: _jsx("div", { className: "overflow-x-auto", children: _jsxs("table", { className: "w-full text-left text-sm", children: [_jsx("thead", { children: _jsxs("tr", { className: "text-slate-400 border-b border-white/10 uppercase text-xs", children: [_jsx("th", { className: "py-2.5 px-4", children: "Wicket" }), _jsx("th", { className: "py-2.5 px-4", children: "Score" }), _jsx("th", { className: "py-2.5 px-4", children: "Over" }), _jsx("th", { className: "py-2.5 px-4", children: "Dismissed Batter" })] }) }), _jsx("tbody", { className: "divide-y divide-white/5 font-semibold", children: matchDetails.fallOfWickets.map((fow) => (_jsxs("tr", { className: "hover:bg-white/5", children: [_jsxs("td", { className: "py-3 px-4 text-red-400 font-bold", children: [fow.wicketNumber, "th Wicket"] }), _jsx("td", { className: "py-3 px-4 font-black text-amber-300", children: fow.runs }), _jsxs("td", { className: "py-3 px-4 text-slate-300", children: [fow.over, " OV"] }), _jsx("td", { className: "py-3 px-4 text-white font-bold", children: fow.batterName })] }, fow.wicketNumber))) })] }) }) }));
+};
