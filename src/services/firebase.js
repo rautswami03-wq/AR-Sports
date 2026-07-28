@@ -2,9 +2,9 @@ import { initializeApp, getApps } from 'firebase/app';
 import { getFirestore, doc, onSnapshot, setDoc } from 'firebase/firestore';
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyDummyKeyForLocalTestingModeOnly",
-    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "ar-sports-broadcast.firebaseapp.com",
-    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "ar-sports-broadcast",
-    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "ar-sports-broadcast.appspot.com",
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "cricscore.firebaseapp.com",
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "cricscore",
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "cricscore.appspot.com",
     messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "1234567890",
     appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:1234567890:web:abcdef123456"
 };
