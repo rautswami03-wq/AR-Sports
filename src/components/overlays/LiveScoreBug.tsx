@@ -104,7 +104,7 @@ export const LiveScoreBug: React.FC = () => {
         style={{ background: theme.headerGradient }}
       >
         <span className="text-white font-black text-lg tracking-wider uppercase drop-shadow">
-          {matchDetails.winnerMargin || theme.name || `${battingTeam.fullName.toUpperCase()} WON BY 9 WICKETS`}
+          {matchDetails.customInputText || matchDetails.winnerMargin || theme.name || `${battingTeam.fullName.toUpperCase()} OPTED TO BAT`}
         </span>
       </div>
 
