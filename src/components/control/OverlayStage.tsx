@@ -141,59 +141,12 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
         if (unsubFirebase) unsubFirebase();
       };
     }
-    wsConnectedRef.current = true;
-
-    let ws: WebSocket | null = null;
-    try {
-      const hostname = window.location.hostname || 'localhost';
-      const wsUrl = `ws://${hostname}:4000`;
-      ws = new WebSocket(wsUrl);
-
-      ws.onopen = () => {
-        console.log('⚡ Connected to CricScorer WebSocket Backend');
-        useBroadcastStore.getState().setWsConnected(true);
-      };
-
-      ws.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          const applyExternalState = useBroadcastStore.getState().applyExternalState;
-
-          if (data.type === 'INITIAL_STATE' || data.type === 'MATCH_UPDATE' || data.type === 'STATE_SYNC') {
-            if (data.payload) {
-              applyExternalState(data.payload);
-            }
-          } else if (data.type === 'OVERLAY_TOGGLE' && data.payload) {
-            const { overlayId, visible } = data.payload;
-            useBroadcastStore.getState().toggleOverlay(overlayId, visible);
-          } else if (data.type === 'ANIMATION_TRIGGER' && data.payload) {
-            const { animationType, durationMs } = data.payload;
-            useBroadcastStore.getState().triggerAnimation(animationType, durationMs);
-          }
-        } catch (e) {
-          console.warn('WebSocket message error:', e);
-        }
-      };
-
-      ws.onerror = () => {
-        useBroadcastStore.getState().setWsConnected(false);
-      };
-
-      ws.onclose = () => {
-        useBroadcastStore.getState().setWsConnected(false);
-      };
-    } catch (err) {
-      console.warn('WebSocket init notice:', err);
-    }
-
     return () => {
       clearInterval(pollInterval);
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('cricscorer_local_update', handleCustomSync);
       if (bc) bc.close();
       if (unsubFirebase) unsubFirebase();
-      wsConnectedRef.current = false;
-      if (ws) ws.close();
     };
   }, []);
 
