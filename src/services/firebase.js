@@ -1,12 +1,14 @@
 import { initializeApp, getApps } from 'firebase/app';
 import { getFirestore, doc, onSnapshot, setDoc } from 'firebase/firestore';
 const firebaseConfig = {
-    apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyDummyKeyForLocalTestingModeOnly",
-    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "cricscore.firebaseapp.com",
-    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "cricscore",
-    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "cricscore.appspot.com",
-    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "1234567890",
-    appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:1234567890:web:abcdef123456"
+    apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyADZq0NyOhHVjMUYsQX4UWS8OWjOt0RbG4",
+    authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "cricscore-dcaa4.firebaseapp.com",
+    databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL || "https://cricscore-dcaa4-default-rtdb.firebaseio.com",
+    projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "cricscore-dcaa4",
+    storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "cricscore-dcaa4.firebasestorage.app",
+    messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "674016632224",
+    appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:674016632224:web:33f3911fe43396cb8e58c5",
+    measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-WG5HE07NYJ"
 };
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
 export const db = getFirestore(app);
