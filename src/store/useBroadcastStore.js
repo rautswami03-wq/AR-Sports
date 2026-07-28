@@ -405,6 +405,13 @@ export const useBroadcastStore = create((set, get) => ({
                     dismissal: dismissalType,
                 };
             }
+            const nextBatterIndex = batters.findIndex((b) => !b.isOut && !b.isStriker);
+            if (nextBatterIndex !== -1) {
+                batters[nextBatterIndex] = {
+                    ...batters[nextBatterIndex],
+                    isStriker: true,
+                };
+            }
             team.batters = batters;
             const recent = ['W', ...state.matchDetails.recentBalls.slice(0, 5)];
             const nextState = {
