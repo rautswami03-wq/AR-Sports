@@ -203,6 +203,8 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
 
   const isVisible = (type: OverlayType) => {
     if (forcedOverlay) return forcedOverlay === type;
+    const hasAnyActiveOverlay = Object.values(activeOverlays).some(Boolean);
+    if (!hasAnyActiveOverlay && type === 'scoreBug') return true;
     return !!activeOverlays[type];
   };
 

@@ -4,8 +4,9 @@ import { useBroadcastStore } from '../../store/useBroadcastStore';
 import { PRESET_TOURNAMENTS } from '../../theme/presetThemes';
 export const LiveScoreBug = () => {
     const { teamA, teamB, battingTeamId, matchDetails, tournamentId } = useBroadcastStore();
-    const battingTeam = battingTeamId === teamA.id ? teamA : teamB;
-    const bowlingTeam = battingTeamId === teamA.id ? teamB : teamA;
+    const isTeamA = battingTeamId === teamA.id || battingTeamId === teamA.shortName || battingTeamId === 'teamA';
+    const battingTeam = isTeamA ? teamA : teamB;
+    const bowlingTeam = isTeamA ? teamB : teamA;
     // Resolve active theme from URL query or store
     const hashQuery = typeof window !== 'undefined' ? (window.location.hash.split('?')[1] || window.location.search) : '';
     const params = new URLSearchParams(hashQuery);
