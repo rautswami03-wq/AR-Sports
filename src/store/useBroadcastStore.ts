@@ -279,7 +279,7 @@ function loadInitialState() {
           bowlingTeamId: parsed.bowlingTeamId || 'AUS',
           activeOverlays: parsed.activeOverlays || INITIAL_OVERLAYS,
           activeAnimation: parsed.activeAnimation || null,
-          tournamentId: parsed.tournamentId || 'IPL',
+          tournamentId: parsed.tournamentId || 'ipl25',
         };
       }
     } catch (e) {
@@ -294,7 +294,7 @@ function loadInitialState() {
     bowlingTeamId: 'AUS',
     activeOverlays: INITIAL_OVERLAYS,
     activeAnimation: null,
-    tournamentId: 'IPL',
+    tournamentId: 'ipl25',
   };
 }
 

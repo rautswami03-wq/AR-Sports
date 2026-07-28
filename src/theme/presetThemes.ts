@@ -107,11 +107,11 @@ export const PRESET_TOURNAMENTS: Record<string, TournamentTheme> = {
   ipl25: {
     id: 'ipl25',
     name: 'IPL 2025 SPECIAL EDITION',
-    headerGradient: 'linear-gradient(90deg, #0d1b2a 0%, #d4af37 50%, #004ba0 100%)',
-    primaryAccent: '#d4af37',
+    headerGradient: 'linear-gradient(90deg, #004BA0 0%, #00D2FF 50%, #EC1C24 100%)',
+    primaryAccent: '#00D2FF',
     badgeBg: '#0b0f19',
-    scoreBugMainBg: 'bg-amber-400',
-    scoreBugAccentBg: 'bg-blue-700',
+    scoreBugMainBg: 'bg-cyan-400',
+    scoreBugAccentBg: 'bg-red-600',
     scoreBugTextColor: 'text-slate-950',
   },
   asia_cup: {
