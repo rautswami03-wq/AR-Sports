@@ -1,0 +1,50 @@
+{
+  "name": "@ar-sports/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "main": "src/main/index.ts",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:next\" \"npm run dev:electron\"",
+    "dev:next": "next dev --port 3000",
+    "dev:electron": "wait-on http://localhost:3000 && electron .",
+    "build": "next build",
+    "start": "next start",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf .next out dist .turbo"
+  },
+  "dependencies": {
+    "@ar-sports/animations": "workspace:*",
+    "@ar-sports/graphics": "workspace:*",
+    "@ar-sports/hooks": "workspace:*",
+    "@ar-sports/icons": "workspace:*",
+    "@ar-sports/store": "workspace:*",
+    "@ar-sports/theme": "workspace:*",
+    "@ar-sports/types": "workspace:*",
+    "@ar-sports/ui": "workspace:*",
+    "@ar-sports/utils": "workspace:*",
+    "clsx": "^2.1.1",
+    "framer-motion": "^11.3.28",
+    "immer": "^10.1.1",
+    "next": "^14.2.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "sql.js": "^1.11.0",
+    "tailwind-merge": "^2.5.2",
+    "ws": "^8.18.0",
+    "zustand": "^4.5.5"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.14",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@types/sql.js": "^1.4.11",
+    "@types/ws": "^8.5.12",
+    "autoprefixer": "^10.4.20",
+    "concurrently": "^8.2.2",
+    "electron": "^31.3.1",
+    "postcss": "^8.4.41",
+    "tailwindcss": "^3.4.10",
+    "typescript": "^5.5.4",
+    "wait-on": "^7.2.0"
+  }
+}

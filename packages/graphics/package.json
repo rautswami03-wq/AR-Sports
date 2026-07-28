@@ -1,0 +1,26 @@
+{
+  "name": "@ar-sports/graphics",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./src/index.tsx",
+  "types": "./src/index.tsx",
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "@ar-sports/types": "workspace:*",
+    "@ar-sports/theme": "workspace:*",
+    "@ar-sports/animations": "workspace:*",
+    "@ar-sports/utils": "workspace:*",
+    "@ar-sports/icons": "workspace:*",
+    "react": "^18.3.1",
+    "framer-motion": "^11.3.28",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^2.5.2"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "typescript": "^5.5.4"
+  }
+}

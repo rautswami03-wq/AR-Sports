@@ -1,0 +1,28 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "plugins": [{ "name": "next" }],
+    "paths": {
+      "@/*": ["./src/app/*"]
+    },
+    "allowJs": true,
+    "noEmit": true,
+    "jsx": "preserve"
+  },
+  "include": [
+    "src/app/**/*",
+    "next-env.d.ts",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    ".next",
+    "src/main",
+    "src/preload"
+  ]
+}

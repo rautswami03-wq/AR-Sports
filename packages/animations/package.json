@@ -1,0 +1,17 @@
+{
+  "name": "@ar-sports/animations",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "framer-motion": "^11.3.28"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4"
+  }
+}

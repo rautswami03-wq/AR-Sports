@@ -1,0 +1,25 @@
+{
+  "name": "@ar-sports/ui",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./src/index.tsx",
+  "types": "./src/index.tsx",
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "@ar-sports/types": "workspace:*",
+    "@ar-sports/theme": "workspace:*",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.1.1",
+    "tailwind-merge": "^2.5.2"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "typescript": "^5.5.4"
+  }
+}

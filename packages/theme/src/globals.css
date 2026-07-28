@@ -1,0 +1,222 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Oswald:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap');
+
+/* ============================================================================
+   AR Sports Studio Pro — CSS Custom Properties
+   ============================================================================ */
+
+:root {
+  /* Colors — Dark theme (default) */
+  --color-primary: #1E3A5F;
+  --color-secondary: #0D1B2A;
+  --color-accent: #FFB800;
+  --color-background: #0A0E17;
+  --color-surface: #111827;
+  --color-surface-elevated: #1F2937;
+  --color-text: #F9FAFB;
+  --color-text-secondary: #D1D5DB;
+  --color-text-muted: #6B7280;
+  --color-border: #374151;
+  --color-error: #EF4444;
+  --color-warning: #F59E0B;
+  --color-success: #10B981;
+  --color-info: #3B82F6;
+
+  /* Broadcast colors */
+  --color-live: #EF4444;
+  --color-wicket: #DC2626;
+  --color-four: #2563EB;
+  --color-six: #7C3AED;
+  --color-gold: #FFB800;
+
+  /* Gradients */
+  --gradient-overlay: linear-gradient(135deg, rgba(17, 24, 39, 0.85), rgba(31, 41, 55, 0.75));
+  --gradient-gold: linear-gradient(135deg, #FFB800, #FF8C00);
+  --gradient-wicket: linear-gradient(135deg, #DC2626, #991B1B);
+  --gradient-four: linear-gradient(135deg, #2563EB, #1D4ED8);
+  --gradient-six: linear-gradient(135deg, #7C3AED, #5B21B6);
+
+  /* Blur */
+  --blur-overlay: 16px;
+  --blur-heavy: 24px;
+
+  /* Shadows */
+  --shadow-overlay: 0 8px 32px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --shadow-glow: 0 0 20px rgba(255, 184, 0, 0.3);
+
+  /* Typography */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Oswald', 'Bebas Neue', Impact, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Animation */
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+  --duration-broadcast: 800ms;
+  --easing-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --easing-decelerate: cubic-bezier(0, 0, 0.2, 1);
+  --easing-accelerate: cubic-bezier(0.4, 0, 1, 1);
+  --easing-broadcast: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Safe margins for broadcast */
+  --safe-action: 5%;
+  --safe-title: 10%;
+}
+
+/* Light theme override */
+[data-theme='light'] {
+  --color-primary: #2563EB;
+  --color-secondary: #1E40AF;
+  --color-accent: #D97706;
+  --color-background: #F8FAFC;
+  --color-surface: #FFFFFF;
+  --color-surface-elevated: #F1F5F9;
+  --color-text: #0F172A;
+  --color-text-secondary: #475569;
+  --color-text-muted: #94A3B8;
+  --color-border: #E2E8F0;
+  --color-gold: #D97706;
+
+  --gradient-overlay: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(241, 245, 249, 0.85));
+  --shadow-overlay: 0 8px 32px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+/* ============================================================================
+   Base Styles
+   ============================================================================ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--color-text);
+  background-color: var(--color-background);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+/* Selection */
+::selection {
+  background: var(--color-accent);
+  color: #000;
+}
+
+/* Focus ring */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* ============================================================================
+   Overlay Base (transparent background for browser source)
+   ============================================================================ */
+
+.overlay-root {
+  background: transparent !important;
+  overflow: hidden;
+  position: fixed;
+  inset: 0;
+}
+
+/* Safe area container for broadcast */
+.safe-area {
+  position: absolute;
+  top: var(--safe-action);
+  right: var(--safe-action);
+  bottom: var(--safe-action);
+  left: var(--safe-action);
+}
+
+.title-safe-area {
+  position: absolute;
+  top: var(--safe-title);
+  right: var(--safe-title);
+  bottom: var(--safe-title);
+  left: var(--safe-title);
+}
+
+/* ============================================================================
+   Glassmorphism Panels (for overlays on video)
+   ============================================================================ */
+
+.glass-panel {
+  background: var(--gradient-overlay);
+  backdrop-filter: blur(var(--blur-overlay));
+  -webkit-backdrop-filter: blur(var(--blur-overlay));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-overlay);
+}
+
+.glass-panel-elevated {
+  background: var(--gradient-overlay);
+  backdrop-filter: blur(var(--blur-heavy));
+  -webkit-backdrop-filter: blur(var(--blur-heavy));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-overlay);
+}
+
+/* ============================================================================
+   Utility Classes
+   ============================================================================ */
+
+.text-display {
+  font-family: var(--font-display);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.text-mono {
+  font-family: var(--font-mono);
+}
+
+.live-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.live-indicator::before {
+  content: '';
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-live);
+  animation: pulse-live 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-live {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}

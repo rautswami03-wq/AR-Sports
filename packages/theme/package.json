@@ -1,0 +1,24 @@
+{
+  "name": "@ar-sports/theme",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./tokens": "./src/tokens.ts",
+    "./tailwind-preset": "./src/tailwind-preset.ts",
+    "./globals.css": "./src/globals.css"
+  },
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist .turbo"
+  },
+  "dependencies": {
+    "@ar-sports/types": "workspace:*"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.10",
+    "typescript": "^5.5.4"
+  }
+}
