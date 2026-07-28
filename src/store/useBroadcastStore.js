@@ -278,8 +278,20 @@ export const useBroadcastStore = create((set, get) => ({
     historyStack: [],
     setWsConnected: (connected) => set({ isWsConnected: connected }),
     applyExternalState: (newState) => {
+        if (!newState || typeof newState !== 'object')
+            return;
         isReceivingBroadcast = true;
-        set((state) => ({ ...state, ...newState }));
+        set((state) => ({
+            ...state,
+            ...(newState.teamA ? { teamA: { ...state.teamA, ...newState.teamA } } : {}),
+            ...(newState.teamB ? { teamB: { ...state.teamB, ...newState.teamB } } : {}),
+            ...(newState.matchDetails ? { matchDetails: { ...state.matchDetails, ...newState.matchDetails } } : {}),
+            ...(newState.battingTeamId ? { battingTeamId: newState.battingTeamId } : {}),
+            ...(newState.bowlingTeamId ? { bowlingTeamId: newState.bowlingTeamId } : {}),
+            ...(newState.activeOverlays ? { activeOverlays: { ...state.activeOverlays, ...newState.activeOverlays } } : {}),
+            ...(newState.activeAnimation !== undefined ? { activeAnimation: newState.activeAnimation } : {}),
+            ...(newState.tournamentId ? { tournamentId: newState.tournamentId } : {}),
+        }));
         isReceivingBroadcast = false;
     },
     toggleOverlay: (type, forceState) => {
