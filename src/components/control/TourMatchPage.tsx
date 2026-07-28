@@ -19,8 +19,29 @@ export const TourMatchPage: React.FC = () => {
     addWicket,
     switchStrikers,
     updateTeamColors,
+    updateTeamDetails,
+    updateMatchSettings,
     resetMatchState,
   } = useBroadcastStore();
+
+  React.useEffect(() => {
+    if (!id || typeof window === 'undefined') return;
+    try {
+      const saved = localStorage.getItem('cricscorer_tournaments_v1');
+      if (saved) {
+        const items = JSON.parse(saved);
+        const tour = items.find((t: any) => t.id === id);
+        if (tour) {
+          updateTeamDetails('teamA', { fullName: tour.teamA });
+          updateTeamDetails('teamB', { fullName: tour.teamB });
+          updateMatchSettings({ tournament: tour.name });
+          if (tour.tossText) setTossText(tour.tossText);
+        }
+      }
+    } catch (e) {
+      console.warn('Failed to sync tour match:', e);
+    }
+  }, [id]);
 
   const [tossText, setTossText] = useState(
     `${teamB.fullName.toUpperCase()} WON THE TOSS AND OPTED TO BOWL`

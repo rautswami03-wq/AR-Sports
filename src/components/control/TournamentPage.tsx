@@ -12,26 +12,45 @@ export interface TournamentItem {
   createdAt: string;
 }
 
+const DEFAULT_TOURNAMENTS: TournamentItem[] = [
+  {
+    id: '0d840fa0-a9f4-45c2-990c-a265c4cb4sda',
+    name: 'Asthavinayak Premier League',
+    teamA: 'ASHTAVINAYAK SUPER KINGS',
+    teamB: 'ASHTAVINAYAK INDIANS',
+    tossText: 'ASHTAVINAYAK INDIANS WON THE TOSS AND OPTED TO BOWL',
+    createdAt: '2026-07-24',
+  },
+  {
+    id: 'tourn_ipl_2026',
+    name: 'T20 World Trophy Final 2026',
+    teamA: 'INDIA',
+    teamB: 'AUSTRALIA',
+    tossText: 'AUSTRALIA WON THE TOSS AND OPTED TO BOWL',
+    createdAt: '2026-07-24',
+  },
+];
+
 export const TournamentPage: React.FC = () => {
   const navigate = useNavigate();
-  const [tournaments, setTournaments] = useState<TournamentItem[]>([
-    {
-      id: '0d840fa0-a9f4-45c2-990c-a265c4cb4sda',
-      name: 'Asthavinayak Premier League',
-      teamA: 'ASHTAVINAYAK SUPER KINGS',
-      teamB: 'ASHTAVINAYAK INDIANS',
-      tossText: 'ASHTAVINAYAK INDIANS WON THE TOSS AND OPTED TO BOWL',
-      createdAt: '2026-07-24',
-    },
-    {
-      id: 'tourn_ipl_2026',
-      name: 'T20 World Trophy Final 2026',
-      teamA: 'INDIA',
-      teamB: 'AUSTRALIA',
-      tossText: 'AUSTRALIA WON THE TOSS AND OPTED TO BOWL',
-      createdAt: '2026-07-24',
-    },
-  ]);
+  const [tournaments, setTournaments] = useState<TournamentItem[]>(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem('cricscorer_tournaments_v1');
+        if (saved) return JSON.parse(saved);
+      } catch (e) {
+        console.warn('Failed to load tournaments:', e);
+      }
+    }
+    return DEFAULT_TOURNAMENTS;
+  });
+
+  const saveTournaments = (items: TournamentItem[]) => {
+    setTournaments(items);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('cricscorer_tournaments_v1', JSON.stringify(items));
+    }
+  };
 
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newTourName, setNewTourName] = useState('');
@@ -51,7 +70,8 @@ export const TournamentPage: React.FC = () => {
       createdAt: new Date().toISOString().split('T')[0],
     };
 
-    setTournaments([newItem, ...tournaments]);
+    const updatedList = [newItem, ...tournaments];
+    saveTournaments(updatedList);
     setShowCreateModal(false);
     setNewTourName('');
     setNewTeamA('');
@@ -61,7 +81,7 @@ export const TournamentPage: React.FC = () => {
   };
 
   const handleDelete = (id: string) => {
-    setTournaments(tournaments.filter((t) => t.id !== id));
+    saveTournaments(tournaments.filter((t) => t.id !== id));
   };
 
   return (

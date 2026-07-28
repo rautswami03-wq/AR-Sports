@@ -1,12 +1,33 @@
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useBroadcastStore } from '../../store/useBroadcastStore';
 import { Send, ChevronDown, ChevronUp } from 'lucide-react';
 import { CricNavbar } from '../common/CricNavbar';
 export const TourMatchPage = () => {
     const { id } = useParams();
-    const { teamA, teamB, matchDetails, activeOverlays, toggleOverlay, triggerAnimation, addRuns, addExtra, addWicket, switchStrikers, updateTeamColors, resetMatchState, } = useBroadcastStore();
+    const { teamA, teamB, matchDetails, activeOverlays, toggleOverlay, triggerAnimation, addRuns, addExtra, addWicket, switchStrikers, updateTeamColors, updateTeamDetails, updateMatchSettings, resetMatchState, } = useBroadcastStore();
+    React.useEffect(() => {
+        if (!id || typeof window === 'undefined')
+            return;
+        try {
+            const saved = localStorage.getItem('cricscorer_tournaments_v1');
+            if (saved) {
+                const items = JSON.parse(saved);
+                const tour = items.find((t) => t.id === id);
+                if (tour) {
+                    updateTeamDetails('teamA', { fullName: tour.teamA });
+                    updateTeamDetails('teamB', { fullName: tour.teamB });
+                    updateMatchSettings({ tournament: tour.name });
+                    if (tour.tossText)
+                        setTossText(tour.tossText);
+                }
+            }
+        }
+        catch (e) {
+            console.warn('Failed to sync tour match:', e);
+        }
+    }, [id]);
     const [tossText, setTossText] = useState(`${teamB.fullName.toUpperCase()} WON THE TOSS AND OPTED TO BOWL`);
     const [currentInningsText, setCurrentInningsText] = useState('Start 1st Inning');
     const [editingShortNames, setEditingShortNames] = useState(false);
