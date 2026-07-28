@@ -87,6 +87,9 @@ export const ControlStudio = () => {
         { id: 'sponsorGraphics', label: 'Sponsor Banner' },
         { id: 'countdown', label: 'Match Countdown' },
         { id: 'replayLowerThird', label: 'Replay Banner' },
+        { id: 'superOver', label: 'Super Over Special' },
+        { id: 'wagonWheel', label: 'Wagon Wheel Radar' },
+        { id: 'manOfTheMatchCard', label: 'MOM Trophy Full Card' },
     ];
     const animationList = [
         { id: 'FREE_HIT', label: 'FREE HIT', color: 'bg-emerald-600 text-white' },
@@ -95,6 +98,8 @@ export const ControlStudio = () => {
         { id: 'FOUR', label: 'FOUR (4)', color: 'bg-amber-500 text-slate-950' },
         { id: 'SIX', label: 'SIX (6)', color: 'bg-purple-600 text-white' },
         { id: 'WICKET', label: 'WICKET', color: 'bg-red-600 text-white' },
+        { id: 'FIFTY', label: 'HALF CENTURY (50)', color: 'bg-amber-400 text-slate-950' },
+        { id: 'CENTURY', label: 'CENTURY (100)', color: 'bg-yellow-300 text-slate-950' },
         { id: 'POWERPLAY', label: 'POWERPLAY', color: 'bg-orange-500 text-white' },
         { id: 'STRATEGIC_TIMEOUT', label: 'TIMEOUT', color: 'bg-slate-700 text-white' },
         { id: 'DRINKS_BREAK', label: 'DRINKS', color: 'bg-sky-600 text-white' },

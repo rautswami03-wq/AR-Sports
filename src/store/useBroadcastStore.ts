@@ -272,6 +272,9 @@ const INITIAL_OVERLAYS: Record<OverlayType, boolean> = {
   groupPt6: false,
   groupPt7: false,
   groupPt8: false,
+  superOver: false,
+  wagonWheel: false,
+  manOfTheMatchCard: false,
 };
 
 // Initial state loader from LocalStorage
@@ -423,8 +426,21 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
       return nextState;
     });
 
-    if (boundaryType === 4) get().triggerAnimation('FOUR', 3500);
-    if (boundaryType === 6) get().triggerAnimation('SIX', 4500);
+    let milestoneReached: 'FIFTY' | 'CENTURY' | null = null;
+    const currentBatters = (get().battingTeamId === get().teamA.id ? get().teamA : get().teamB).batters;
+    const currentStriker = currentBatters.find((b) => b.isStriker);
+    const prevRuns = currentStriker?.runs || 0;
+    const newRuns = prevRuns + runs;
+
+    if (prevRuns < 50 && newRuns >= 50 && newRuns < 100) milestoneReached = 'FIFTY';
+    if (prevRuns < 100 && newRuns >= 100) milestoneReached = 'CENTURY';
+
+    if (milestoneReached) {
+      get().triggerAnimation(milestoneReached, 5000);
+    } else {
+      if (boundaryType === 4) get().triggerAnimation('FOUR', 3500);
+      if (boundaryType === 6) get().triggerAnimation('SIX', 4500);
+    }
   },
 
   addExtra: (extraType, extraRuns = 1) => {

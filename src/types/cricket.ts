@@ -165,7 +165,10 @@ export type OverlayType =
   | 'groupPt5'
   | 'groupPt6'
   | 'groupPt7'
-  | 'groupPt8';
+  | 'groupPt8'
+  | 'superOver'
+  | 'wagonWheel'
+  | 'manOfTheMatchCard';
 
 export type EventAnimationType =
   | 'FOUR'
@@ -179,4 +182,6 @@ export type EventAnimationType =
   | 'DRINKS_BREAK'
   | 'END_OF_INNINGS'
   | 'MATCH_WINNER'
+  | 'FIFTY'
+  | 'CENTURY'
   | null;

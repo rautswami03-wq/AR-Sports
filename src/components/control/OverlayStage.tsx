@@ -31,6 +31,9 @@ import { PointsTableOverlay } from '../overlays/PointsTableOverlay';
 import { SponsorGraphicsOverlay } from '../overlays/SponsorGraphicsOverlay';
 import { CountdownOverlay } from '../overlays/CountdownOverlay';
 import { ReplayLowerThird } from '../overlays/ReplayLowerThird';
+import { SuperOverOverlay } from '../overlays/SuperOverOverlay';
+import { WagonWheelOverlay } from '../overlays/WagonWheelOverlay';
+import { ManOfTheMatchCardOverlay } from '../overlays/ManOfTheMatchCardOverlay';
 
 // Animations
 import { FourAnimation } from '../animations/FourAnimation';
@@ -44,6 +47,8 @@ import { StrategicTimeoutAnimation } from '../animations/StrategicTimeoutAnimati
 import { DrinksBreakAnimation } from '../animations/DrinksBreakAnimation';
 import { EndOfInningsAnimation } from '../animations/EndOfInningsAnimation';
 import { MatchWinnerAnimation } from '../animations/MatchWinnerAnimation';
+import { FiftyAnimation } from '../animations/FiftyAnimation';
+import { CenturyAnimation } from '../animations/CenturyAnimation';
 
 interface OverlayStageProps {
   scale?: number;
@@ -234,6 +239,9 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
         {isVisible('sponsorGraphics') && <SponsorGraphicsOverlay key="sponsors" />}
         {isVisible('countdown') && <CountdownOverlay key="countdown" />}
         {isVisible('replayLowerThird') && <ReplayLowerThird key="replay" />}
+        {isVisible('superOver') && <SuperOverOverlay key="superOver" />}
+        {isVisible('wagonWheel') && <WagonWheelOverlay key="wagonWheel" />}
+        {isVisible('manOfTheMatchCard') && <ManOfTheMatchCardOverlay key="momCard" />}
 
         {/* Animations */}
         {activeAnimation === 'FOUR' && <FourAnimation key="animFour" />}
@@ -247,6 +255,8 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
         {activeAnimation === 'DRINKS_BREAK' && <DrinksBreakAnimation key="animDrinks" />}
         {activeAnimation === 'END_OF_INNINGS' && <EndOfInningsAnimation key="animInnings" />}
         {activeAnimation === 'MATCH_WINNER' && <MatchWinnerAnimation key="animMatchWinner" />}
+        {activeAnimation === 'FIFTY' && <FiftyAnimation key="animFifty" />}
+        {activeAnimation === 'CENTURY' && <CenturyAnimation key="animCentury" />}
       </AnimatePresence>
     </div>
   );
