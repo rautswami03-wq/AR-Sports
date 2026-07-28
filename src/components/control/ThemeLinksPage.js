@@ -19,6 +19,9 @@ export const THEME_LINKS_DATA = [
     { id: '14', name: 'BBL Star Sports', server1Url: '/#/overlay?theme=bbl_star&server=1', server2Url: '/#/overlay?theme=bbl_star&server=2', mobileUrl: '/#/overlay?theme=bbl_star&mobile=true' },
     { id: '15', name: 'IPL 25', server1Url: '/#/overlay?theme=ipl25&server=1', server2Url: '/#/overlay?theme=ipl25&server=2', mobileUrl: '/#/overlay?theme=ipl25&mobile=true' },
     { id: '16', name: 'CricPic Theme', server1Url: '/#/overlay?theme=cricpic&server=1', server2Url: '/#/overlay?theme=cricpic&server=2', mobileUrl: '/#/overlay?theme=cricpic&mobile=true', badge: 'TOP' },
+    { id: '17', name: 'CWC 23 India (Diwali Edition)', server1Url: '/#/overlay?theme=cwc23_diwali&server=1', server2Url: '/#/overlay?theme=cwc23_diwali&server=2', mobileUrl: '/#/overlay?theme=cwc23_diwali&mobile=true', badge: 'SPECIAL' },
+    { id: '18', name: 'BBL White', server1Url: '/#/overlay?theme=bbl_white&server=1', server2Url: '/#/overlay?theme=bbl_white&server=2', mobileUrl: '/#/overlay?theme=bbl_white&mobile=true' },
+    { id: '19', name: 'ICC T20 World Cup 2020', server1Url: '/#/overlay?theme=cwc_t20_2020&server=1', server2Url: '/#/overlay?theme=cwc_t20_2020&server=2', mobileUrl: '/#/overlay?theme=cwc_t20_2020&mobile=true' },
 ];
 export const ThemeLinksPage = () => {
     const [copiedKey, setCopiedKey] = useState(null);
