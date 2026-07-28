@@ -1,12 +1,12 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { HardDrive, ShieldCheck, Tv, Radio, Palette, Trophy, Home } from 'lucide-react';
+import { HardDrive, ShieldCheck, Tv, Radio, Palette, Trophy, Home, Sliders } from 'lucide-react';
 
 export const CricNavbar: React.FC = () => {
   const location = useLocation();
 
   const isActive = (path: string) => {
-    if (path === '/' && (location.pathname === '/' || location.pathname === '/control')) return true;
+    if (path === '/' && location.pathname === '/') return true;
     return location.pathname.startsWith(path) && path !== '/';
   };
 
@@ -27,6 +27,14 @@ export const CricNavbar: React.FC = () => {
             }`}
           >
             <Home className="w-4 h-4" /> Home
+          </Link>
+          <Link
+            to="/control"
+            className={`flex items-center gap-1.5 transition-all ${
+              location.pathname === '/control' ? 'text-cyan-400 border-b-2 border-cyan-400 pb-1 font-extrabold' : 'hover:text-cyan-300'
+            }`}
+          >
+            <Sliders className="w-4 h-4 text-emerald-400" /> Control Studio
           </Link>
           <Link
             to="/tournament"

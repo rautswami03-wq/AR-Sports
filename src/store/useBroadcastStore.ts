@@ -45,6 +45,7 @@ export interface BroadcastStoreState {
   updateBowlerStats: (bowlerId: string, updates: Partial<Team['bowlers'][0]>) => void;
   updateTeamColors: (teamId: 'teamA' | 'teamB', primary: string, secondary: string, accent?: string) => void;
   setTournament: (tournamentId: string) => void;
+  setTournamentId: (tournamentId: string) => void;
   resetMatchState: () => void;
   applyExternalState: (newState: Partial<BroadcastStoreState>) => void;
   setWsConnected: (connected: boolean) => void;
@@ -720,6 +721,13 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
   },
 
   setTournament: (tournamentId) => {
+    set((state) => {
+      postStateSync({ ...state, tournamentId });
+      return { tournamentId };
+    });
+  },
+
+  setTournamentId: (tournamentId) => {
     set((state) => {
       postStateSync({ ...state, tournamentId });
       return { tournamentId };

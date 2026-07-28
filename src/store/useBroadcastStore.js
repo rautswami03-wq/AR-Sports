@@ -637,6 +637,12 @@ export const useBroadcastStore = create((set, get) => ({
             return { tournamentId };
         });
     },
+    setTournamentId: (tournamentId) => {
+        set((state) => {
+            postStateSync({ ...state, tournamentId });
+            return { tournamentId };
+        });
+    },
     resetMatchState: () => {
         const defaultState = {
             teamA: DEFAULT_TEAM_A,
