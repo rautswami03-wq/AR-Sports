@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { EventAnimationType, MatchDetails, OverlayType, Team } from '../types/cricket';
 import { PRESET_TEAMS } from '../theme/presetThemes';
+import { publishLiveMatchState } from '../services/firebase';
 
 export interface HistorySnapshot {
   teamA: Team;
@@ -104,6 +105,13 @@ function postStateSync(state: any) {
     } catch (e) {
       console.warn('WebSocket send warning:', e);
     }
+  }
+
+  // 4. Post to Firebase Cloud Firestore
+  try {
+    publishLiveMatchState('live_match_default', syncPayload);
+  } catch (e) {
+    console.warn('Firebase publish notice:', e);
   }
 }
 

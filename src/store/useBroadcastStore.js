@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { PRESET_TEAMS } from '../theme/presetThemes';
+import { publishLiveMatchState } from '../services/firebase';
 const STORAGE_KEY = 'cricscorer_match_state_v2';
 const broadcastChannel = typeof window !== 'undefined' && 'BroadcastChannel' in window
     ? new BroadcastChannel('cricscorer_overlay_channel_v2')
@@ -53,6 +54,13 @@ function postStateSync(state) {
         catch (e) {
             console.warn('WebSocket send warning:', e);
         }
+    }
+    // 4. Post to Firebase Cloud Firestore
+    try {
+        publishLiveMatchState('live_match_default', syncPayload);
+    }
+    catch (e) {
+        console.warn('Firebase publish notice:', e);
     }
 }
 const DEFAULT_TEAM_A = {

@@ -2,6 +2,7 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 import { useEffect, useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useBroadcastStore } from '../../store/useBroadcastStore';
+import { subscribeToLiveMatch } from '../../services/firebase';
 // Overlays
 import { LiveScoreBug } from '../overlays/LiveScoreBug';
 import { BattingLowerThird } from '../overlays/BattingLowerThird';
@@ -102,7 +103,19 @@ export const OverlayStage = ({ scale = 1 }) => {
                 console.warn('BroadcastChannel notice:', e);
             }
         }
-        // 5. WebSocket Connection
+        // 5. Firebase Cloud Firestore Listener (Remote/Internet Real-Time Cloud Sync)
+        let unsubFirebase = null;
+        try {
+            unsubFirebase = subscribeToLiveMatch('live_match_default', (data) => {
+                if (data) {
+                    useBroadcastStore.getState().applyExternalState(data);
+                }
+            });
+        }
+        catch (e) {
+            console.warn('Firebase subscribe notice:', e);
+        }
+        // 6. WebSocket Connection
         if (wsConnectedRef.current) {
             return () => {
                 clearInterval(pollInterval);
@@ -110,6 +123,8 @@ export const OverlayStage = ({ scale = 1 }) => {
                 window.removeEventListener('cricscorer_local_update', handleCustomSync);
                 if (bc)
                     bc.close();
+                if (unsubFirebase)
+                    unsubFirebase();
             };
         }
         wsConnectedRef.current = true;
@@ -160,6 +175,8 @@ export const OverlayStage = ({ scale = 1 }) => {
             window.removeEventListener('cricscorer_local_update', handleCustomSync);
             if (bc)
                 bc.close();
+            if (unsubFirebase)
+                unsubFirebase();
             wsConnectedRef.current = false;
             if (ws)
                 ws.close();
