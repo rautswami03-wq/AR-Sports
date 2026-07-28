@@ -52,12 +52,11 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
   const { activeOverlays, activeAnimation } = useBroadcastStore();
   const wsConnectedRef = useRef(false);
 
-  // Real-time synchronization for OBS Studio & Browser Sources (WebSocket + LocalStorage Polling + BroadcastChannel)
+  // Instant real-time sync for OBS Studio & Browser Sources
   useEffect(() => {
     let lastSavedRaw = '';
 
-    // 1. Polling LocalStorage (Guarantees OBS Studio updates even when offline or sandboxed)
-    const pollInterval = setInterval(() => {
+    const syncFromStorage = () => {
       if (typeof window === 'undefined') return;
       try {
         const raw = localStorage.getItem('cricscorer_match_state_v2');
@@ -69,9 +68,37 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
       } catch (e) {
         console.warn('Storage polling notice:', e);
       }
-    }, 250);
+    };
 
-    // 2. BroadcastChannel Listener
+    // Initial sync immediately on load
+    syncFromStorage();
+
+    // 1. Ultra-fast Polling (Every 100ms guarantees OBS updates without delay)
+    const pollInterval = setInterval(syncFromStorage, 100);
+
+    // 2. Storage Event Listener (Cross-tab/Window Instant Trigger)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'cricscorer_match_state_v2' && e.newValue) {
+        try {
+          const parsed = JSON.parse(e.newValue);
+          useBroadcastStore.getState().applyExternalState(parsed);
+        } catch (err) {
+          console.warn('Storage event sync notice:', err);
+        }
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+
+    // 3. Custom Window Event Listener (Same Window/Preview Instant Sync)
+    const handleCustomSync = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      if (customEvent.detail) {
+        useBroadcastStore.getState().applyExternalState(customEvent.detail);
+      }
+    };
+    window.addEventListener('cricscorer_local_update', handleCustomSync);
+
+    // 4. BroadcastChannel Listener
     let bc: BroadcastChannel | null = null;
     if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
       try {
@@ -86,10 +113,12 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
       }
     }
 
-    // 3. WebSocket Connection
+    // 5. WebSocket Connection
     if (wsConnectedRef.current) {
       return () => {
         clearInterval(pollInterval);
+        window.removeEventListener('storage', handleStorageChange);
+        window.removeEventListener('cricscorer_local_update', handleCustomSync);
         if (bc) bc.close();
       };
     }
@@ -140,6 +169,8 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
 
     return () => {
       clearInterval(pollInterval);
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('cricscorer_local_update', handleCustomSync);
       if (bc) bc.close();
       wsConnectedRef.current = false;
       if (ws) ws.close();
@@ -161,7 +192,7 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
       style={{ transform: scale !== 1 ? `scale(${scale})` : undefined }}
     >
       <AnimatePresence mode="sync">
-        {/* 26 Overlays */}
+        {/* Overlays */}
         {isVisible('scoreBug') && <LiveScoreBug key="scoreBug" />}
         {isVisible('battingLowerThird') && <BattingLowerThird key="battingL3" />}
         {isVisible('bowlingLowerThird') && <BowlingLowerThird key="bowlingL3" />}
@@ -189,7 +220,7 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
         {isVisible('countdown') && <CountdownOverlay key="countdown" />}
         {isVisible('replayLowerThird') && <ReplayLowerThird key="replay" />}
 
-        {/* 11 Animations */}
+        {/* Animations */}
         {activeAnimation === 'FOUR' && <FourAnimation key="animFour" />}
         {activeAnimation === 'SIX' && <SixAnimation key="animSix" />}
         {activeAnimation === 'WICKET' && <WicketAnimation key="animWicket" />}

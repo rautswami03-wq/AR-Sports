@@ -44,11 +44,10 @@ import { MatchWinnerAnimation } from '../animations/MatchWinnerAnimation';
 export const OverlayStage = ({ scale = 1 }) => {
     const { activeOverlays, activeAnimation } = useBroadcastStore();
     const wsConnectedRef = useRef(false);
-    // Real-time synchronization for OBS Studio & Browser Sources (WebSocket + LocalStorage Polling + BroadcastChannel)
+    // Instant real-time sync for OBS Studio & Browser Sources
     useEffect(() => {
         let lastSavedRaw = '';
-        // 1. Polling LocalStorage (Guarantees OBS Studio updates even when offline or sandboxed)
-        const pollInterval = setInterval(() => {
+        const syncFromStorage = () => {
             if (typeof window === 'undefined')
                 return;
             try {
@@ -62,8 +61,33 @@ export const OverlayStage = ({ scale = 1 }) => {
             catch (e) {
                 console.warn('Storage polling notice:', e);
             }
-        }, 250);
-        // 2. BroadcastChannel Listener
+        };
+        // Initial sync immediately on load
+        syncFromStorage();
+        // 1. Ultra-fast Polling (Every 100ms guarantees OBS updates without delay)
+        const pollInterval = setInterval(syncFromStorage, 100);
+        // 2. Storage Event Listener (Cross-tab/Window Instant Trigger)
+        const handleStorageChange = (e) => {
+            if (e.key === 'cricscorer_match_state_v2' && e.newValue) {
+                try {
+                    const parsed = JSON.parse(e.newValue);
+                    useBroadcastStore.getState().applyExternalState(parsed);
+                }
+                catch (err) {
+                    console.warn('Storage event sync notice:', err);
+                }
+            }
+        };
+        window.addEventListener('storage', handleStorageChange);
+        // 3. Custom Window Event Listener (Same Window/Preview Instant Sync)
+        const handleCustomSync = (e) => {
+            const customEvent = e;
+            if (customEvent.detail) {
+                useBroadcastStore.getState().applyExternalState(customEvent.detail);
+            }
+        };
+        window.addEventListener('cricscorer_local_update', handleCustomSync);
+        // 4. BroadcastChannel Listener
         let bc = null;
         if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
             try {
@@ -78,10 +102,12 @@ export const OverlayStage = ({ scale = 1 }) => {
                 console.warn('BroadcastChannel notice:', e);
             }
         }
-        // 3. WebSocket Connection
+        // 5. WebSocket Connection
         if (wsConnectedRef.current) {
             return () => {
                 clearInterval(pollInterval);
+                window.removeEventListener('storage', handleStorageChange);
+                window.removeEventListener('cricscorer_local_update', handleCustomSync);
                 if (bc)
                     bc.close();
             };
@@ -130,6 +156,8 @@ export const OverlayStage = ({ scale = 1 }) => {
         }
         return () => {
             clearInterval(pollInterval);
+            window.removeEventListener('storage', handleStorageChange);
+            window.removeEventListener('cricscorer_local_update', handleCustomSync);
             if (bc)
                 bc.close();
             wsConnectedRef.current = false;

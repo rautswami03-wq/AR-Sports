@@ -71,10 +71,11 @@ function postStateSync(state: any) {
     tournamentId: state.tournamentId,
   };
 
-  // 1. Save to LocalStorage
+  // 1. Save to LocalStorage & Dispatch Local Event
   if (typeof window !== 'undefined') {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(syncPayload));
+      window.dispatchEvent(new CustomEvent('cricscorer_local_update', { detail: syncPayload }));
     } catch (e) {
       console.warn('LocalStorage save warning:', e);
     }
@@ -548,10 +549,15 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
 
   updateTeamDetails: (targetTeam, details) => {
     set((state) => {
+      const newFullName = details.fullName !== undefined ? details.fullName : state[targetTeam].fullName;
+      let newShortName = details.shortName !== undefined ? details.shortName : state[targetTeam].shortName;
+      if (details.fullName && (!details.shortName || details.shortName === state[targetTeam].shortName)) {
+        newShortName = newFullName.split(' ').map((word) => word[0]).join('').substring(0, 4).toUpperCase() || newFullName.substring(0, 3).toUpperCase();
+      }
       const updatedTeam = {
         ...state[targetTeam],
-        fullName: details.fullName !== undefined ? details.fullName : state[targetTeam].fullName,
-        shortName: details.shortName !== undefined ? details.shortName : state[targetTeam].shortName,
+        fullName: newFullName,
+        shortName: newShortName,
         logoUrl: details.logoUrl !== undefined ? details.logoUrl : state[targetTeam].logoUrl,
       };
       const nextState = { [targetTeam]: updatedTeam };
