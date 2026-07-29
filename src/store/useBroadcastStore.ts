@@ -933,10 +933,25 @@ function initWebSocketClient() {
   if (typeof window === 'undefined') return;
 
   const RENDER_WS_URL = 'wss://websocket-36f4.onrender.com';
+  const RENDER_HTTP_URL = 'https://websocket-36f4.onrender.com';
   const wsUrl = window.location.protocol === 'https:' ? RENDER_WS_URL : (import.meta.env.VITE_WS_URL || RENDER_WS_URL);
+
+  // Keepalive ping to prevent Render free-tier container from sleeping
+  const pingRenderHost = () => {
+    try {
+      fetch(RENDER_HTTP_URL, { mode: 'no-cors' }).catch(() => {});
+    } catch (e) {}
+  };
+
+  pingRenderHost();
+  setInterval(pingRenderHost, 30000);
 
   function connect() {
     try {
+      if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) {
+        return;
+      }
+
       socket = new WebSocket(wsUrl);
 
       socket.onopen = () => {
@@ -983,7 +998,7 @@ function initWebSocketClient() {
 
       socket.onclose = () => {
         useBroadcastStore.getState().setWsConnected(false);
-        setTimeout(connect, 5000);
+        setTimeout(connect, 2000);
       };
 
       socket.onerror = () => {
@@ -991,7 +1006,7 @@ function initWebSocketClient() {
       };
     } catch (err) {
       console.warn('WebSocket init exception:', err);
-      setTimeout(connect, 5000);
+      setTimeout(connect, 2000);
     }
   }
 
