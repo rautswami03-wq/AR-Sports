@@ -4,6 +4,7 @@ import { ControlStudio } from './components/control/ControlStudio';
 import { OverlayStage } from './components/control/OverlayStage';
 import { ThemeLinksPage } from './components/control/ThemeLinksPage';
 import { TournamentPage } from './components/control/TournamentPage';
+import { TournamentDetailPage } from './components/control/TournamentDetailPage';
 import { TourMatchPage } from './components/control/TourMatchPage';
 
 export default function App() {
@@ -36,7 +37,9 @@ export default function App() {
       <Route path="/" element={<ControlStudio />} />
       <Route path="/control" element={<ControlStudio />} />
       <Route path="/tournament" element={<TournamentPage />} />
-      <Route path="/tournament/:id" element={<TourMatchPage />} />
+      <Route path="/tournament/:id" element={<TournamentDetailPage />} />
+      <Route path="/tournament/:tourId/match/:id" element={<TourMatchPage />} />
+      <Route path="/match/:id" element={<TourMatchPage />} />
       <Route path="/theme_links" element={<ThemeLinksPage />} />
       <Route path="/themes" element={<ThemeLinksPage />} />
       <Route

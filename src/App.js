@@ -5,6 +5,7 @@ import { ControlStudio } from './components/control/ControlStudio';
 import { OverlayStage } from './components/control/OverlayStage';
 import { ThemeLinksPage } from './components/control/ThemeLinksPage';
 import { TournamentPage } from './components/control/TournamentPage';
+import { TournamentDetailPage } from './components/control/TournamentDetailPage';
 import { TourMatchPage } from './components/control/TourMatchPage';
 export default function App() {
     const location = useLocation();
@@ -28,5 +29,5 @@ export default function App() {
             document.documentElement.style.setProperty('background', '#070b15');
         }
     }, [location.pathname, location.hash]);
-    return (_jsxs(Routes, { children: [_jsx(Route, { path: "/", element: _jsx(ControlStudio, {}) }), _jsx(Route, { path: "/control", element: _jsx(ControlStudio, {}) }), _jsx(Route, { path: "/tournament", element: _jsx(TournamentPage, {}) }), _jsx(Route, { path: "/tournament/:id", element: _jsx(TourMatchPage, {}) }), _jsx(Route, { path: "/theme_links", element: _jsx(ThemeLinksPage, {}) }), _jsx(Route, { path: "/themes", element: _jsx(ThemeLinksPage, {}) }), _jsx(Route, { path: "/overlay", element: _jsx("div", { className: "w-full h-full bg-transparent overflow-hidden flex items-center justify-center", children: _jsx(OverlayStage, {}) }) }), _jsx(Route, { path: "/theme/:themeId", element: _jsx("div", { className: "w-full h-full bg-transparent overflow-hidden flex items-center justify-center", children: _jsx(OverlayStage, {}) }) }), _jsx(Route, { path: "/theme/:themeId/:matchId", element: _jsx("div", { className: "w-full h-full bg-transparent overflow-hidden flex items-center justify-center", children: _jsx(OverlayStage, {}) }) })] }));
+    return (_jsxs(Routes, { children: [_jsx(Route, { path: "/", element: _jsx(ControlStudio, {}) }), _jsx(Route, { path: "/control", element: _jsx(ControlStudio, {}) }), _jsx(Route, { path: "/tournament", element: _jsx(TournamentPage, {}) }), _jsx(Route, { path: "/tournament/:id", element: _jsx(TournamentDetailPage, {}) }), _jsx(Route, { path: "/tournament/:tourId/match/:id", element: _jsx(TourMatchPage, {}) }), _jsx(Route, { path: "/match/:id", element: _jsx(TourMatchPage, {}) }), _jsx(Route, { path: "/theme_links", element: _jsx(ThemeLinksPage, {}) }), _jsx(Route, { path: "/themes", element: _jsx(ThemeLinksPage, {}) }), _jsx(Route, { path: "/overlay", element: _jsx("div", { className: "w-full h-full bg-transparent overflow-hidden flex items-center justify-center", children: _jsx(OverlayStage, {}) }) }), _jsx(Route, { path: "/theme/:themeId", element: _jsx("div", { className: "w-full h-full bg-transparent overflow-hidden flex items-center justify-center", children: _jsx(OverlayStage, {}) }) }), _jsx(Route, { path: "/theme/:themeId/:matchId", element: _jsx("div", { className: "w-full h-full bg-transparent overflow-hidden flex items-center justify-center", children: _jsx(OverlayStage, {}) }) })] }));
 }
