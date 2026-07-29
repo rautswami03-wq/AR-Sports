@@ -12,29 +12,66 @@ const firebaseConfig = {
 };
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
 export const db = getFirestore(app);
+const RTDB_URL = 'https://cricscore-dcaa4-default-rtdb.firebaseio.com/matches/live_match_default.json';
 export function subscribeToLiveMatch(matchId, onUpdate) {
+    let unsubFirestore = () => { };
     try {
         const matchDoc = doc(db, 'matches', matchId);
-        return onSnapshot(matchDoc, (snapshot) => {
+        unsubFirestore = onSnapshot(matchDoc, (snapshot) => {
             if (snapshot.exists()) {
                 onUpdate(snapshot.data());
             }
         }, (error) => {
-            console.warn('Firebase snapshot listener notice (using local offline state):', error.message);
+            console.warn('Firestore snapshot notice:', error.message);
         });
     }
     catch (err) {
-        console.warn('Firebase connection notice (using local state fallback):', err);
-        return () => { };
+        console.warn('Firestore connection notice:', err);
     }
+    // Ultra-Fast RTDB REST Polling (Guarantees OBS Studio Software Sync Across Applications)
+    let lastRtdbJson = '';
+    const pollRtdb = async () => {
+        try {
+            const res = await fetch(RTDB_URL);
+            if (res.ok) {
+                const text = await res.text();
+                if (text && text !== lastRtdbJson && text !== 'null') {
+                    lastRtdbJson = text;
+                    const parsed = JSON.parse(text);
+                    onUpdate(parsed);
+                }
+            }
+        }
+        catch (e) {
+            // Network fallback
+        }
+    };
+    pollRtdb();
+    const pollInterval = setInterval(pollRtdb, 500);
+    return () => {
+        unsubFirestore();
+        clearInterval(pollInterval);
+    };
 }
 export async function publishLiveMatchState(matchId, state) {
+    const cleanState = JSON.parse(JSON.stringify(state));
+    // 1. Publish to Firestore
     try {
         const matchDoc = doc(db, 'matches', matchId);
-        const cleanState = JSON.parse(JSON.stringify(state));
         await setDoc(matchDoc, cleanState, { merge: true });
     }
     catch (err) {
-        console.warn('Firebase publish notice (saved locally in Zustand):', err);
+        console.warn('Firestore publish notice:', err);
+    }
+    // 2. Publish to Realtime DB REST Endpoint (Guarantees OBS Studio Software Sync!)
+    try {
+        await fetch(RTDB_URL, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(cleanState),
+        });
+    }
+    catch (err) {
+        console.warn('RTDB publish notice:', err);
     }
 }
