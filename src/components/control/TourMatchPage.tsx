@@ -127,7 +127,7 @@ export const TourMatchPage: React.FC = () => {
   const [team2Color, setTeam2Color] = useState(teamB.primaryColor);
 
   const handleSendUpdate = () => {
-    alert('Broadcast match update sent to OBS Studio!');
+    useBroadcastStore.getState().toggleOverlay('scoreBug', true);
   };
 
   const handleChangeToss = () => {
@@ -135,15 +135,16 @@ export const TourMatchPage: React.FC = () => {
   };
 
   const toggleInnings = () => {
-    startSecondInnings();
-    setCurrentInningsText('2nd Innings Active');
-    alert(`2nd Innings Started! Target: ${matchDetails.targetRuns || 'Calculated'}`);
+    if (matchDetails.currentInnings === 1) {
+      setShowTossModal(true);
+    } else {
+      startSecondInnings();
+    }
   };
 
   const handleSaveTeamColors = () => {
     updateTeamColors('teamA', team1Color, teamA.secondaryColor);
     updateTeamColors('teamB', team2Color, teamB.secondaryColor);
-    alert('Team colors saved!');
   };
 
   const displayButtons: { id: OverlayType; label: string; bg: string }[] = [
@@ -374,10 +375,10 @@ export const TourMatchPage: React.FC = () => {
             onClick={toggleInnings}
             className="py-3.5 bg-slate-900 border-2 border-red-500 hover:border-red-400 text-white font-black text-base rounded-2xl shadow-[0_0_20px_rgba(239,68,68,0.5)] active:scale-95 transition-all uppercase tracking-wider"
           >
-            {currentInningsText}
+            {matchDetails.currentInnings === 1 ? 'START 1ST INNINGS' : '2ND INNINGS ACTIVE'}
           </button>
           <button
-            onClick={() => alert(`Tournament Name: ${matchDetails.tournament}`)}
+            onClick={() => toggleOverlay('matchSummary')}
             className="py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-black text-base rounded-2xl shadow-lg active:scale-95 transition-all uppercase tracking-wider"
           >
             Tour Name
@@ -437,7 +438,7 @@ export const TourMatchPage: React.FC = () => {
               className="flex-1 bg-slate-950 border border-slate-700 px-4 py-2 rounded-xl text-white text-sm font-bold focus:outline-none focus:border-cyan-400"
             />
             <button
-              onClick={() => alert(`Displayed Custom Banner: ${customInputText}`)}
+              onClick={() => updateMatchSettings({ customInputText })}
               className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs px-5 py-2.5 rounded-xl uppercase tracking-wider"
             >
               Display Input
