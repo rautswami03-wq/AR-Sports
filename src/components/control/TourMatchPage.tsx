@@ -99,7 +99,9 @@ export const TourMatchPage: React.FC = () => {
         const items = JSON.parse(saved);
         const tour = items.find((t: any) => t.id === id);
         if (tour) {
-          startNewMatchWithTeams(tour.teamA, tour.teamB, tour.name);
+          if (teamA.fullName !== tour.teamA || teamB.fullName !== tour.teamB) {
+            startNewMatchWithTeams(tour.teamA, tour.teamB, tour.name);
+          }
           if (tour.tossText) setTossText(tour.tossText);
         }
       }

@@ -5,7 +5,8 @@ import { StatBadge } from '../common/StatBadge';
 
 export const BattingLowerThird: React.FC = () => {
   const { teamA, teamB, battingTeamId } = useBroadcastStore();
-  const battingTeam = battingTeamId === teamA.id ? teamA : teamB;
+  const isTeamA = battingTeamId === teamA.id || battingTeamId === teamA.shortName || battingTeamId === 'teamA' || battingTeamId === teamA.fullName;
+  const battingTeam = isTeamA ? teamA : teamB;
   const striker = battingTeam.batters.find((b) => b.isStriker) || battingTeam.batters[0];
 
   if (!striker) return null;

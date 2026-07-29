@@ -5,7 +5,8 @@ import { StatBadge } from '../common/StatBadge';
 
 export const CurrentBattersOverlay: React.FC = () => {
   const { teamA, teamB, battingTeamId } = useBroadcastStore();
-  const battingTeam = battingTeamId === teamA.id ? teamA : teamB;
+  const isTeamA = battingTeamId === teamA.id || battingTeamId === teamA.shortName || battingTeamId === 'teamA' || battingTeamId === teamA.fullName;
+  const battingTeam = isTeamA ? teamA : teamB;
   const activeBatters = battingTeam.batters.filter((b) => !b.isOut).slice(0, 2);
 
   return (

@@ -4,7 +4,8 @@ import { LowerThirdBase } from '../common/LowerThirdBase';
 import { StatBadge } from '../common/StatBadge';
 export const CurrentBattersOverlay = () => {
     const { teamA, teamB, battingTeamId } = useBroadcastStore();
-    const battingTeam = battingTeamId === teamA.id ? teamA : teamB;
+    const isTeamA = battingTeamId === teamA.id || battingTeamId === teamA.shortName || battingTeamId === 'teamA' || battingTeamId === teamA.fullName;
+    const battingTeam = isTeamA ? teamA : teamB;
     const activeBatters = battingTeam.batters.filter((b) => !b.isOut).slice(0, 2);
     return (_jsx(LowerThirdBase, { title: "CURRENT BATTERS AT THE CREASE", subtitle: battingTeam.fullName, category: "BATTERS", primaryColor: battingTeam.primaryColor, children: _jsx("div", { className: "grid grid-cols-2 gap-4", children: activeBatters.map((b) => {
                 const sr = b.balls > 0 ? ((b.runs / b.balls) * 100).toFixed(1) : '0.0';
