@@ -58,11 +58,14 @@ export const CricNavbar: React.FC = () => {
 
       {/* Account Expiry & Storage Badges */}
       <div className="flex items-center gap-3">
+        <div className="bg-emerald-500/10 border border-emerald-400/40 text-emerald-300 px-3 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 font-mono">
+          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+          {typeof window !== 'undefined' && window.location.protocol === 'https:'
+            ? '🌐 BROADCAST SYNC (ACTIVE)'
+            : '🟢 LOCAL BROADCAST SYNC'}
+        </div>
         <div className="bg-cyan-500/10 border border-cyan-400/40 text-cyan-300 px-3 py-1.5 rounded-md text-xs font-mono font-bold flex items-center gap-1.5">
           <HardDrive className="w-4 h-4 text-cyan-400" /> Storage: 1206/10000 kb
-        </div>
-        <div className="bg-emerald-500/10 border border-emerald-400/40 text-emerald-300 px-3 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5">
-          <ShieldCheck className="w-4 h-4 text-emerald-400" /> Account Expiry Date : 4/13/2026, 10:44:04 PM
         </div>
       </div>
     </header>

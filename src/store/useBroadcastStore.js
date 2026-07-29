@@ -791,7 +791,14 @@ export const useBroadcastStore = create((set, get) => ({
 function initWebSocketClient() {
     if (typeof window === 'undefined')
         return;
+    // On HTTPS hosts (like GitHub Pages), direct insecure ws:// is blocked by browser security.
+    // BroadcastChannel and LocalStorage events automatically handle 100% sync in browser tabs.
+    const isHttps = window.location.protocol === 'https:';
     function connect() {
+        if (isHttps) {
+            console.log('🌐 Running on HTTPS (GitHub Pages): BroadcastChannel & LocalStorage instant sync active.');
+            return;
+        }
         try {
             socket = new WebSocket('ws://localhost:4000');
             socket.onopen = () => {
@@ -819,7 +826,7 @@ function initWebSocketClient() {
             };
             socket.onclose = () => {
                 useBroadcastStore.getState().setWsConnected(false);
-                setTimeout(connect, 3000);
+                setTimeout(connect, 5000);
             };
             socket.onerror = () => {
                 useBroadcastStore.getState().setWsConnected(false);
@@ -827,7 +834,7 @@ function initWebSocketClient() {
         }
         catch (err) {
             console.warn('WebSocket init exception:', err);
-            setTimeout(connect, 3000);
+            setTimeout(connect, 5000);
         }
     }
     connect();
