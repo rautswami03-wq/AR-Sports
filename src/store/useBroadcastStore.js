@@ -814,23 +814,37 @@ export const useBroadcastStore = create((set, get) => ({
         });
     },
 }));
-// Auto-reconnecting WebSocket Gateway Client
+// Auto-reconnecting WebSocket Gateway Client (Connects to wss://websocket-36f4.onrender.com)
 function initWebSocketClient() {
     if (typeof window === 'undefined')
         return;
-    // On HTTPS hosts (like GitHub Pages), direct insecure ws:// is blocked by browser security.
-    // BroadcastChannel and LocalStorage events automatically handle 100% sync in browser tabs.
-    const isHttps = window.location.protocol === 'https:';
+    const RENDER_WS_URL = 'wss://websocket-36f4.onrender.com';
+    const wsUrl = window.location.protocol === 'https:' ? RENDER_WS_URL : (import.meta.env.VITE_WS_URL || RENDER_WS_URL);
     function connect() {
-        if (isHttps) {
-            console.log('🌐 Running on HTTPS (GitHub Pages): BroadcastChannel & LocalStorage instant sync active.');
-            return;
-        }
         try {
-            socket = new WebSocket('ws://localhost:4000');
+            socket = new WebSocket(wsUrl);
             socket.onopen = () => {
-                console.log('⚡ Connected to CricScorer WebSocket Backend');
+                console.log(`⚡ Connected to CricScorer WebSocket Gateway (${wsUrl})`);
                 useBroadcastStore.getState().setWsConnected(true);
+                // Send state sync on connection
+                if (socket && socket.readyState === WebSocket.OPEN) {
+                    const state = useBroadcastStore.getState();
+                    const syncPayload = {
+                        teamA: state.teamA,
+                        teamB: state.teamB,
+                        matchDetails: state.matchDetails,
+                        battingTeamId: state.battingTeamId,
+                        bowlingTeamId: state.bowlingTeamId,
+                        activeOverlays: state.activeOverlays,
+                        activeAnimation: state.activeAnimation,
+                        tournamentId: state.tournamentId,
+                    };
+                    socket.send(JSON.stringify({
+                        type: 'STATE_SYNC',
+                        matchId: 'match_live_001',
+                        payload: syncPayload,
+                    }));
+                }
             };
             socket.onmessage = (event) => {
                 try {
