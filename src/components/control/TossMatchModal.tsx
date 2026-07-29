@@ -58,8 +58,8 @@ export const TossMatchModal: React.FC<TossMatchModalProps> = ({ isOpen, onClose 
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-      <div className="w-full max-w-lg bg-gradient-to-b from-cyan-600 via-sky-700 to-blue-900 border-2 border-cyan-300 rounded-3xl shadow-2xl p-6 text-white font-sans">
+    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto">
+      <div className="w-full max-w-lg bg-gradient-to-b from-cyan-600 via-sky-700 to-blue-900 border-2 border-cyan-300 rounded-3xl shadow-2xl p-6 text-white font-sans max-h-[90vh] overflow-y-auto">
         <h2 className="text-2xl font-black uppercase text-center mb-6 tracking-wide drop-shadow text-amber-300">
           🪙 TOSS & MATCH INITIALIZATION
         </h2>
