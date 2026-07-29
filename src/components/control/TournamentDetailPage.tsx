@@ -105,7 +105,28 @@ export const TournamentDetailPage: React.FC = () => {
       if (savedTours) {
         const tours = JSON.parse(savedTours);
         const current = tours.find((t: any) => t.id === id);
-        if (current) setTournamentName(current.name);
+        if (current) {
+          setTournamentName(current.name);
+          // If no match exists for this tournament, create an initial match from tournament details
+          const existingForTour = matches.filter((m) => m.tournamentId === id);
+          if (existingForTour.length === 0 && current.teamA && current.teamB) {
+            const initMatch: MatchItem = {
+              id: `match_${Date.now()}`,
+              tournamentId: id,
+              teamA: current.teamA,
+              teamB: current.teamB,
+              overs: 4,
+              matchNo: 1,
+              matchType: 'GROUP STAGE',
+              groupNo: 1,
+              tossText: current.tossText || `${current.teamB} WIN TOSS AND CHOOSE TO BOWL`,
+              winner: 'MATCH NOT FINISH YET',
+              createdAt: current.createdAt || new Date().toISOString().split('T')[0],
+            };
+            const updated = [initMatch, ...matches];
+            saveMatches(updated);
+          }
+        }
       }
     } catch (e) {}
   }, [id]);
@@ -131,7 +152,7 @@ export const TournamentDetailPage: React.FC = () => {
   // Edit Match Modal State
   const [editingMatch, setEditingMatch] = useState<MatchItem | null>(null);
 
-  const filteredMatches = matches.filter((m) => m.tournamentId === id || !id);
+  const filteredMatches = matches.filter((m) => m.tournamentId === id);
 
   const handleCreateMatch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -242,8 +263,19 @@ export const TournamentDetailPage: React.FC = () => {
             </button>
 
             {/* List of Matches Cards */}
-            <div className="w-full space-y-5">
-              {filteredMatches.map((match) => (
+            {filteredMatches.length === 0 ? (
+              <div className="text-center py-12 px-6 bg-slate-900/60 border border-slate-800 rounded-3xl w-full max-w-lg space-y-4">
+                <p className="text-slate-400 font-bold text-sm uppercase">No matches created for this tournament yet.</p>
+                <button
+                  onClick={() => setShowCreateModal(true)}
+                  className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black px-6 py-2.5 rounded-xl uppercase text-xs shadow-lg"
+                >
+                  + CREATE FIRST MATCH
+                </button>
+              </div>
+            ) : (
+              <div className="w-full space-y-5">
+                {filteredMatches.map((match) => (
                 <div
                   key={match.id}
                   className="relative overflow-hidden bg-gradient-to-r from-cyan-500 via-indigo-600 to-purple-600 p-6 rounded-3xl border border-white/20 shadow-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4"
@@ -308,8 +340,9 @@ export const TournamentDetailPage: React.FC = () => {
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          )}
+        </div>
+      )}
 
         {activeTab === 'details' && (
           <div className="w-full bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-xl space-y-4">

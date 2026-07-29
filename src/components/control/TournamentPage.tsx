@@ -119,9 +119,14 @@ export const TournamentPage: React.FC = () => {
               key={tour.id}
               className="bg-gradient-to-r from-cyan-500 via-indigo-600 to-purple-600 p-6 rounded-3xl border border-white/20 shadow-2xl flex items-center justify-between gap-4"
             >
-              <h3 className="text-white text-xl md:text-2xl font-black uppercase tracking-wide drop-shadow-md">
-                {tour.name}
-              </h3>
+              <div>
+                <h3 className="text-white text-xl md:text-2xl font-black uppercase tracking-wide drop-shadow-md">
+                  {tour.name}
+                </h3>
+                <p className="text-[11px] font-bold text-slate-200 mt-1 uppercase tracking-wider opacity-80">
+                  Click TOUR PAGE to view & create matches
+                </p>
+              </div>
 
               <div className="flex items-center gap-3">
                 {/* Purple TOUR PAGE Button */}
