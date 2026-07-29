@@ -34,7 +34,8 @@ export function subscribeToLiveMatch(matchId: string, onUpdate: (data: any) => v
 export async function publishLiveMatchState(matchId: string, state: any) {
   try {
     const matchDoc = doc(db, 'matches', matchId);
-    await setDoc(matchDoc, state, { merge: true });
+    const cleanState = JSON.parse(JSON.stringify(state));
+    await setDoc(matchDoc, cleanState, { merge: true });
   } catch (err) {
     console.warn('Firebase publish notice (saved locally in Zustand):', err);
   }

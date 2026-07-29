@@ -55,9 +55,10 @@ function postStateSync(state) {
             console.warn('WebSocket send warning:', e);
         }
     }
-    // 4. Post to Firebase Cloud Firestore
+    // 4. Post to Firebase Cloud Firestore (Sanitize JSON to remove undefined fields for Firebase)
     try {
-        publishLiveMatchState('live_match_default', syncPayload);
+        const cleanPayload = JSON.parse(JSON.stringify(syncPayload));
+        publishLiveMatchState('live_match_default', cleanPayload);
     }
     catch (e) {
         console.warn('Firebase publish notice:', e);
