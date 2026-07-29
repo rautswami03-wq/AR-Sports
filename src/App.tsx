@@ -37,6 +37,22 @@ export default function App() {
           </div>
         }
       />
+      <Route
+        path="/theme/:themeId"
+        element={
+          <div className="w-full h-full bg-transparent overflow-hidden flex items-center justify-center">
+            <OverlayStage />
+          </div>
+        }
+      />
+      <Route
+        path="/theme/:themeId/:matchId"
+        element={
+          <div className="w-full h-full bg-transparent overflow-hidden flex items-center justify-center">
+            <OverlayStage />
+          </div>
+        }
+      />
     </Routes>
   );
 }
