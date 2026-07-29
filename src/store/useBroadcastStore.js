@@ -222,6 +222,10 @@ function getSnapshot(state) {
         bowlingTeamId: state.bowlingTeamId,
     }));
 }
+const isBattingTeamA = (state) => state.battingTeamId === 'teamA' ||
+    state.battingTeamId === state.teamA.id ||
+    state.battingTeamId === state.teamA.shortName ||
+    state.battingTeamId === state.teamA.fullName;
 export const useBroadcastStore = create((set, get) => ({
     teamA: loadedState.teamA,
     teamB: loadedState.teamB,
@@ -285,7 +289,7 @@ export const useBroadcastStore = create((set, get) => ({
         set((state) => {
             const snapshot = getSnapshot(state);
             const newHistory = [...state.historyStack, snapshot].slice(-30);
-            const isTeamA = state.battingTeamId === state.teamA.id;
+            const isTeamA = isBattingTeamA(state);
             const team = isTeamA ? { ...state.teamA } : { ...state.teamB };
             let balls = team.balls + 1;
             let overs = team.overs;
@@ -327,7 +331,7 @@ export const useBroadcastStore = create((set, get) => ({
             return nextState;
         });
         let milestoneReached = null;
-        const currentBatters = (get().battingTeamId === get().teamA.id ? get().teamA : get().teamB).batters;
+        const currentBatters = (isBattingTeamA(get()) ? get().teamA : get().teamB).batters;
         const currentStriker = currentBatters.find((b) => b.isStriker);
         const prevRuns = currentStriker?.runs || 0;
         const newRuns = prevRuns + runs;
@@ -349,7 +353,7 @@ export const useBroadcastStore = create((set, get) => ({
         set((state) => {
             const snapshot = getSnapshot(state);
             const newHistory = [...state.historyStack, snapshot].slice(-30);
-            const isTeamA = state.battingTeamId === state.teamA.id;
+            const isTeamA = isBattingTeamA(state);
             const team = isTeamA ? { ...state.teamA } : { ...state.teamB };
             team.score += extraRuns;
             const symbol = extraType === 'WIDE' ? `${extraRuns}WD` : `${extraRuns}NB`;
@@ -371,7 +375,7 @@ export const useBroadcastStore = create((set, get) => ({
         set((state) => {
             const snapshot = getSnapshot(state);
             const newHistory = [...state.historyStack, snapshot].slice(-30);
-            const isTeamA = state.battingTeamId === state.teamA.id;
+            const isTeamA = isBattingTeamA(state);
             const team = isTeamA ? { ...state.teamA } : { ...state.teamB };
             team.wickets += 1;
             let balls = team.balls + 1;
@@ -438,7 +442,7 @@ export const useBroadcastStore = create((set, get) => ({
     },
     switchStrikers: () => {
         set((state) => {
-            const isTeamA = state.battingTeamId === state.teamA.id;
+            const isTeamA = isBattingTeamA(state);
             const team = isTeamA ? { ...state.teamA } : { ...state.teamB };
             const batters = team.batters.map((b) => {
                 if (!b.isOut)
@@ -453,9 +457,10 @@ export const useBroadcastStore = create((set, get) => ({
     },
     setBattingTeam: (teamId) => {
         set((state) => {
+            const canonicalId = teamId === state.teamA.id || teamId === state.teamA.shortName || teamId === 'teamA' ? 'teamA' : 'teamB';
             const nextState = {
-                battingTeamId: teamId,
-                bowlingTeamId: teamId === state.teamA.id ? state.teamB.id : state.teamA.id,
+                battingTeamId: canonicalId,
+                bowlingTeamId: canonicalId === 'teamA' ? 'teamB' : 'teamA',
             };
             postStateSync({ ...state, ...nextState });
             return nextState;
@@ -504,7 +509,7 @@ export const useBroadcastStore = create((set, get) => ({
     },
     retireBatter: () => {
         set((state) => {
-            const isTeamA = state.battingTeamId === state.teamA.id;
+            const isTeamA = isBattingTeamA(state);
             const battingTeamKey = isTeamA ? 'teamA' : 'teamB';
             const team = state[battingTeamKey];
             const strikerIndex = team.batters.findIndex((b) => b.isStriker);
@@ -525,7 +530,7 @@ export const useBroadcastStore = create((set, get) => ({
     },
     changeBowler: (name) => {
         set((state) => {
-            const isTeamA = state.battingTeamId === state.teamA.id;
+            const isTeamA = isBattingTeamA(state);
             const bowlingTeamKey = isTeamA ? 'teamB' : 'teamA';
             const team = state[bowlingTeamKey];
             const existingBowlerIndex = team.bowlers.findIndex((bw) => bw.name.toLowerCase() === name.toLowerCase());
@@ -680,8 +685,8 @@ export const useBroadcastStore = create((set, get) => ({
             const nextState = {
                 teamA: resetTeam(state.teamA, teamAName, shortA),
                 teamB: resetTeam(state.teamB, teamBName, shortB),
-                battingTeamId: state.teamA.id,
-                bowlingTeamId: state.teamB.id,
+                battingTeamId: 'teamA',
+                bowlingTeamId: 'teamB',
                 matchDetails: {
                     ...state.matchDetails,
                     tournament: tournamentName || state.matchDetails.tournament,
@@ -699,10 +704,11 @@ export const useBroadcastStore = create((set, get) => ({
     },
     startSecondInnings: () => {
         set((state) => {
-            const firstInningsBattingTeam = state.battingTeamId === state.teamA.id ? state.teamA : state.teamB;
+            const isAFirst = state.battingTeamId === 'teamA' || state.battingTeamId === state.teamA.id;
+            const firstInningsBattingTeam = isAFirst ? state.teamA : state.teamB;
             const targetRuns = firstInningsBattingTeam.score + 1;
-            const newBattingTeamId = state.bowlingTeamId;
-            const newBowlingTeamId = state.battingTeamId;
+            const newBattingTeamId = isAFirst ? 'teamB' : 'teamA';
+            const newBowlingTeamId = isAFirst ? 'teamA' : 'teamB';
             const nextState = {
                 battingTeamId: newBattingTeamId,
                 bowlingTeamId: newBowlingTeamId,

@@ -9,7 +9,7 @@ interface WicketModalProps {
 export const WicketModal: React.FC<WicketModalProps> = ({ isOpen, onClose }) => {
   const { teamA, teamB, battingTeamId, addWicket, updateBatterStats } = useBroadcastStore();
 
-  const isTeamA = battingTeamId === teamA.id || battingTeamId === teamA.shortName || battingTeamId === 'teamA';
+  const isTeamA = battingTeamId === teamA.id || battingTeamId === teamA.shortName || battingTeamId === 'teamA' || battingTeamId === teamA.fullName;
   const battingTeam = isTeamA ? teamA : teamB;
 
   const striker = battingTeam.batters.find((b) => b.isStriker) || battingTeam.batters[0];
@@ -99,7 +99,7 @@ export const WicketModal: React.FC<WicketModalProps> = ({ isOpen, onClose }) => 
               onClick={onClose}
               className="bg-slate-800 hover:bg-slate-700 text-white font-black px-6 py-2.5 rounded-xl shadow-lg uppercase tracking-wider text-xs active:scale-95 transition-all"
             >
-              Cancle
+              Cancel
             </button>
           </div>
         </form>
