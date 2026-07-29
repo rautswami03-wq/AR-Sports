@@ -9,6 +9,7 @@ import { ChangeBowlerModal } from './ChangeBowlerModal';
 import { WicketModal } from './WicketModal';
 import { PlayerListModal } from './PlayerListModal';
 import { TossMatchModal } from './TossMatchModal';
+import { EditMatchModal } from './EditMatchModal';
 
 export const TourMatchPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -198,11 +199,27 @@ export const TourMatchPage: React.FC = () => {
       {/* Main Content */}
       <main className="max-w-5xl mx-auto py-8 px-4 flex flex-col items-center">
         {/* Navigation Breadcrumb Links */}
-        <div className="flex items-center gap-12 mb-8 text-xl font-black uppercase tracking-wider">
-          <span className="text-white border-b-2 border-cyan-400 pb-1">Match Scoreboard</span>
-          <Link to="/theme_links" className="text-cyan-400 hover:text-cyan-300 border-b-2 border-cyan-400 pb-1">
-            SCOREBOARD LINKS
-          </Link>
+        <div className="flex flex-wrap items-center justify-between w-full mb-8 text-xl font-black uppercase tracking-wider gap-4">
+          <div className="flex items-center gap-8">
+            <span className="text-white border-b-2 border-cyan-400 pb-1">Match Scoreboard</span>
+            <Link to="/theme_links" className="text-cyan-400 hover:text-cyan-300 border-b-2 border-cyan-400 pb-1">
+              SCOREBOARD LINKS
+            </Link>
+          </div>
+          <button
+            onClick={() => {
+              setEditTeamA(teamA.fullName);
+              setEditTeamAShort(teamA.shortName);
+              setEditTeamB(teamB.fullName);
+              setEditTeamBShort(teamB.shortName);
+              setEditTourName(matchDetails.tournament);
+              setEditTotalOvers(matchDetails.totalOvers);
+              setShowEditModal(true);
+            }}
+            className="px-5 py-2 bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-500 hover:to-blue-700 text-white text-xs font-black rounded-xl border border-blue-400/50 shadow-lg flex items-center gap-2 uppercase tracking-wider transition-all transform hover:scale-105"
+          >
+            <Edit3 className="w-4 h-4 text-cyan-300" /> EDIT MATCH
+          </button>
         </div>
 
         {/* Versus Match Banner (Responsive Layout) */}
@@ -683,6 +700,7 @@ export const TourMatchPage: React.FC = () => {
         <PlayerListModal isOpen={!!showPlayerTeamId} teamId={showPlayerTeamId} onClose={() => setShowPlayerTeamId(null)} />
       )}
       <TossMatchModal isOpen={showTossModal} onClose={() => setShowTossModal(false)} />
+      <EditMatchModal isOpen={showEditModal} onClose={() => setShowEditModal(false)} />
     </div>
   );
 };
