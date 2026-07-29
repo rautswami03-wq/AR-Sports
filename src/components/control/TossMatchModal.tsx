@@ -21,17 +21,20 @@ export const TossMatchModal: React.FC<TossMatchModalProps> = ({ isOpen, onClose 
   const handleStartMatch = (e: React.FormEvent) => {
     e.preventDefault();
 
-    const winnerName = tossWinner === 'teamA' ? teamA.fullName : teamB.fullName;
+    const store = useBroadcastStore.getState();
+    const freshTeamA = store.teamA;
+    const freshTeamB = store.teamB;
+
+    const winnerName = tossWinner === 'teamA' ? freshTeamA.fullName : freshTeamB.fullName;
     const decisionText = tossDecision === 'bat' ? 'OPTED TO BAT' : 'OPTED TO BOWL';
     const tossText = `${winnerName.toUpperCase()} WON THE TOSS AND ${decisionText}`;
 
-    // Determine batting & bowling team based on toss winner & decision
-    let battingTeamId = tossWinner;
-    let bowlingTeamId = tossWinner === 'teamA' ? 'teamB' : 'teamA';
+    let battingTeamId = tossWinner === 'teamA' ? freshTeamA.id : freshTeamB.id;
+    let bowlingTeamId = tossWinner === 'teamA' ? freshTeamB.id : freshTeamA.id;
 
     if (tossDecision === 'bowl') {
-      battingTeamId = tossWinner === 'teamA' ? 'teamB' : 'teamA';
-      bowlingTeamId = tossWinner;
+      battingTeamId = tossWinner === 'teamA' ? freshTeamB.id : freshTeamA.id;
+      bowlingTeamId = tossWinner === 'teamA' ? freshTeamA.id : freshTeamB.id;
     }
 
     useBroadcastStore.setState({
@@ -47,8 +50,10 @@ export const TossMatchModal: React.FC<TossMatchModalProps> = ({ isOpen, onClose 
       currentInnings: 1,
     });
 
-    const battingTeam = battingTeamId === 'teamA' ? teamA : teamB;
-    const bowlingTeam = bowlingTeamId === 'teamA' ? teamA : teamB;
+    const freshStore = useBroadcastStore.getState();
+    const isBattingA = battingTeamId === freshTeamA.id || battingTeamId === 'teamA';
+    const battingTeam = isBattingA ? freshStore.teamA : freshStore.teamB;
+    const bowlingTeam = isBattingA ? freshStore.teamB : freshStore.teamA;
 
     if (battingTeam.batters[0]) updateBatterStats(battingTeam.batters[0].id, { name: strikerName, isStriker: true });
     if (battingTeam.batters[1]) updateBatterStats(battingTeam.batters[1].id, { name: nonStrikerName, isStriker: false });

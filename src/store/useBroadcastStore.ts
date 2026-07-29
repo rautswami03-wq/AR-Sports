@@ -911,7 +911,7 @@ if (broadcastChannel) {
   };
 }
 
-// Setup Window Storage Event Listener (Guarantees OBS Studio Sync!)
+// Setup Window Storage Event Listener & CustomEvent Listener (Guarantees OBS Studio Sync!)
 if (typeof window !== 'undefined') {
   window.addEventListener('storage', (e) => {
     if (e.key === STORAGE_KEY && e.newValue) {
@@ -921,6 +921,12 @@ if (typeof window !== 'undefined') {
       } catch (err) {
         console.warn('Storage event sync warning:', err);
       }
+    }
+  });
+
+  window.addEventListener('cricscorer_local_update', (e: any) => {
+    if (e.detail) {
+      useBroadcastStore.getState().applyExternalState(e.detail);
     }
   });
 }
