@@ -12,6 +12,7 @@ const firebaseConfig = {
 };
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
 export const db = getFirestore(app);
+const NTFY_TOPIC = 'https://ntfy.sh/cricscorer_broadcast_live_v2';
 const RTDB_URL = 'https://cricscore-dcaa4-default-rtdb.firebaseio.com/matches/live_match_default.json';
 export function subscribeToLiveMatch(matchId, onUpdate) {
     let unsubFirestore = () => { };
@@ -28,7 +29,29 @@ export function subscribeToLiveMatch(matchId, onUpdate) {
     catch (err) {
         console.warn('Firestore connection notice:', err);
     }
-    // Ultra-Fast RTDB REST Polling (Guarantees OBS Studio Software Sync Across Applications)
+    // 1. Ultra-Fast ntfy.sh SSE Real-Time Stream (Instant Sub-100ms Push to OBS Studio Software)
+    let eventSource = null;
+    if (typeof window !== 'undefined' && 'EventSource' in window) {
+        try {
+            eventSource = new EventSource(`${NTFY_TOPIC}/sse`);
+            eventSource.onmessage = (event) => {
+                try {
+                    const parsed = JSON.parse(event.data);
+                    if (parsed.message) {
+                        const statePayload = JSON.parse(parsed.message);
+                        onUpdate(statePayload);
+                    }
+                }
+                catch (e) {
+                    // Keepalive or notice
+                }
+            };
+        }
+        catch (e) {
+            console.warn('ntfy SSE notice:', e);
+        }
+    }
+    // 2. High-Frequency RTDB REST Polling (Guarantees OBS Studio Software Sync Across Applications)
     let lastRtdbJson = '';
     const pollRtdb = async () => {
         try {
@@ -50,12 +73,24 @@ export function subscribeToLiveMatch(matchId, onUpdate) {
     const pollInterval = setInterval(pollRtdb, 500);
     return () => {
         unsubFirestore();
+        if (eventSource)
+            eventSource.close();
         clearInterval(pollInterval);
     };
 }
 export async function publishLiveMatchState(matchId, state) {
     const cleanState = JSON.parse(JSON.stringify(state));
-    // 1. Publish to Firestore
+    // 1. Publish to ntfy.sh SSE Cloud Stream (Instant Push to OBS Studio Software)
+    try {
+        fetch(NTFY_TOPIC, {
+            method: 'POST',
+            body: JSON.stringify(cleanState),
+        }).catch(() => { });
+    }
+    catch (err) {
+        console.warn('ntfy publish notice:', err);
+    }
+    // 2. Publish to Firestore
     try {
         const matchDoc = doc(db, 'matches', matchId);
         await setDoc(matchDoc, cleanState, { merge: true });
@@ -63,7 +98,7 @@ export async function publishLiveMatchState(matchId, state) {
     catch (err) {
         console.warn('Firestore publish notice:', err);
     }
-    // 2. Publish to Realtime DB REST Endpoint (Guarantees OBS Studio Software Sync!)
+    // 3. Publish to Realtime DB REST Endpoint (Guarantees OBS Studio Software Sync!)
     try {
         await fetch(RTDB_URL, {
             method: 'PUT',
