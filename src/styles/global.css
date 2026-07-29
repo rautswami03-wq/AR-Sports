@@ -7,9 +7,15 @@ body,
   min-height: 100vh;
   margin: 0;
   overflow-x: hidden;
-  overflow-y: auto !important;
-  background: #070b15;
   font-family: Inter, sans-serif;
+}
+
+body.overlay-mode,
+html.overlay-mode,
+#root.overlay-mode {
+  background: transparent !important;
+  background-color: transparent !important;
+  overflow: hidden !important;
 }
 
 .overlay {

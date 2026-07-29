@@ -15,13 +15,13 @@ export default function App() {
       location.pathname.startsWith('/theme');
 
     if (isOverlayRoute) {
-      document.body.style.overflow = 'hidden';
-      document.documentElement.style.overflow = 'hidden';
+      document.body.classList.add('overlay-mode');
+      document.documentElement.classList.add('overlay-mode');
       document.body.style.background = 'transparent';
       document.documentElement.style.background = 'transparent';
     } else {
-      document.body.style.overflowY = 'auto';
-      document.documentElement.style.overflowY = 'auto';
+      document.body.classList.remove('overlay-mode');
+      document.documentElement.classList.remove('overlay-mode');
       document.body.style.background = '#070b15';
       document.documentElement.style.background = '#070b15';
     }
