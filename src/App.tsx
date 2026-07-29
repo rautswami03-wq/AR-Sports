@@ -10,14 +10,20 @@ export default function App() {
   const location = useLocation();
 
   useEffect(() => {
-    if (location.pathname === '/overlay') {
+    const isOverlayRoute =
+      location.pathname.startsWith('/overlay') ||
+      location.pathname.startsWith('/theme');
+
+    if (isOverlayRoute) {
       document.body.style.overflow = 'hidden';
       document.documentElement.style.overflow = 'hidden';
       document.body.style.background = 'transparent';
+      document.documentElement.style.background = 'transparent';
     } else {
       document.body.style.overflowY = 'auto';
       document.documentElement.style.overflowY = 'auto';
       document.body.style.background = '#070b15';
+      document.documentElement.style.background = '#070b15';
     }
   }, [location.pathname]);
 
