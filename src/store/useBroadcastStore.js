@@ -290,7 +290,10 @@ export const useBroadcastStore = create((set, get) => ({
             const snapshot = getSnapshot(state);
             const newHistory = [...state.historyStack, snapshot].slice(-30);
             const isTeamA = isBattingTeamA(state);
-            const team = isTeamA ? { ...state.teamA } : { ...state.teamB };
+            const battingTeamKey = isTeamA ? 'teamA' : 'teamB';
+            const bowlingTeamKey = isTeamA ? 'teamB' : 'teamA';
+            const team = { ...state[battingTeamKey] };
+            const bowlingTeam = { ...state[bowlingTeamKey] };
             let balls = team.balls + 1;
             let overs = team.overs;
             if (balls >= 6) {
@@ -320,10 +323,32 @@ export const useBroadcastStore = create((set, get) => ({
                 batters[strikerIndex] = striker;
             }
             team.batters = batters;
+            // Update active Bowler stats
+            const bowlers = [...bowlingTeam.bowlers];
+            const activeBowlerIndex = bowlers.findIndex((bw) => bw.isCurrent) !== -1
+                ? bowlers.findIndex((bw) => bw.isCurrent)
+                : 0;
+            if (bowlers[activeBowlerIndex]) {
+                const bw = { ...bowlers[activeBowlerIndex] };
+                bw.runsConceded += runs;
+                let bwBalls = bw.ballsInCurrentOver + 1;
+                let bwOvers = bw.overs;
+                if (bwBalls >= 6) {
+                    bwOvers += 1;
+                    bwBalls = 0;
+                }
+                bw.ballsInCurrentOver = bwBalls;
+                bw.overs = bwOvers;
+                const totalBowlerBalls = bwOvers * 6 + bwBalls;
+                bw.economy = totalBowlerBalls > 0 ? Number(((bw.runsConceded / totalBowlerBalls) * 6).toFixed(2)) : 0;
+                bowlers[activeBowlerIndex] = bw;
+                bowlingTeam.bowlers = bowlers;
+            }
             const symbol = isBoundary ? (boundaryType === 6 ? '6' : '4') : runs.toString();
             const recent = [symbol, ...state.matchDetails.recentBalls.slice(0, 5)];
             const nextState = {
-                [isTeamA ? 'teamA' : 'teamB']: team,
+                [battingTeamKey]: team,
+                [bowlingTeamKey]: bowlingTeam,
                 matchDetails: { ...state.matchDetails, recentBalls: recent },
                 historyStack: newHistory,
             };
@@ -354,12 +379,28 @@ export const useBroadcastStore = create((set, get) => ({
             const snapshot = getSnapshot(state);
             const newHistory = [...state.historyStack, snapshot].slice(-30);
             const isTeamA = isBattingTeamA(state);
-            const team = isTeamA ? { ...state.teamA } : { ...state.teamB };
+            const battingTeamKey = isTeamA ? 'teamA' : 'teamB';
+            const bowlingTeamKey = isTeamA ? 'teamB' : 'teamA';
+            const team = { ...state[battingTeamKey] };
+            const bowlingTeam = { ...state[bowlingTeamKey] };
             team.score += extraRuns;
+            const bowlers = [...bowlingTeam.bowlers];
+            const activeBowlerIndex = bowlers.findIndex((bw) => bw.isCurrent) !== -1
+                ? bowlers.findIndex((bw) => bw.isCurrent)
+                : 0;
+            if (bowlers[activeBowlerIndex]) {
+                const bw = { ...bowlers[activeBowlerIndex] };
+                bw.runsConceded += extraRuns;
+                const totalBowlerBalls = bw.overs * 6 + bw.ballsInCurrentOver;
+                bw.economy = totalBowlerBalls > 0 ? Number(((bw.runsConceded / totalBowlerBalls) * 6).toFixed(2)) : 0;
+                bowlers[activeBowlerIndex] = bw;
+                bowlingTeam.bowlers = bowlers;
+            }
             const symbol = extraType === 'WIDE' ? `${extraRuns}WD` : `${extraRuns}NB`;
             const recent = [symbol, ...state.matchDetails.recentBalls.slice(0, 5)];
             const nextState = {
-                [isTeamA ? 'teamA' : 'teamB']: team,
+                [battingTeamKey]: team,
+                [bowlingTeamKey]: bowlingTeam,
                 matchDetails: { ...state.matchDetails, recentBalls: recent },
                 historyStack: newHistory,
             };
@@ -376,7 +417,10 @@ export const useBroadcastStore = create((set, get) => ({
             const snapshot = getSnapshot(state);
             const newHistory = [...state.historyStack, snapshot].slice(-30);
             const isTeamA = isBattingTeamA(state);
-            const team = isTeamA ? { ...state.teamA } : { ...state.teamB };
+            const battingTeamKey = isTeamA ? 'teamA' : 'teamB';
+            const bowlingTeamKey = isTeamA ? 'teamB' : 'teamA';
+            const team = { ...state[battingTeamKey] };
+            const bowlingTeam = { ...state[bowlingTeamKey] };
             team.wickets += 1;
             let balls = team.balls + 1;
             let overs = team.overs;
@@ -404,9 +448,31 @@ export const useBroadcastStore = create((set, get) => ({
                 };
             }
             team.batters = batters;
+            // Update active Bowler wickets & overs
+            const bowlers = [...bowlingTeam.bowlers];
+            const activeBowlerIndex = bowlers.findIndex((bw) => bw.isCurrent) !== -1
+                ? bowlers.findIndex((bw) => bw.isCurrent)
+                : 0;
+            if (bowlers[activeBowlerIndex]) {
+                const bw = { ...bowlers[activeBowlerIndex] };
+                bw.wickets += 1;
+                let bwBalls = bw.ballsInCurrentOver + 1;
+                let bwOvers = bw.overs;
+                if (bwBalls >= 6) {
+                    bwOvers += 1;
+                    bwBalls = 0;
+                }
+                bw.ballsInCurrentOver = bwBalls;
+                bw.overs = bwOvers;
+                const totalBowlerBalls = bwOvers * 6 + bwBalls;
+                bw.economy = totalBowlerBalls > 0 ? Number(((bw.runsConceded / totalBowlerBalls) * 6).toFixed(2)) : 0;
+                bowlers[activeBowlerIndex] = bw;
+                bowlingTeam.bowlers = bowlers;
+            }
             const recent = ['W', ...state.matchDetails.recentBalls.slice(0, 5)];
             const nextState = {
-                [isTeamA ? 'teamA' : 'teamB']: team,
+                [battingTeamKey]: team,
+                [bowlingTeamKey]: bowlingTeam,
                 matchDetails: { ...state.matchDetails, recentBalls: recent },
                 historyStack: newHistory,
             };
