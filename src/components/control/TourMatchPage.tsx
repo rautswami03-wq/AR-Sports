@@ -7,6 +7,7 @@ import { CricNavbar } from '../common/CricNavbar';
 import { ChangeBowlerModal } from './ChangeBowlerModal';
 import { WicketModal } from './WicketModal';
 import { PlayerListModal } from './PlayerListModal';
+import { TossMatchModal } from './TossMatchModal';
 
 export const TourMatchPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -46,6 +47,7 @@ export const TourMatchPage: React.FC = () => {
   const [showBowlerModal, setShowBowlerModal] = useState(false);
   const [showWicketModal, setShowWicketModal] = useState(false);
   const [showPlayerTeamId, setShowPlayerTeamId] = useState<'teamA' | 'teamB' | null>(null);
+  const [showTossModal, setShowTossModal] = useState(false);
 
   const isTeamA = battingTeamId === teamA.id || battingTeamId === teamA.shortName || battingTeamId === 'teamA';
   const battingTeam = isTeamA ? teamA : teamB;
@@ -129,10 +131,7 @@ export const TourMatchPage: React.FC = () => {
   };
 
   const handleChangeToss = () => {
-    const choices = ['BAT', 'BOWL'];
-    const randomChoice = choices[Math.floor(Math.random() * choices.length)];
-    const newToss = `${teamA.fullName.toUpperCase()} WON THE TOSS AND OPTED TO ${randomChoice}`;
-    setTossText(newToss);
+    setShowTossModal(true);
   };
 
   const toggleInnings = () => {
@@ -660,6 +659,7 @@ export const TourMatchPage: React.FC = () => {
       {showPlayerTeamId && (
         <PlayerListModal isOpen={!!showPlayerTeamId} teamId={showPlayerTeamId} onClose={() => setShowPlayerTeamId(null)} />
       )}
+      <TossMatchModal isOpen={showTossModal} onClose={() => setShowTossModal(false)} />
     </div>
   );
 };

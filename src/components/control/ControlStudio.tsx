@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useBroadcastStore } from '../../store/useBroadcastStore';
 import { OverlayStage } from './OverlayStage';
 import { EditMatchModal } from './EditMatchModal';
+import { TossMatchModal } from './TossMatchModal';
 import { OverlayType, EventAnimationType } from '../../types/cricket';
 import { PRESET_TEAMS } from '../../theme/presetThemes';
 import { Radio, Tv, Zap, Palette, Layers, RefreshCw, Copy, Check, RotateCcw, Settings, Users, PlusCircle } from 'lucide-react';
@@ -36,7 +37,8 @@ export const ControlStudio: React.FC = () => {
 
   const [copiedUrl, setCopiedUrl] = useState(false);
   const [selectedTab, setSelectedTab] = useState<'scorer' | 'overlays' | 'animations' | 'theme' | 'tourStats'>('scorer');
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showTossModal, setShowTossModal] = useState(false);
 
   // Form states for custom inputs & bowler changes
   const [bowlerInput, setBowlerInput] = useState('');
@@ -162,7 +164,7 @@ export const ControlStudio: React.FC = () => {
         {/* Action Controls */}
         <div className="flex items-center gap-3">
           <button
-            onClick={() => setIsEditModalOpen(true)}
+            onClick={() => setShowEditModal(true)}
             className="bg-blue-600 hover:bg-blue-500 text-white border border-blue-400/40 px-3.5 py-1.5 rounded-lg text-xs font-black uppercase transition-all flex items-center gap-1.5 shadow-md"
           >
             <Settings className="w-4 h-4 text-amber-300" />
@@ -334,6 +336,12 @@ export const ControlStudio: React.FC = () => {
               <div className="space-y-5">
                 {/* Controller Quick Action Row matching Screenshot 2026-04-13 204512 */}
                 <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    onClick={() => setShowTossModal(true)}
+                    className="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded shadow uppercase tracking-wider flex items-center gap-1 border border-white/40 animate-pulse"
+                  >
+                    🪙 WHO WON TOSS
+                  </button>
                   <button
                     onClick={switchStrikers}
                     className="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs rounded shadow"
@@ -820,8 +828,9 @@ export const ControlStudio: React.FC = () => {
         </div>
       </div>
 
-      {/* Edit Match Modal */}
-      <EditMatchModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} />
+      {/* Edit & Toss Match Modals */}
+      <EditMatchModal isOpen={showEditModal} onClose={() => setShowEditModal(false)} />
+      <TossMatchModal isOpen={showTossModal} onClose={() => setShowTossModal(false)} />
     </div>
   );
 };

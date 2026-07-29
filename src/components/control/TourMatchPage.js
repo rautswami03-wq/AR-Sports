@@ -7,6 +7,7 @@ import { CricNavbar } from '../common/CricNavbar';
 import { ChangeBowlerModal } from './ChangeBowlerModal';
 import { WicketModal } from './WicketModal';
 import { PlayerListModal } from './PlayerListModal';
+import { TossMatchModal } from './TossMatchModal';
 export const TourMatchPage = () => {
     const { id } = useParams();
     const { teamA, teamB, matchDetails, battingTeamId, activeOverlays, toggleOverlay, triggerAnimation, addRuns, addExtra, addWicket, switchStrikers, retireBatter, changeBowler, undoLastBall, updateTeamColors, updateTeamDetails, updateMatchSettings, resetMatchState, startNewMatchWithTeams, startSecondInnings, setDecision, updatePlayerAvatar, updateBatterStats, updateBowlerStats, } = useBroadcastStore();
@@ -18,6 +19,7 @@ export const TourMatchPage = () => {
     const [showBowlerModal, setShowBowlerModal] = useState(false);
     const [showWicketModal, setShowWicketModal] = useState(false);
     const [showPlayerTeamId, setShowPlayerTeamId] = useState(null);
+    const [showTossModal, setShowTossModal] = useState(false);
     const isTeamA = battingTeamId === teamA.id || battingTeamId === teamA.shortName || battingTeamId === 'teamA';
     const battingTeam = isTeamA ? teamA : teamB;
     const bowlingTeam = isTeamA ? teamB : teamA;
@@ -95,10 +97,7 @@ export const TourMatchPage = () => {
         alert('Broadcast match update sent to OBS Studio!');
     };
     const handleChangeToss = () => {
-        const choices = ['BAT', 'BOWL'];
-        const randomChoice = choices[Math.floor(Math.random() * choices.length)];
-        const newToss = `${teamA.fullName.toUpperCase()} WON THE TOSS AND OPTED TO ${randomChoice}`;
-        setTossText(newToss);
+        setShowTossModal(true);
     };
     const toggleInnings = () => {
         startSecondInnings();
@@ -148,5 +147,5 @@ export const TourMatchPage = () => {
                                         updateTeamDetails('teamB', { fullName: editTeamB, shortName: editTeamBShort });
                                         updateMatchSettings({ tournament: editTourName, totalOvers: editTotalOvers });
                                         setShowEditModal(false);
-                                    }, className: "px-6 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black rounded-xl text-xs uppercase shadow-lg", children: "Save & Apply to Broadcast" })] })] }) })), _jsx(ChangeBowlerModal, { isOpen: showBowlerModal, onClose: () => setShowBowlerModal(false) }), _jsx(WicketModal, { isOpen: showWicketModal, onClose: () => setShowWicketModal(false) }), showPlayerTeamId && (_jsx(PlayerListModal, { isOpen: !!showPlayerTeamId, teamId: showPlayerTeamId, onClose: () => setShowPlayerTeamId(null) }))] }));
+                                    }, className: "px-6 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black rounded-xl text-xs uppercase shadow-lg", children: "Save & Apply to Broadcast" })] })] }) })), _jsx(ChangeBowlerModal, { isOpen: showBowlerModal, onClose: () => setShowBowlerModal(false) }), _jsx(WicketModal, { isOpen: showWicketModal, onClose: () => setShowWicketModal(false) }), showPlayerTeamId && (_jsx(PlayerListModal, { isOpen: !!showPlayerTeamId, teamId: showPlayerTeamId, onClose: () => setShowPlayerTeamId(null) })), _jsx(TossMatchModal, { isOpen: showTossModal, onClose: () => setShowTossModal(false) })] }));
 };
