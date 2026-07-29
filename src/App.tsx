@@ -10,22 +10,26 @@ export default function App() {
   const location = useLocation();
 
   useEffect(() => {
+    const href = window.location.href;
+    const hash = window.location.hash;
     const isOverlayRoute =
+      href.includes('/overlay') ||
+      href.includes('/theme/') ||
+      hash.includes('/overlay') ||
+      hash.includes('/theme/') ||
       location.pathname.startsWith('/overlay') ||
       location.pathname.startsWith('/theme');
 
     if (isOverlayRoute) {
-      document.body.classList.add('overlay-mode');
-      document.documentElement.classList.add('overlay-mode');
-      document.body.style.background = 'transparent';
-      document.documentElement.style.background = 'transparent';
+      document.body.style.setProperty('background', 'transparent', 'important');
+      document.body.style.setProperty('background-color', 'transparent', 'important');
+      document.documentElement.style.setProperty('background', 'transparent', 'important');
+      document.documentElement.style.setProperty('background-color', 'transparent', 'important');
     } else {
-      document.body.classList.remove('overlay-mode');
-      document.documentElement.classList.remove('overlay-mode');
-      document.body.style.background = '#070b15';
-      document.documentElement.style.background = '#070b15';
+      document.body.style.setProperty('background', '#070b15');
+      document.documentElement.style.setProperty('background', '#070b15');
     }
-  }, [location.pathname]);
+  }, [location.pathname, location.hash]);
 
   return (
     <Routes>

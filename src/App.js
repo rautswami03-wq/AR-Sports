@@ -9,20 +9,24 @@ import { TourMatchPage } from './components/control/TourMatchPage';
 export default function App() {
     const location = useLocation();
     useEffect(() => {
-        const isOverlayRoute = location.pathname.startsWith('/overlay') ||
+        const href = window.location.href;
+        const hash = window.location.hash;
+        const isOverlayRoute = href.includes('/overlay') ||
+            href.includes('/theme/') ||
+            hash.includes('/overlay') ||
+            hash.includes('/theme/') ||
+            location.pathname.startsWith('/overlay') ||
             location.pathname.startsWith('/theme');
         if (isOverlayRoute) {
-            document.body.classList.add('overlay-mode');
-            document.documentElement.classList.add('overlay-mode');
-            document.body.style.background = 'transparent';
-            document.documentElement.style.background = 'transparent';
+            document.body.style.setProperty('background', 'transparent', 'important');
+            document.body.style.setProperty('background-color', 'transparent', 'important');
+            document.documentElement.style.setProperty('background', 'transparent', 'important');
+            document.documentElement.style.setProperty('background-color', 'transparent', 'important');
         }
         else {
-            document.body.classList.remove('overlay-mode');
-            document.documentElement.classList.remove('overlay-mode');
-            document.body.style.background = '#070b15';
-            document.documentElement.style.background = '#070b15';
+            document.body.style.setProperty('background', '#070b15');
+            document.documentElement.style.setProperty('background', '#070b15');
         }
-    }, [location.pathname]);
+    }, [location.pathname, location.hash]);
     return (_jsxs(Routes, { children: [_jsx(Route, { path: "/", element: _jsx(ControlStudio, {}) }), _jsx(Route, { path: "/control", element: _jsx(ControlStudio, {}) }), _jsx(Route, { path: "/tournament", element: _jsx(TournamentPage, {}) }), _jsx(Route, { path: "/tournament/:id", element: _jsx(TourMatchPage, {}) }), _jsx(Route, { path: "/theme_links", element: _jsx(ThemeLinksPage, {}) }), _jsx(Route, { path: "/themes", element: _jsx(ThemeLinksPage, {}) }), _jsx(Route, { path: "/overlay", element: _jsx("div", { className: "w-full h-full bg-transparent overflow-hidden flex items-center justify-center", children: _jsx(OverlayStage, {}) }) }), _jsx(Route, { path: "/theme/:themeId", element: _jsx("div", { className: "w-full h-full bg-transparent overflow-hidden flex items-center justify-center", children: _jsx(OverlayStage, {}) }) }), _jsx(Route, { path: "/theme/:themeId/:matchId", element: _jsx("div", { className: "w-full h-full bg-transparent overflow-hidden flex items-center justify-center", children: _jsx(OverlayStage, {}) }) })] }));
 }
