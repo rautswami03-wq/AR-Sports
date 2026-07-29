@@ -399,7 +399,10 @@ export const TourMatchPage: React.FC = () => {
         {/* Action Controls Button Matrix */}
         <div className="w-full grid grid-cols-2 sm:grid-cols-5 gap-4 mb-10">
           <button
-            onClick={() => resetMatchState()}
+            onClick={() => {
+              toggleOverlay('tournamentTitle', false);
+              toggleOverlay('scoreBug', true);
+            }}
             className="py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-base rounded-2xl shadow-lg active:scale-95 transition-all uppercase tracking-wider"
           >
             Default
@@ -411,19 +414,26 @@ export const TourMatchPage: React.FC = () => {
             Change Toss
           </button>
           <button
-            onClick={toggleInnings}
+            onClick={() => {
+              toggleOverlay('tournamentTitle', false);
+              toggleOverlay('scoreBug', true);
+              toggleInnings();
+            }}
             className="py-3.5 bg-slate-900 border-2 border-red-500 hover:border-red-400 text-white font-black text-base rounded-2xl shadow-[0_0_20px_rgba(239,68,68,0.5)] active:scale-95 transition-all uppercase tracking-wider"
           >
             {matchDetails.currentInnings === 1 ? 'START 1ST INNINGS' : '2ND INNINGS ACTIVE'}
           </button>
           <button
-            onClick={() => toggleOverlay('matchSummary')}
+            onClick={() => {
+              toggleOverlay('scoreBug', false);
+              toggleOverlay('tournamentTitle', true);
+            }}
             className="py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-black text-base rounded-2xl shadow-lg active:scale-95 transition-all uppercase tracking-wider"
           >
             Tour Name
           </button>
           <button
-            onClick={() => resetMatchState()}
+            onClick={() => undoLastBall()}
             className="py-3.5 bg-red-600 hover:bg-red-500 text-white font-black text-base rounded-2xl shadow-lg active:scale-95 transition-all uppercase tracking-wider col-span-2 sm:col-span-1"
           >
             UNDO

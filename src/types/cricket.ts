@@ -174,7 +174,8 @@ export type OverlayType =
   | 'manhattan'
   | 'commentator'
   | 'watermark'
-  | 'manOfTheMatchCard';
+  | 'manOfTheMatchCard'
+  | 'tournamentTitle';
 
 export type EventAnimationType =
   | 'FOUR'

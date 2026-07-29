@@ -39,6 +39,7 @@ import { PitchMapOverlay } from '../overlays/PitchMapOverlay';
 import { ManhattanOverlay } from '../overlays/ManhattanOverlay';
 import { CommentatorOverlay } from '../overlays/CommentatorOverlay';
 import { WatermarkOverlay } from '../overlays/WatermarkOverlay';
+import { TournamentTitleOverlay } from '../overlays/TournamentTitleOverlay';
 
 // Animations
 import { FourAnimation } from '../animations/FourAnimation';
@@ -164,7 +165,7 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
   const isVisible = (type: OverlayType) => {
     if (forcedOverlay) return forcedOverlay === type;
     const hasAnyActiveOverlay = Object.values(activeOverlays).some(Boolean);
-    if (!hasAnyActiveOverlay && type === 'scoreBug') return true;
+    if (!hasAnyActiveOverlay && type === 'tournamentTitle') return true;
     return !!activeOverlays[type];
   };
 
@@ -176,6 +177,7 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
       <AnimatePresence mode="sync">
         {/* Overlays */}
         {isVisible('scoreBug') && <LiveScoreBug key="scoreBug" />}
+        {isVisible('tournamentTitle') && <TournamentTitleOverlay key="tournamentTitle" />}
         {isVisible('battingLowerThird') && <BattingLowerThird key="battingL3" />}
         {isVisible('bowlingLowerThird') && <BowlingLowerThird key="bowlingL3" />}
         {isVisible('battingScorecard') && <BattingScorecard key="battingCard" />}

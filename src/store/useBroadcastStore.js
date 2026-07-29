@@ -178,6 +178,7 @@ const INITIAL_OVERLAYS = {
     commentator: false,
     watermark: false,
     manOfTheMatchCard: false,
+    tournamentTitle: false,
 };
 // Initial state loader from LocalStorage
 function loadInitialState() {
@@ -763,6 +764,11 @@ export const useBroadcastStore = create((set, get) => ({
                     decision: null,
                 },
                 activeAnimation: null,
+                activeOverlays: {
+                    ...INITIAL_OVERLAYS,
+                    scoreBug: false,
+                    tournamentTitle: true,
+                },
                 historyStack: [],
             };
             postStateSync(nextState);
