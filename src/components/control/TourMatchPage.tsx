@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useBroadcastStore } from '../../store/useBroadcastStore';
-import { Send, Edit3, Image, Radio, ChevronDown, ChevronUp } from 'lucide-react';
+import { Send, Edit3, Image, Radio, ChevronDown, ChevronUp, CheckCircle2 } from 'lucide-react';
 import { OverlayType } from '../../types/cricket';
 import { CricNavbar } from '../common/CricNavbar';
 import { ChangeBowlerModal } from './ChangeBowlerModal';
@@ -128,8 +129,12 @@ export const TourMatchPage: React.FC = () => {
   const [team1Color, setTeam1Color] = useState(teamA.primaryColor);
   const [team2Color, setTeam2Color] = useState(teamB.primaryColor);
 
+  const [showSendToast, setShowSendToast] = useState(false);
+
   const handleSendUpdate = () => {
     useBroadcastStore.getState().toggleOverlay('scoreBug', true);
+    setShowSendToast(true);
+    setTimeout(() => setShowSendToast(false), 3500);
   };
 
   const handleChangeToss = () => {
@@ -174,6 +179,21 @@ export const TourMatchPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-[#070b15] text-slate-100 font-sans pb-32 overflow-y-auto w-full">
       <CricNavbar />
+
+      {/* Floating OBS Broadcast Confirmation Toast Popup */}
+      <AnimatePresence>
+        {showSendToast && (
+          <motion.div
+            initial={{ opacity: 0, y: -40, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -40, scale: 0.9 }}
+            className="fixed top-20 z-50 bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-500 text-slate-950 px-8 py-3.5 rounded-2xl shadow-[0_0_50px_rgba(16,185,129,0.9)] border-2 border-white font-black text-sm uppercase tracking-wider flex items-center gap-3 drop-shadow-2xl"
+          >
+            <CheckCircle2 className="w-6 h-6 text-slate-950 animate-pulse" />
+            <span>⚡ OBS BROADCAST UPDATED! OVERLAY SYNC ACTIVE</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Main Content */}
       <main className="max-w-5xl mx-auto py-8 px-4 flex flex-col items-center">
