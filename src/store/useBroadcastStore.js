@@ -218,6 +218,10 @@ const INITIAL_OVERLAYS = {
     groupPt8: false,
     superOver: false,
     wagonWheel: false,
+    pitchMap: false,
+    manhattan: false,
+    commentator: false,
+    watermark: false,
     manOfTheMatchCard: false,
 };
 // Initial state loader from LocalStorage
@@ -683,6 +687,104 @@ export const useBroadcastStore = create((set, get) => ({
         };
         set(defaultState);
         postStateSync(defaultState);
+    },
+    startNewMatchWithTeams: (teamAName, teamBName, tournamentName) => {
+        const deriveShort = (name) => name.split(' ').map((w) => w[0]).join('').substring(0, 4).toUpperCase() || name.substring(0, 3).toUpperCase();
+        const shortA = deriveShort(teamAName);
+        const shortB = deriveShort(teamBName);
+        const resetTeam = (baseTeam, fullName, shortName) => ({
+            ...baseTeam,
+            fullName,
+            shortName,
+            score: 0,
+            wickets: 0,
+            overs: 0,
+            balls: 0,
+            batters: Array.from({ length: 11 }, (_, idx) => ({
+                id: `${shortName}_b${idx + 1}`,
+                name: idx === 0 ? 'Striker 1' : idx === 1 ? 'Striker 2' : `Batter ${idx + 1}`,
+                runs: 0,
+                balls: 0,
+                fours: 0,
+                sixes: 0,
+                isOut: false,
+                isStriker: idx === 0,
+            })),
+            bowlers: Array.from({ length: 6 }, (_, idx) => ({
+                id: `${shortName}_bw${idx + 1}`,
+                name: `Bowler ${idx + 1}`,
+                overs: 0,
+                ballsInCurrentOver: 0,
+                maidens: 0,
+                runsConceded: 0,
+                wickets: 0,
+                economy: 0.0,
+                isCurrent: idx === 0,
+            })),
+        });
+        set((state) => {
+            const nextState = {
+                teamA: resetTeam(state.teamA, teamAName, shortA),
+                teamB: resetTeam(state.teamB, teamBName, shortB),
+                battingTeamId: state.teamA.id,
+                bowlingTeamId: state.teamB.id,
+                matchDetails: {
+                    ...state.matchDetails,
+                    tournament: tournamentName || state.matchDetails.tournament,
+                    recentBalls: [],
+                    winnerMargin: undefined,
+                    customInputText: undefined,
+                    decision: null,
+                },
+                activeAnimation: null,
+                historyStack: [],
+            };
+            postStateSync(nextState);
+            return nextState;
+        });
+    },
+    startSecondInnings: () => {
+        set((state) => {
+            const firstInningsBattingTeam = state.battingTeamId === state.teamA.id ? state.teamA : state.teamB;
+            const targetRuns = firstInningsBattingTeam.score + 1;
+            const newBattingTeamId = state.bowlingTeamId;
+            const newBowlingTeamId = state.battingTeamId;
+            const nextState = {
+                battingTeamId: newBattingTeamId,
+                bowlingTeamId: newBowlingTeamId,
+                matchDetails: {
+                    ...state.matchDetails,
+                    currentInnings: 2,
+                    targetRuns: targetRuns,
+                    recentBalls: [],
+                    matchStatusText: `2ND INNINGS | TARGET: ${targetRuns}`,
+                },
+            };
+            postStateSync({ ...state, ...nextState });
+            return nextState;
+        });
+    },
+    updatePlayerAvatar: (teamId, playerType, playerId, avatarUrl) => {
+        set((state) => {
+            const targetTeamKey = teamId === 'teamA' ? 'teamA' : 'teamB';
+            const currentTeam = state[targetTeamKey];
+            let updatedTeam;
+            if (playerType === 'batter') {
+                updatedTeam = {
+                    ...currentTeam,
+                    batters: currentTeam.batters.map((b) => (b.id === playerId ? { ...b, avatarUrl } : b)),
+                };
+            }
+            else {
+                updatedTeam = {
+                    ...currentTeam,
+                    bowlers: currentTeam.bowlers.map((b) => (b.id === playerId ? { ...b, avatarUrl } : b)),
+                };
+            }
+            const nextState = { [targetTeamKey]: updatedTeam };
+            postStateSync({ ...state, ...nextState });
+            return nextState;
+        });
     },
 }));
 // Auto-reconnecting WebSocket Gateway Client

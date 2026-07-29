@@ -78,11 +78,16 @@ export const LiveScoreBug: React.FC = () => {
       </div>
 
       {/* 3. Batters Box */}
-      <div className={`${theme.scoreBugMainBg || 'bg-cyan-300'} brightness-95 px-4 flex flex-col justify-center border-r border-slate-900 min-w-[250px] text-xs font-black`}>
+      <div className={`${theme.scoreBugMainBg || 'bg-cyan-300'} brightness-95 px-4 flex flex-col justify-center border-r border-slate-900 min-w-[260px] text-xs font-black`}>
         {striker && (
           <div className="flex items-center justify-between opacity-95 mb-0.5">
-            <span className="truncate flex items-center gap-1">
-              <span className="font-black text-sm">&gt;</span> {striker.name.toUpperCase()}
+            <span className="truncate flex items-center gap-1.5">
+              {striker.avatarUrl ? (
+                <img src={striker.avatarUrl} alt="" className="w-6 h-6 rounded-full object-cover border border-white/50" />
+              ) : (
+                <span className="font-black text-sm text-amber-400">&gt;</span>
+              )}
+              <span className="truncate">{striker.name.toUpperCase()}</span>
             </span>
             <span className="font-black text-sm ml-2">
               {striker.runs} <span className="opacity-75 font-bold text-xs">{striker.balls}</span>
@@ -91,7 +96,12 @@ export const LiveScoreBug: React.FC = () => {
         )}
         {nonStriker && (
           <div className="flex items-center justify-between opacity-80 font-bold">
-            <span className="truncate max-w-[160px] pl-3">{nonStriker.name.toUpperCase()}</span>
+            <span className="truncate max-w-[170px] flex items-center gap-1.5 pl-1">
+              {nonStriker.avatarUrl && (
+                <img src={nonStriker.avatarUrl} alt="" className="w-5 h-5 rounded-full object-cover border border-white/30" />
+              )}
+              <span className="truncate">{nonStriker.name.toUpperCase()}</span>
+            </span>
             <span className="text-xs ml-2">
               {nonStriker.runs} <span className="opacity-75 font-bold text-xs">{nonStriker.balls}</span>
             </span>

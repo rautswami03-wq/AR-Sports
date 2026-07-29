@@ -34,6 +34,11 @@ import { ReplayLowerThird } from '../overlays/ReplayLowerThird';
 import { SuperOverOverlay } from '../overlays/SuperOverOverlay';
 import { WagonWheelOverlay } from '../overlays/WagonWheelOverlay';
 import { ManOfTheMatchCardOverlay } from '../overlays/ManOfTheMatchCardOverlay';
+import { DecisionOverlay } from '../overlays/DecisionOverlay';
+import { PitchMapOverlay } from '../overlays/PitchMapOverlay';
+import { ManhattanOverlay } from '../overlays/ManhattanOverlay';
+import { CommentatorOverlay } from '../overlays/CommentatorOverlay';
+import { WatermarkOverlay } from '../overlays/WatermarkOverlay';
 
 // Animations
 import { FourAnimation } from '../animations/FourAnimation';
@@ -49,6 +54,8 @@ import { EndOfInningsAnimation } from '../animations/EndOfInningsAnimation';
 import { MatchWinnerAnimation } from '../animations/MatchWinnerAnimation';
 import { FiftyAnimation } from '../animations/FiftyAnimation';
 import { CenturyAnimation } from '../animations/CenturyAnimation';
+import { HatTrickAnimation } from '../animations/HatTrickAnimation';
+import { TourBoundariesAnimation } from '../animations/TourBoundariesAnimation';
 
 interface OverlayStageProps {
   scale?: number;
@@ -197,6 +204,11 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
         {isVisible('superOver') && <SuperOverOverlay key="superOver" />}
         {isVisible('wagonWheel') && <WagonWheelOverlay key="wagonWheel" />}
         {isVisible('manOfTheMatchCard') && <ManOfTheMatchCardOverlay key="momCard" />}
+        {isVisible('decision') && <DecisionOverlay key="decision" />}
+        {isVisible('pitchMap') && <PitchMapOverlay key="pitchMap" />}
+        {isVisible('manhattan') && <ManhattanOverlay key="manhattan" />}
+        {isVisible('commentator') && <CommentatorOverlay key="commentator" />}
+        {isVisible('watermark') && <WatermarkOverlay key="watermark" />}
 
         {/* Animations */}
         {activeAnimation === 'FOUR' && <FourAnimation key="animFour" />}
@@ -212,6 +224,8 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
         {activeAnimation === 'MATCH_WINNER' && <MatchWinnerAnimation key="animMatchWinner" />}
         {activeAnimation === 'FIFTY' && <FiftyAnimation key="animFifty" />}
         {activeAnimation === 'CENTURY' && <CenturyAnimation key="animCentury" />}
+        {activeAnimation === 'HAT_TRICK' && <HatTrickAnimation key="animHatTrick" />}
+        {activeAnimation === 'TOUR_BOUNDARIES' && <TourBoundariesAnimation key="animTourBoundaries" />}
       </AnimatePresence>
     </div>
   );

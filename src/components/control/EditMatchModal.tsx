@@ -7,7 +7,16 @@ interface EditMatchModalProps {
 }
 
 export const EditMatchModal: React.FC<EditMatchModalProps> = ({ isOpen, onClose }) => {
-  const { teamA, teamB, matchDetails, updateMatchSettings, updateTeamDetails } = useBroadcastStore();
+  const { teamA, teamB, matchDetails, battingTeamId, updateMatchSettings, updateTeamDetails, updatePlayerAvatar } = useBroadcastStore();
+
+  const isTeamA = battingTeamId === teamA.id || battingTeamId === teamA.shortName || battingTeamId === 'teamA';
+  const battingTeam = isTeamA ? teamA : teamB;
+  const bowlingTeam = isTeamA ? teamB : teamA;
+  const battingTeamKey = isTeamA ? 'teamA' : 'teamB';
+  const bowlingTeamKey = isTeamA ? 'teamB' : 'teamA';
+
+  const striker = battingTeam.batters.find((b) => b.isStriker) || battingTeam.batters[0];
+  const currentBowler = bowlingTeam.bowlers.find((bw) => bw.isCurrent) || bowlingTeam.bowlers[0];
 
   const [team1Name, setTeam1Name] = useState(teamA.fullName || '');
   const [team2Name, setTeam2Name] = useState(teamB.fullName || '');
@@ -17,6 +26,8 @@ export const EditMatchModal: React.FC<EditMatchModalProps> = ({ isOpen, onClose 
   const [ballsPerOver, setBallsPerOver] = useState(matchDetails.ballsPerOver || 6);
   const [matchType, setMatchType] = useState(matchDetails.matchType || 'Group Stage');
   const [groupNo, setGroupNo] = useState(matchDetails.groupNo || 1);
+  const [strikerPhoto, setStrikerPhoto] = useState(striker?.avatarUrl || '');
+  const [bowlerPhoto, setBowlerPhoto] = useState(currentBowler?.avatarUrl || '');
 
   if (!isOpen) return null;
 
@@ -32,6 +43,13 @@ export const EditMatchModal: React.FC<EditMatchModalProps> = ({ isOpen, onClose 
       matchType,
       groupNo: Number(groupNo),
     });
+
+    if (striker && strikerPhoto) {
+      updatePlayerAvatar(battingTeamKey, 'batter', striker.id, strikerPhoto);
+    }
+    if (currentBowler && bowlerPhoto) {
+      updatePlayerAvatar(bowlingTeamKey, 'bowler', currentBowler.id, bowlerPhoto);
+    }
     onClose();
   };
 
@@ -158,6 +176,31 @@ export const EditMatchModal: React.FC<EditMatchModalProps> = ({ isOpen, onClose 
               <option value={4}>4</option>
               <option value={5}>5</option>
             </select>
+          </div>
+
+          {/* CricPic Player Photos Section */}
+          <div className="pt-3 border-t border-blue-400/40 space-y-2 text-left">
+            <p className="text-xs font-black uppercase text-amber-400 text-center tracking-wider">📷 CRICPIC PLAYER PHOTOS</p>
+            <div>
+              <label className="block text-xs font-bold uppercase mb-1 text-cyan-300">Striker Photo URL ({striker?.name})</label>
+              <input
+                type="text"
+                placeholder="https://example.com/player.png or file path"
+                value={strikerPhoto}
+                onChange={(e) => setStrikerPhoto(e.target.value)}
+                className="w-full px-3 py-1.5 text-xs text-slate-900 font-bold bg-white rounded-md focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold uppercase mb-1 text-cyan-300">Bowler Photo URL ({currentBowler?.name})</label>
+              <input
+                type="text"
+                placeholder="https://example.com/bowler.png or file path"
+                value={bowlerPhoto}
+                onChange={(e) => setBowlerPhoto(e.target.value)}
+                className="w-full px-3 py-1.5 text-xs text-slate-900 font-bold bg-white rounded-md focus:outline-none"
+              />
+            </div>
           </div>
 
           {/* Actions */}

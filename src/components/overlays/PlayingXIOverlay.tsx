@@ -20,10 +20,13 @@ export const PlayingXIOverlay: React.FC = () => {
             <h3 className="text-white font-extrabold text-lg uppercase">{teamA.fullName}</h3>
           </div>
           <ol className="space-y-1 text-xs font-semibold divide-y divide-white/5">
-            {teamA.playingXI.map((player, idx) => (
-              <li key={idx} className="py-1.5 flex items-center justify-between">
+            {teamA.batters.map((player, idx) => (
+              <li key={idx} className="py-1.5 flex items-center justify-between gap-2">
                 <span className="text-slate-400 font-bold w-6">{idx + 1}.</span>
-                <span className="text-white flex-1">{player}</span>
+                {player.avatarUrl ? (
+                  <img src={player.avatarUrl} alt="" className="w-6 h-6 rounded-full object-cover border border-amber-400" />
+                ) : null}
+                <span className="text-white flex-1 font-bold">{player.name}</span>
               </li>
             ))}
           </ol>
@@ -36,10 +39,13 @@ export const PlayingXIOverlay: React.FC = () => {
             <h3 className="text-white font-extrabold text-lg uppercase">{teamB.fullName}</h3>
           </div>
           <ol className="space-y-1 text-xs font-semibold divide-y divide-white/5">
-            {teamB.playingXI.map((player, idx) => (
-              <li key={idx} className="py-1.5 flex items-center justify-between">
+            {teamB.batters.map((player, idx) => (
+              <li key={idx} className="py-1.5 flex items-center justify-between gap-2">
                 <span className="text-slate-400 font-bold w-6">{idx + 1}.</span>
-                <span className="text-white flex-1">{player}</span>
+                {player.avatarUrl ? (
+                  <img src={player.avatarUrl} alt="" className="w-6 h-6 rounded-full object-cover border border-amber-400" />
+                ) : null}
+                <span className="text-white flex-1 font-bold">{player.name}</span>
               </li>
             ))}
           </ol>

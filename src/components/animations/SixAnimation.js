@@ -1,5 +1,12 @@
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { jsx as _jsx } from "react/jsx-runtime";
+import { useRef, useEffect } from 'react';
 import { motion } from 'framer-motion';
 export const SixAnimation = () => {
-    return (_jsx(motion.div, { initial: { opacity: 0, scale: 0.3, rotate: -10 }, animate: { opacity: 1, scale: 1.15, rotate: 0 }, exit: { opacity: 0, scale: 1.5, rotate: 10 }, transition: { type: 'spring', damping: 14, stiffness: 220 }, className: "absolute inset-0 flex items-center justify-center pointer-events-none z-50", children: _jsxs("div", { className: "bg-gradient-to-r from-purple-700 via-indigo-500 to-purple-700 text-white px-28 py-10 rounded-3xl border-4 border-purple-300 shadow-[0_0_100px_rgba(168,85,247,0.9)] transform skew-x-[-15deg] text-center", children: [_jsx("h1", { className: "text-9xl font-black italic uppercase tracking-tighter text-broadcast-gold", children: "MAXIMUM SIX!" }), _jsx("span", { className: "text-2xl font-black uppercase tracking-widest text-purple-200 block mt-2", children: "MASSIVE HIT \u2022 6 RUNS" })] }) }));
+    const videoRef = useRef(null);
+    useEffect(() => {
+        if (videoRef.current) {
+            videoRef.current.play().catch((err) => console.log('Autoplay notice:', err));
+        }
+    }, []);
+    return (_jsx(motion.div, { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 }, transition: { duration: 0.2 }, className: "fixed inset-0 w-full h-full flex items-center justify-center pointer-events-none z-50 overflow-hidden", children: _jsx("video", { ref: videoRef, src: "/transitions/six.webm", autoPlay: true, playsInline: true, muted: true, className: "w-full h-full object-cover" }) }));
 };

@@ -8,6 +8,7 @@ export interface Batter {
   isOut: boolean;
   dismissal?: string;
   isStriker?: boolean;
+  avatarUrl?: string;
 }
 
 export interface Bowler {
@@ -20,6 +21,7 @@ export interface Bowler {
   wickets: number;
   economy: number;
   isCurrent?: boolean;
+  avatarUrl?: string;
 }
 
 export interface Partnership {
@@ -168,6 +170,10 @@ export type OverlayType =
   | 'groupPt8'
   | 'superOver'
   | 'wagonWheel'
+  | 'pitchMap'
+  | 'manhattan'
+  | 'commentator'
+  | 'watermark'
   | 'manOfTheMatchCard';
 
 export type EventAnimationType =
@@ -184,4 +190,6 @@ export type EventAnimationType =
   | 'MATCH_WINNER'
   | 'FIFTY'
   | 'CENTURY'
+  | 'HAT_TRICK'
+  | 'TOUR_BOUNDARIES'
   | null;
