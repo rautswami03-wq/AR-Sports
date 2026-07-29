@@ -199,7 +199,7 @@ export const ControlStudio: React.FC = () => {
       </header>
 
       {/* Main Grid */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 p-6 overflow-hidden">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 p-6 overflow-y-auto pb-24">
         {/* Left Column: Stage Preview + Quick Live Header */}
         <div className="lg:col-span-6 flex flex-col gap-4">
           <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col">

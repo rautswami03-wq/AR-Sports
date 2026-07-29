@@ -169,7 +169,7 @@ export const TourMatchPage: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#070b15] text-slate-100 font-sans pb-16">
+    <div className="min-h-screen bg-[#070b15] text-slate-100 font-sans pb-32 overflow-y-auto w-full">
       <CricNavbar />
 
       {/* Main Content */}
