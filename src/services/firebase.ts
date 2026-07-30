@@ -2,14 +2,14 @@ import { initializeApp, getApps } from 'firebase/app';
 import { getFirestore, doc, onSnapshot, setDoc } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyADZq0NyOhHVjMUYsQX4UWS8OWjOt0RbG4",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "cricscore-dcaa4.firebaseapp.com",
-  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL || "https://cricscore-dcaa4-default-rtdb.firebaseio.com",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "cricscore-dcaa4",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "cricscore-dcaa4.firebasestorage.app",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "674016632224",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:674016632224:web:33f3911fe43396cb8e58c5",
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID || "G-WG5HE07NYJ"
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
@@ -30,14 +30,14 @@ export function subscribeToLiveMatch(matchId: string, onUpdate: (data: any) => v
         }
       },
       (error) => {
-        console.warn('Firestore snapshot notice:', error.message);
+        console.warn('firestore:', error.message);
       }
     );
   } catch (err) {
-    console.warn('Firestore connection notice:', err);
+    console.warn('firestore init failed:', err);
   }
 
-  // 1. Ultra-Fast ntfy.sh SSE Real-Time Stream (Instant Sub-100ms Push to OBS Studio Software)
+  // ntfy.sh SSE push
   let eventSource: EventSource | null = null;
   if (typeof window !== 'undefined' && 'EventSource' in window) {
     try {
@@ -49,16 +49,12 @@ export function subscribeToLiveMatch(matchId: string, onUpdate: (data: any) => v
             const statePayload = JSON.parse(parsed.message);
             onUpdate(statePayload);
           }
-        } catch (e) {
-          // Keepalive or notice
-        }
+        } catch {}
       };
-    } catch (e) {
-      console.warn('ntfy SSE notice:', e);
-    }
+    } catch {}
   }
 
-  // 2. High-Frequency RTDB REST Polling (Guarantees OBS Studio Software Sync Across Applications)
+  // RTDB polling fallback
   let lastRtdbJson = '';
   const pollRtdb = async () => {
     try {
@@ -71,9 +67,7 @@ export function subscribeToLiveMatch(matchId: string, onUpdate: (data: any) => v
           onUpdate(parsed);
         }
       }
-    } catch (e) {
-      // Network fallback
-    }
+    } catch {}
   };
 
   pollRtdb();
@@ -89,32 +83,25 @@ export function subscribeToLiveMatch(matchId: string, onUpdate: (data: any) => v
 export async function publishLiveMatchState(matchId: string, state: any) {
   const cleanState = JSON.parse(JSON.stringify(state));
 
-  // 1. Publish to ntfy.sh SSE Cloud Stream (Instant Push to OBS Studio Software)
   try {
     fetch(NTFY_TOPIC, {
       method: 'POST',
       body: JSON.stringify(cleanState),
     }).catch(() => {});
-  } catch (err) {
-    console.warn('ntfy publish notice:', err);
-  }
+  } catch {}
 
-  // 2. Publish to Firestore
   try {
     const matchDoc = doc(db, 'matches', matchId);
     await setDoc(matchDoc, cleanState, { merge: true });
   } catch (err) {
-    console.warn('Firestore publish notice:', err);
+    console.warn('firestore write failed:', err);
   }
 
-  // 3. Publish to Realtime DB REST Endpoint (Guarantees OBS Studio Software Sync!)
   try {
     await fetch(RTDB_URL, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(cleanState),
     });
-  } catch (err) {
-    console.warn('RTDB publish notice:', err);
-  }
+  } catch {}
 }

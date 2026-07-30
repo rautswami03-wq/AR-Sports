@@ -42,17 +42,17 @@ export const LandingPage: React.FC = () => {
 
       {/* Hero Section */}
       <section className="relative overflow-hidden pt-12 pb-20 px-6 max-w-7xl mx-auto text-center">
-        {/* Background Ambient Glows */}
+
         <div className="absolute top-10 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-gradient-to-tr from-cyan-500/20 via-indigo-500/20 to-purple-600/20 blur-[120px] pointer-events-none rounded-full" />
 
-        {/* Live Status Badge */}
+
         <div className="inline-flex items-center gap-2 bg-gradient-to-r from-emerald-500/20 via-cyan-500/20 to-indigo-500/20 border border-cyan-400/40 text-cyan-300 text-xs font-mono font-black uppercase px-4 py-1.5 rounded-full mb-6 shadow-lg shadow-cyan-500/10">
           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
           <Radio className="w-3.5 h-3.5 text-amber-400" />
-          PRO BROADCAST & OVERLAY ENGINE ACTIVE
+          LIVE OVERLAY ENGINE
         </div>
 
-        {/* Title */}
+
         <h1 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight text-white max-w-4xl mx-auto leading-tight">
           Live Cricket Broadcast <br className="hidden sm:inline" />
           <span className="bg-gradient-to-r from-cyan-400 via-sky-300 to-amber-400 bg-clip-text text-transparent">
@@ -60,12 +60,12 @@ export const LandingPage: React.FC = () => {
           </span>
         </h1>
 
-        {/* Subtitle */}
+
         <p className="mt-6 text-lg sm:text-xl text-slate-400 max-w-2xl mx-auto font-medium leading-relaxed">
-          Ultra-fast 100ms real-time score overlays for OBS Studio, vMix, and YouTube Live. Complete with 19 tournament themes, decision popups, spotlight graphics, and Firebase cloud sync.
+          Real-time score overlays for OBS Studio and YouTube Live. Customizable themes, DRS decisions, scorecards, and cloud sync across devices.
         </p>
 
-        {/* CTA Buttons */}
+
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
           <Link
             to="/control"
@@ -95,7 +95,7 @@ export const LandingPage: React.FC = () => {
           </Link>
         </div>
 
-        {/* Feature Badges */}
+
         <div className="mt-12 flex flex-wrap justify-center items-center gap-8 text-slate-400 text-xs font-bold uppercase tracking-wider">
           <div className="flex items-center gap-2">
             <Zap className="w-4 h-4 text-amber-400" /> 100ms Ultra-Low Latency

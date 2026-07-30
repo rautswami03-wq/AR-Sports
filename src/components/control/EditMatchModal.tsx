@@ -61,7 +61,7 @@ export const EditMatchModal: React.FC<EditMatchModalProps> = ({ isOpen, onClose 
         </h2>
 
         <form onSubmit={handleUpdate} className="space-y-4 text-center">
-          {/* Team 1 Name */}
+
           <div>
             <label className="block text-sm font-bold uppercase mb-1">Team 1 Name</label>
             <input
@@ -72,7 +72,7 @@ export const EditMatchModal: React.FC<EditMatchModalProps> = ({ isOpen, onClose 
             />
           </div>
 
-          {/* Team 2 Name */}
+
           <div>
             <label className="block text-sm font-bold uppercase mb-1">Team 2 Name</label>
             <input
@@ -83,7 +83,7 @@ export const EditMatchModal: React.FC<EditMatchModalProps> = ({ isOpen, onClose 
             />
           </div>
 
-          {/* Overs & Match No. */}
+
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <label className="text-sm font-bold uppercase">Overs</label>
@@ -105,7 +105,7 @@ export const EditMatchModal: React.FC<EditMatchModalProps> = ({ isOpen, onClose 
             </div>
           </div>
 
-          {/* Match Tied? */}
+
           <div className="flex items-center justify-center gap-6 py-1">
             <span className="text-sm font-bold uppercase">Match Tied?</span>
             <label className="flex items-center gap-1.5 font-bold cursor-pointer">
@@ -130,7 +130,7 @@ export const EditMatchModal: React.FC<EditMatchModalProps> = ({ isOpen, onClose 
             </label>
           </div>
 
-          {/* Balls Per Over */}
+
           <div className="flex items-center justify-between gap-2">
             <label className="text-sm font-bold uppercase">Balls Per Over :</label>
             <select
@@ -145,7 +145,7 @@ export const EditMatchModal: React.FC<EditMatchModalProps> = ({ isOpen, onClose 
             </select>
           </div>
 
-          {/* Match Type */}
+
           <div className="flex items-center justify-between gap-2">
             <label className="text-sm font-bold uppercase">Match Type :</label>
             <select
@@ -162,7 +162,7 @@ export const EditMatchModal: React.FC<EditMatchModalProps> = ({ isOpen, onClose 
             </select>
           </div>
 
-          {/* Group No. */}
+
           <div className="flex items-center justify-between gap-2">
             <label className="text-sm font-bold uppercase">Group No. :</label>
             <select
@@ -178,9 +178,9 @@ export const EditMatchModal: React.FC<EditMatchModalProps> = ({ isOpen, onClose 
             </select>
           </div>
 
-          {/* CricPic Player Photos Section */}
+
           <div className="pt-3 border-t border-blue-400/40 space-y-2 text-left">
-            <p className="text-xs font-black uppercase text-amber-400 text-center tracking-wider">📷 CRICPIC PLAYER PHOTOS</p>
+            <p className="text-xs font-black uppercase text-amber-400 text-center tracking-wider">Player Photos</p>
             <div>
               <label className="block text-xs font-bold uppercase mb-1 text-cyan-300">Striker Photo URL ({striker?.name})</label>
               <input
@@ -203,7 +203,7 @@ export const EditMatchModal: React.FC<EditMatchModalProps> = ({ isOpen, onClose 
             </div>
           </div>
 
-          {/* Actions */}
+
           <div className="flex items-center justify-center gap-4 pt-3">
             <button
               type="submit"

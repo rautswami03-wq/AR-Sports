@@ -1,9 +1,0 @@
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-import { motion } from 'framer-motion';
-import { useBroadcastStore } from '../../store/useBroadcastStore';
-export const FiftyAnimation = () => {
-    const { teamA, teamB, battingTeamId } = useBroadcastStore();
-    const battingTeam = battingTeamId === teamA.id ? teamA : teamB;
-    const striker = battingTeam.batters.find((b) => b.isStriker) || battingTeam.batters[0];
-    return (_jsx(motion.div, { initial: { scaleY: 0, opacity: 0 }, animate: { scaleY: 1, opacity: 1 }, exit: { scaleY: 0, opacity: 0 }, transition: { duration: 0.4, ease: 'easeOut' }, className: "absolute inset-x-0 bottom-24 z-50 overflow-hidden font-sans shadow-2xl", children: _jsxs("div", { className: "w-full bg-gradient-to-r from-amber-600 via-yellow-400 to-amber-500 py-4 border-y-4 border-white flex items-center justify-center relative shadow-[0_0_50px_rgba(251,191,36,0.8)]", children: [_jsx("div", { className: "absolute inset-0 bg-white/10 animate-pulse" }), _jsxs("div", { className: "relative z-10 flex items-center gap-6 text-slate-950", children: [_jsx("div", { className: "w-14 h-14 rounded-full bg-slate-950 text-amber-400 font-black text-2xl border-2 border-white flex items-center justify-center shadow-lg", children: "50" }), _jsxs("div", { children: [_jsx("span", { className: "text-xs font-black tracking-widest uppercase block text-slate-900 opacity-90", children: "HALF CENTURY CELEBRATION" }), _jsxs("h2", { className: "text-3xl sm:text-4xl font-black uppercase tracking-tight drop-shadow", children: [striker?.name || 'ROHIT SHARMA', " \u2022 50 RUNS!"] })] }), _jsxs("div", { className: "text-right hidden sm:block pl-6 border-l-2 border-slate-950/20 text-xs font-extrabold uppercase", children: [_jsxs("div", { children: ["FOURS: ", striker?.fours || 0] }), _jsxs("div", { children: ["SIXES: ", striker?.sixes || 0] })] })] })] }) }));
-};

@@ -6,7 +6,7 @@ export const ReplayLowerThird: React.FC = () => {
 
   useEffect(() => {
     if (videoRef.current) {
-      videoRef.current.play().catch((err) => console.log('Autoplay notice:', err));
+      videoRef.current.play().catch(() => {});
     }
   }, []);
 

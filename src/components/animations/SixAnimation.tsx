@@ -8,7 +8,7 @@ export const SixAnimation: React.FC = () => {
 
   useEffect(() => {
     if (videoRef.current) {
-      videoRef.current.play().catch((err) => console.log('Autoplay notice:', err));
+      videoRef.current.play().catch(() => {});
     }
   }, []);
 
@@ -29,7 +29,7 @@ export const SixAnimation: React.FC = () => {
         className="absolute inset-0 w-full h-full object-cover z-10"
       />
 
-      {/* High impact Animated Graphic Banner */}
+
       <motion.div
         initial={{ y: 80, scale: 0.5 }}
         animate={{ y: 0, scale: 1.1 }}

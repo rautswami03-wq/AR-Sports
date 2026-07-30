@@ -120,7 +120,7 @@ export const TourMatchPage: React.FC = () => {
   const [teamAShort, setTeamAShort] = useState(teamA.shortName);
   const [teamBShort, setTeamBShort] = useState(teamB.shortName);
 
-  // Custom Input & MOM / Tournament Player Selectors (Screenshot 1 & 2)
+
   const [customInputText, setCustomInputText] = useState('Jagdish Pawar');
   const [selectedMOM, setSelectedMOM] = useState('nagesh chitia (ashtavinayak indians)');
   const [selectedTourPlayer, setSelectedTourPlayer] = useState('ajit khade (ashtavinayak indians)');
@@ -440,7 +440,7 @@ export const TourMatchPage: React.FC = () => {
           </button>
         </div>
 
-        {/* 1. DISPLAY CONTROLLER SECTION (Exact CricScorer PRO Screenshot 1 & 2) */}
+
         <div className="w-full bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-2xl mb-8 space-y-6">
           <h2 className="text-xl font-black text-center text-white uppercase tracking-widest border-b border-slate-800 pb-3">
             DISPLAY CONTROLLER
@@ -529,7 +529,7 @@ export const TourMatchPage: React.FC = () => {
           </div>
         </div>
 
-        {/* 2. TOUR STATS CONTROLLER SECTION (Exact CricScorer PRO Screenshot 2) */}
+
         <div className="w-full bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-2xl mb-8 space-y-4">
           <h2 className="text-xl font-black text-center text-white uppercase tracking-widest border-b border-slate-800 pb-3">
             TOUR STATS CONTROLLER
@@ -550,7 +550,7 @@ export const TourMatchPage: React.FC = () => {
           </div>
         </div>
 
-        {/* 3. SELECT TEAM COLOR SECTION (Exact CricScorer PRO Screenshot 2) */}
+
         <div className="w-full bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-2xl mb-8 space-y-4">
           <h2 className="text-xl font-black text-center text-white uppercase tracking-widest border-b border-slate-800 pb-3">
             SELECT TEAM COLOR

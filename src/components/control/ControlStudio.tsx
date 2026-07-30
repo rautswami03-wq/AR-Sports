@@ -40,14 +40,14 @@ export const ControlStudio: React.FC = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showTossModal, setShowTossModal] = useState(false);
 
-  // Form states for custom inputs & bowler changes
+
   const [bowlerInput, setBowlerInput] = useState('');
   const [customAnimInput, setCustomAnimInput] = useState('');
   const [customDisplayInput, setCustomDisplayInput] = useState('');
   const [team1BulkText, setTeam1BulkText] = useState('');
   const [team2BulkText, setTeam2BulkText] = useState('');
 
-  // Scoring extras checkboxes
+
   const [extraWide, setExtraWide] = useState(false);
   const [extraNoBall, setExtraNoBall] = useState(false);
   const [extraByes, setExtraByes] = useState(false);
@@ -146,8 +146,7 @@ export const ControlStudio: React.FC = () => {
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
       <CricNavbar />
 
-      {/* Top Navbar */}
-      <header className="bg-slate-900 border-b border-slate-800 px-6 py-3 flex items-center justify-between shadow-md">
+      {/* Top Navbar */}      <header className="bg-slate-900 border-b border-slate-800 px-6 py-3 flex items-center justify-between shadow-md">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-amber-500 rounded-lg text-slate-950 font-black flex items-center gap-1.5 shadow-lg">
             <Radio className="w-5 h-5 animate-pulse" />
@@ -161,7 +160,7 @@ export const ControlStudio: React.FC = () => {
           </div>
         </div>
 
-        {/* Action Controls */}
+        {/* Actions */}
         <div className="flex items-center gap-3">
           <button
             onClick={() => setShowEditModal(true)}
@@ -198,18 +197,16 @@ export const ControlStudio: React.FC = () => {
         </div>
       </header>
 
-      {/* Main Grid */}
+
       <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-6 p-6 overflow-y-auto pb-24">
-        {/* Left Column: Stage Preview + Quick Live Header */}
+
         <div className="lg:col-span-6 flex flex-col gap-4">
           <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col">
             <div className="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
               <span className="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
-                <Tv className="w-4 h-4" /> Live Broadcast Stage Preview (1920×1080)
+                Preview
               </span>
-              <span className="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded font-mono">
-                OBS / vMix Ready
-              </span>
+
             </div>
 
             <div className="relative w-full aspect-video bg-slate-950 rounded-lg overflow-hidden border border-slate-800 shadow-2xl flex items-center justify-center">
@@ -227,7 +224,6 @@ export const ControlStudio: React.FC = () => {
             </div>
           </div>
 
-          {/* Quick Score Live Header Widget matching Screenshot 2026-04-13 204512 */}
           <div className="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
             <div className="flex items-center justify-between border-b border-slate-800 pb-2">
               <span className="bg-cyan-600 text-white font-black text-xs px-2.5 py-1 rounded tracking-wider">
@@ -241,7 +237,7 @@ export const ControlStudio: React.FC = () => {
               </span>
             </div>
 
-            {/* Striker / Non-Striker & Score */}
+
             <div className="grid grid-cols-3 gap-2 items-center bg-slate-950 p-3 rounded-lg border border-slate-800 text-center">
               <div className="text-left font-bold text-xs">
                 <div className="text-amber-400 font-black text-sm flex items-center gap-1">
@@ -273,9 +269,9 @@ export const ControlStudio: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Column: Operator Controller Studio */}
+
         <div className="lg:col-span-6 flex flex-col bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-xl">
-          {/* Controller Tabs Navigation */}
+
           <div className="flex border-b border-slate-800 bg-slate-950">
             <button
               onClick={() => setSelectedTab('scorer')}
@@ -329,12 +325,11 @@ export const ControlStudio: React.FC = () => {
             </button>
           </div>
 
-          {/* Tab Content */}
+
           <div className="p-5 flex-1 overflow-y-auto max-h-[620px] space-y-6">
-            {/* 1. SCORER / CONTROLLER TAB */}
             {selectedTab === 'scorer' && (
               <div className="space-y-5">
-                {/* Controller Quick Action Row matching Screenshot 2026-04-13 204512 */}
+
                 <div className="flex flex-wrap items-center gap-2">
                   <button
                     onClick={() => setShowTossModal(true)}
@@ -447,7 +442,7 @@ export const ControlStudio: React.FC = () => {
                   </button>
                 </div>
 
-                {/* Checkboxes Row */}
+
                 <div className="flex items-center gap-4 bg-slate-950 p-2.5 rounded-lg border border-slate-800 text-xs font-bold">
                   <label className="flex items-center gap-1.5 cursor-pointer text-slate-300">
                     <input
@@ -496,10 +491,10 @@ export const ControlStudio: React.FC = () => {
                   </label>
                 </div>
 
-                {/* Keypad Runs Grid */}
+
                 <div>
                   <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2">
-                    SCORING MATRIX NUMBERS
+                    RUNS
                   </span>
                   <div className="grid grid-cols-7 gap-2">
                     {[0, 1, 2, 3, 4, 5, 6].map((num) => (
@@ -520,10 +515,10 @@ export const ControlStudio: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Team Player Bulk Add Section */}
+
                 <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
                   <span className="text-xs font-black uppercase text-amber-400 block">
-                    BULK PLAYER NAMES UPLOAD
+                    ADD PLAYERS
                   </span>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
@@ -578,12 +573,11 @@ export const ControlStudio: React.FC = () => {
               </div>
             )}
 
-            {/* 2. OVERLAYS / DISPLAY CONTROLLER TAB */}
             {selectedTab === 'overlays' && (
               <div className="space-y-5">
                 <div>
                   <span className="text-xs font-black uppercase text-amber-400 tracking-wider block mb-2">
-                    DISPLAY CONTROLLER OVERLAYS
+                    OVERLAYS
                   </span>
                   <div className="flex flex-wrap gap-2">
                     {overlayList.map((item) => {
@@ -605,10 +599,10 @@ export const ControlStudio: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Decision Panel */}
+
                 <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
                   <span className="text-xs font-bold uppercase text-slate-400 block mb-2">
-                    DECISION OVERLAY CONTROL:
+                    DECISION
                   </span>
                   <div className="flex items-center gap-2">
                     <button
@@ -638,10 +632,10 @@ export const ControlStudio: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Graphs Control Panel */}
+
                 <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
                   <span className="text-xs font-bold uppercase text-slate-400 block mb-2">
-                    GRAPHS OVERLAY CONTROL:
+                    GRAPHS
                   </span>
                   <div className="flex items-center gap-2">
                     <button
@@ -671,7 +665,7 @@ export const ControlStudio: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Custom Input Field */}
+
                 <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 flex items-center gap-2">
                   <input
                     type="text"
@@ -693,11 +687,10 @@ export const ControlStudio: React.FC = () => {
               </div>
             )}
 
-            {/* 3. STINGS & ANIMATIONS TAB */}
             {selectedTab === 'animations' && (
               <div className="space-y-4">
                 <span className="text-xs font-black text-amber-400 uppercase tracking-wider block mb-2">
-                  ANIMATIONS & STINGS TRIGGER PANEL
+                  ANIMATIONS
                 </span>
                 <div className="grid grid-cols-2 gap-2.5">
                   {animationList.map((anim) => (
@@ -717,7 +710,7 @@ export const ControlStudio: React.FC = () => {
                   </button>
                 </div>
 
-                {/* Custom Animation Text */}
+
                 <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800 flex items-center gap-2">
                   <input
                     type="text"
@@ -739,11 +732,10 @@ export const ControlStudio: React.FC = () => {
               </div>
             )}
 
-            {/* 4. TOUR STATS TAB */}
             {selectedTab === 'tourStats' && (
               <div className="space-y-4">
                 <span className="text-xs font-black uppercase text-amber-400 tracking-wider block mb-2">
-                  TOUR STATS & POINTS TABLE CONTROLLER
+                  TOURNAMENT STATS
                 </span>
                 <div className="flex flex-wrap gap-2">
                   <button
@@ -772,7 +764,7 @@ export const ControlStudio: React.FC = () => {
                   </button>
                 </div>
 
-                {/* Group PT Buttons 1 through 8 */}
+
                 <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
                   <span className="text-xs font-bold uppercase text-slate-400 block mb-2">
                     GROUP POINTS TABLES:
@@ -792,11 +784,10 @@ export const ControlStudio: React.FC = () => {
               </div>
             )}
 
-            {/* 5. THEME / COLORS TAB */}
             {selectedTab === 'theme' && (
               <div className="space-y-4">
                 <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
-                  TEAM PRESET THEMES & COLORS
+                  TEAM COLORS
                 </span>
                 <div className="grid grid-cols-2 gap-2.5">
                   {Object.values(PRESET_TEAMS).map((preset) => (
@@ -828,7 +819,7 @@ export const ControlStudio: React.FC = () => {
         </div>
       </div>
 
-      {/* Edit & Toss Match Modals */}
+
       <EditMatchModal isOpen={showEditModal} onClose={() => setShowEditModal(false)} />
       <TossMatchModal isOpen={showTossModal} onClose={() => setShowTossModal(false)} />
     </div>

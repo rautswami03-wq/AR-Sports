@@ -66,7 +66,7 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
   const { activeOverlays, activeAnimation } = useBroadcastStore();
   const wsConnectedRef = useRef(false);
 
-  // Instant real-time sync for OBS Studio & Browser Sources
+
   useEffect(() => {
     let lastSavedRaw = '';
 
@@ -79,31 +79,26 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
           const parsed = JSON.parse(raw);
           useBroadcastStore.getState().applyExternalState(parsed);
         }
-      } catch (e) {
-        console.warn('Storage polling notice:', e);
-      }
+      } catch {}
     };
 
-    // Initial sync immediately on load
+
     syncFromStorage();
 
-    // 1. Ultra-fast Polling (Every 100ms guarantees OBS updates without delay)
     const pollInterval = setInterval(syncFromStorage, 100);
 
-    // 2. Storage Event Listener (Cross-tab/Window Instant Trigger)
+
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'cricscorer_match_state_v2' && e.newValue) {
         try {
           const parsed = JSON.parse(e.newValue);
           useBroadcastStore.getState().applyExternalState(parsed);
-        } catch (err) {
-          console.warn('Storage event sync notice:', err);
-        }
+        } catch {}
       }
     };
     window.addEventListener('storage', handleStorageChange);
 
-    // 3. Custom Window Event Listener (Same Window/Preview Instant Sync)
+
     const handleCustomSync = (e: Event) => {
       const customEvent = e as CustomEvent;
       if (customEvent.detail) {
@@ -112,7 +107,7 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
     };
     window.addEventListener('cricscorer_local_update', handleCustomSync);
 
-    // 4. BroadcastChannel Listener
+
     let bc: BroadcastChannel | null = null;
     if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
       try {
@@ -122,12 +117,10 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
             useBroadcastStore.getState().applyExternalState(event.data.payload);
           }
         };
-      } catch (e) {
-        console.warn('BroadcastChannel notice:', e);
-      }
+      } catch {}
     }
 
-    // 5. Firebase Cloud Firestore Listener (Remote/Internet Real-Time Cloud Sync)
+
     let unsubFirebase: (() => void) | null = null;
     try {
       unsubFirebase = subscribeToLiveMatch('live_match_default', (data) => {
@@ -135,11 +128,9 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
           useBroadcastStore.getState().applyExternalState(data);
         }
       });
-    } catch (e) {
-      console.warn('Firebase subscribe notice:', e);
-    }
+    } catch {}
 
-    // 6. WebSocket Connection
+
     if (wsConnectedRef.current) {
       return () => {
         clearInterval(pollInterval);

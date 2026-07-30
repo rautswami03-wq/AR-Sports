@@ -76,29 +76,22 @@ function postStateSync(state: any) {
     tournamentId: state.tournamentId,
   };
 
-  // 1. Save to LocalStorage & Dispatch Local Event
   if (typeof window !== 'undefined') {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(syncPayload));
       window.dispatchEvent(new CustomEvent('cricscorer_local_update', { detail: syncPayload }));
-    } catch (e) {
-      console.warn('LocalStorage save warning:', e);
-    }
+    } catch {}
   }
 
-  // 2. Post to BroadcastChannel
   if (broadcastChannel) {
     try {
       broadcastChannel.postMessage({
         type: 'CRICSCORER_STATE_SYNC',
         payload: syncPayload,
       });
-    } catch (e) {
-      console.warn('BroadcastChannel sync warning:', e);
-    }
+    } catch {}
   }
 
-  // 3. Post to WebSocket Server
   if (socket && socket.readyState === WebSocket.OPEN) {
     try {
       socket.send(JSON.stringify({
@@ -106,18 +99,13 @@ function postStateSync(state: any) {
         matchId: 'match_live_001',
         payload: syncPayload,
       }));
-    } catch (e) {
-      console.warn('WebSocket send warning:', e);
-    }
+    } catch {}
   }
 
-  // 4. Post to Firebase Cloud Firestore (Sanitize JSON to remove undefined fields for Firebase)
   try {
     const cleanPayload = JSON.parse(JSON.stringify(syncPayload));
     publishLiveMatchState('live_match_default', cleanPayload);
-  } catch (e) {
-    console.warn('Firebase publish notice:', e);
-  }
+  } catch {}
 }
 
 const DEFAULT_TEAM_A: Team = {
@@ -240,7 +228,6 @@ const INITIAL_OVERLAYS: Record<OverlayType, boolean> = {
   tournamentTitle: false,
 };
 
-// Initial state loader from LocalStorage
 function loadInitialState() {
   if (typeof window !== 'undefined') {
     try {
@@ -258,9 +245,7 @@ function loadInitialState() {
           tournamentId: parsed.tournamentId || 'tour_default',
         };
       }
-    } catch (e) {
-      console.warn('LocalStorage load warning:', e);
-    }
+    } catch {}
   }
   return {
     teamA: DEFAULT_TEAM_A,
@@ -398,7 +383,7 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
       }
       team.batters = batters;
 
-      // Update active Bowler stats
+
       const bowlers = [...bowlingTeam.bowlers];
       const activeBowlerIndex = bowlers.findIndex((bw) => bw.isCurrent) !== -1
         ? bowlers.findIndex((bw) => bw.isCurrent)
@@ -536,7 +521,7 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
       }
       team.batters = batters;
 
-      // Update active Bowler wickets & overs
+
       const bowlers = [...bowlingTeam.bowlers];
       const activeBowlerIndex = bowlers.findIndex((bw) => bw.isCurrent) !== -1
         ? bowlers.findIndex((bw) => bw.isCurrent)
@@ -594,7 +579,6 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
       return nextState;
     });
 
-    // Also notify backend server if connected
     if (typeof window !== 'undefined') {
       fetch('http://localhost:4000/api/matches/match_live_001/undo', { method: 'POST' }).catch(() => {});
     }
@@ -934,7 +918,6 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
   },
 }));
 
-// Auto-reconnecting WebSocket Gateway Client (Connects to wss://websocket-36f4.onrender.com)
 function initWebSocketClient() {
   if (typeof window === 'undefined') return;
 
@@ -942,7 +925,7 @@ function initWebSocketClient() {
   const RENDER_HTTP_URL = 'https://websocket-36f4.onrender.com';
   const wsUrl = window.location.protocol === 'https:' ? RENDER_WS_URL : (import.meta.env.VITE_WS_URL || RENDER_WS_URL);
 
-  // Keepalive ping to prevent Render free-tier container from sleeping
+  // keepalive ping
   const pingRenderHost = () => {
     try {
       fetch(RENDER_HTTP_URL, { mode: 'no-cors' }).catch(() => {});
@@ -961,10 +944,9 @@ function initWebSocketClient() {
       socket = new WebSocket(wsUrl);
 
       socket.onopen = () => {
-        console.log(`⚡ Connected to CricScorer WebSocket Gateway (${wsUrl})`);
+        console.log(`ws connected: ${wsUrl}`);
         useBroadcastStore.getState().setWsConnected(true);
 
-        // Send state sync on connection
         if (socket && socket.readyState === WebSocket.OPEN) {
           const state = useBroadcastStore.getState();
           const syncPayload = {
@@ -997,8 +979,7 @@ function initWebSocketClient() {
           } else if (data.type === 'ANIMATION_TRIGGER' && data.payload) {
             useBroadcastStore.getState().triggerAnimation(data.payload.animation, data.payload.durationMs);
           }
-        } catch (err) {
-          console.warn('WS Message parsing error:', err);
+        } catch {
         }
       };
 
@@ -1010,8 +991,7 @@ function initWebSocketClient() {
       socket.onerror = () => {
         useBroadcastStore.getState().setWsConnected(false);
       };
-    } catch (err) {
-      console.warn('WebSocket init exception:', err);
+    } catch {
       setTimeout(connect, 2000);
     }
   }
@@ -1021,7 +1001,7 @@ function initWebSocketClient() {
 
 initWebSocketClient();
 
-// Setup BroadcastChannel Listener
+
 if (broadcastChannel) {
   broadcastChannel.onmessage = (event) => {
     if (event.data?.type === 'CRICSCORER_STATE_SYNC' && event.data.payload) {
@@ -1030,16 +1010,14 @@ if (broadcastChannel) {
   };
 }
 
-// Setup Window Storage Event Listener & CustomEvent Listener (Guarantees OBS Studio Sync!)
+
 if (typeof window !== 'undefined') {
   window.addEventListener('storage', (e) => {
     if (e.key === STORAGE_KEY && e.newValue) {
       try {
         const parsed = JSON.parse(e.newValue);
         useBroadcastStore.getState().applyExternalState(parsed);
-      } catch (err) {
-        console.warn('Storage event sync warning:', err);
-      }
+      } catch {}
     }
   });
 

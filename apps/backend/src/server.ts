@@ -26,7 +26,7 @@ function broadcast(event: { type: string; matchId: string; payload: any }) {
   });
 }
 
-// WebSocket Ping / Pong Keep-Alive Interval
+
 const pingInterval = setInterval(() => {
   wss.clients.forEach((client: ExtendedWebSocket) => {
     if (client.isAlive === false) {
@@ -41,9 +41,8 @@ wss.on('close', () => {
   clearInterval(pingInterval);
 });
 
-// REST APIs inspired by CricScorer / CricScorer.in
 
-// 1. Health Check
+// 1. Health
 app.get('/api/health', (_req: Request, res: Response) => {
   res.json({
     status: 'online',
@@ -53,7 +52,7 @@ app.get('/api/health', (_req: Request, res: Response) => {
   });
 });
 
-// 2. Authentication API
+// 2. Auth
 app.post('/api/auth/login', (req: Request, res: Response) => {
   const { email } = req.body;
   const db = readDB();
@@ -74,7 +73,7 @@ app.post('/api/auth/register', (req: Request, res: Response) => {
   res.json({ success: true, user: newUser });
 });
 
-// 3. Matches API
+// 3. Matches
 app.get('/api/matches', (_req: Request, res: Response) => {
   const db = readDB();
   res.json({ success: true, matches: db.matches });
@@ -111,7 +110,7 @@ app.post('/api/matches', (req: Request, res: Response) => {
   res.json({ success: true, match: newMatch });
 });
 
-// 4. Score Ball Event API with Dynamic Team Selection & History Snapshot
+// 4. Score event
 app.post('/api/matches/:id/score', (req: Request, res: Response) => {
   const db = readDB();
   const match = db.matches.find((m) => m.id === req.params.id);
@@ -183,7 +182,7 @@ app.post('/api/matches/:id/score', (req: Request, res: Response) => {
   res.json({ success: true, match });
 });
 
-// 5. Undo Delivery API
+// 5. Undo
 app.post('/api/matches/:id/undo', (req: Request, res: Response) => {
   const db = readDB();
   const match = db.matches.find((m) => m.id === req.params.id);
@@ -214,7 +213,7 @@ app.post('/api/matches/:id/undo', (req: Request, res: Response) => {
   res.status(400).json({ error: 'Failed to restore undo state' });
 });
 
-// 6. OBS Stream Key Generation
+// 6. Stream key
 app.post('/api/matches/:id/stream-key', (req: Request, res: Response) => {
   const db = readDB();
   const match = db.matches.find((m) => m.id === req.params.id);
@@ -227,20 +226,20 @@ app.post('/api/matches/:id/stream-key', (req: Request, res: Response) => {
   res.json({ success: true, streamKey: match.streamKey, obsUrl: `http://localhost:5173/#/overlay?streamKey=${match.streamKey}` });
 });
 
-// 7. Tournaments & Standings
+// 7. Tournaments
 app.get('/api/tournaments', (_req: Request, res: Response) => {
   const db = readDB();
   res.json({ success: true, tournaments: db.tournaments });
 });
 
-// WebSocket Gateway Connection
+// WS handler
 wss.on('connection', (ws: ExtendedWebSocket) => {
   ws.isAlive = true;
   ws.on('pong', () => {
     ws.isAlive = true;
   });
 
-  console.log('⚡ CricScorer WebSocket Client Connected (OBS / Control Studio)');
+  console.log('ws: client connected');
   const db = readDB();
   const currentMatch = db.matches[0];
   if (currentMatch) {
@@ -261,7 +260,7 @@ wss.on('connection', (ws: ExtendedWebSocket) => {
       } else if (data.type === 'TRIGGER_ANIMATION') {
         broadcast({ type: 'ANIMATION_TRIGGER', matchId: data.matchId, payload: data.payload });
       } else if (data.type === 'STATE_SYNC') {
-        // Full state broadcast from Control Studio to all connected OBS overlays
+        // full state relay from control to overlays
         broadcast({ type: 'STATE_SYNC', matchId: data.matchId || 'match_live_001', payload: data.payload });
       }
     } catch (err) {
@@ -270,11 +269,11 @@ wss.on('connection', (ws: ExtendedWebSocket) => {
   });
 
   ws.on('close', () => {
-    console.log('WebSocket Client Disconnected');
+    console.log('ws: client disconnected');
   });
 });
 
 server.listen(PORT, () => {
-  console.log(`🚀 CricScorer Backend API & Real-time Server running at http://localhost:${PORT}`);
-  console.log(`⚡ WebSocket Server listening at ws://localhost:${PORT}`);
+  console.log(`listening on :${PORT}`);
+  console.log(`ws available at ws://localhost:${PORT}`);
 });

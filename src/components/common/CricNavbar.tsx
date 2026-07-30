@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { HardDrive, ShieldCheck, Tv, Radio, Palette, Trophy, Home, Sliders } from 'lucide-react';
+import { HardDrive, Radio, Tv, Palette, Trophy, Sliders } from 'lucide-react';
 
 export const CricNavbar: React.FC = () => {
   const location = useLocation();
@@ -56,16 +56,13 @@ export const CricNavbar: React.FC = () => {
         </nav>
       </div>
 
-      {/* Account Expiry & Storage Badges */}
+
       <div className="flex items-center gap-3">
         <div className="bg-emerald-500/10 border border-emerald-400/40 text-emerald-300 px-3 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 font-mono">
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
           {typeof window !== 'undefined' && window.location.protocol === 'https:'
-            ? '🌐 BROADCAST SYNC (ACTIVE)'
-            : '🟢 LOCAL BROADCAST SYNC'}
-        </div>
-        <div className="bg-cyan-500/10 border border-cyan-400/40 text-cyan-300 px-3 py-1.5 rounded-md text-xs font-mono font-bold flex items-center gap-1.5">
-          <HardDrive className="w-4 h-4 text-cyan-400" /> Storage: 1206/10000 kb
+            ? 'Cloud Sync'
+            : 'Local Sync'}
         </div>
       </div>
     </header>
