@@ -1,12 +1,12 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { HardDrive, Radio, Tv, Palette, Trophy, Sliders } from 'lucide-react';
+import { Home, Radio, Tv, Palette, Trophy } from 'lucide-react';
 
 export const CricNavbar: React.FC = () => {
   const location = useLocation();
 
   const isActive = (path: string) => {
-    if (path === '/' && location.pathname === '/') return true;
+    if (path === '/' && (location.pathname === '/' || location.pathname === '/home')) return true;
     return location.pathname.startsWith(path) && path !== '/';
   };
 
@@ -23,20 +23,22 @@ export const CricNavbar: React.FC = () => {
           <Link
             to="/"
             className={`flex items-center gap-1.5 transition-all ${
-              location.pathname === '/' || location.pathname === '/control'
+              location.pathname === '/' || location.pathname === '/home'
                 ? 'text-cyan-400 border-b-2 border-cyan-400 pb-1 font-extrabold'
                 : 'hover:text-cyan-300'
             }`}
           >
-            <Sliders className="w-4 h-4 text-emerald-400" /> Control Studio
+            <Home className="w-4 h-4 text-emerald-400" /> Home
           </Link>
           <Link
             to="/tournament"
             className={`flex items-center gap-1.5 transition-all ${
-              isActive('/tournament') ? 'text-cyan-400 border-b-2 border-cyan-400 pb-1 font-extrabold' : 'hover:text-cyan-300'
+              isActive('/tournament') || isActive('/matches') || isActive('/match')
+                ? 'text-cyan-400 border-b-2 border-cyan-400 pb-1 font-extrabold'
+                : 'hover:text-cyan-300'
             }`}
           >
-            <Trophy className="w-4 h-4 text-amber-400" /> Tournament
+            <Trophy className="w-4 h-4 text-amber-400" /> Tournaments & Matches
           </Link>
           <Link
             to="/theme_links"
@@ -55,6 +57,7 @@ export const CricNavbar: React.FC = () => {
           </Link>
         </nav>
       </div>
+
 
 
       <div className="flex items-center gap-3">

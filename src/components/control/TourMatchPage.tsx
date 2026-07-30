@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useBroadcastStore } from '../../store/useBroadcastStore';
-import { Send, Edit3, Image, Radio, ChevronDown, ChevronUp, CheckCircle2 } from 'lucide-react';
+import { Send, Edit3, Image, Radio, ChevronDown, ChevronUp, CheckCircle2, Tv } from 'lucide-react';
 import { OverlayType } from '../../types/cricket';
 import { CricNavbar } from '../common/CricNavbar';
 import { ChangeBowlerModal } from './ChangeBowlerModal';
@@ -10,6 +10,8 @@ import { WicketModal } from './WicketModal';
 import { PlayerListModal } from './PlayerListModal';
 import { TossMatchModal } from './TossMatchModal';
 import { EditMatchModal } from './EditMatchModal';
+import { OverlayStage } from './OverlayStage';
+
 
 export const TourMatchPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -222,8 +224,35 @@ export const TourMatchPage: React.FC = () => {
           </button>
         </div>
 
+        {/* Live Broadcast Stage Preview (1920x1080) */}
+        <div className="w-full bg-slate-900 border border-slate-800 p-4 rounded-3xl shadow-2xl mb-8 space-y-3">
+          <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+            <span className="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+              <Tv className="w-4 h-4 text-sky-400" /> Live Stage Preview (1920×1080)
+            </span>
+            <span className="text-[10px] bg-slate-800 text-slate-400 px-2.5 py-0.5 rounded font-mono">
+              OBS Browser Source Ready
+            </span>
+          </div>
+
+          <div className="relative w-full aspect-video bg-slate-950 rounded-2xl overflow-hidden border border-slate-800 shadow-2xl flex items-center justify-center">
+            <div
+              className="absolute inset-0 opacity-10 pointer-events-none"
+              style={{
+                backgroundImage:
+                  'radial-gradient(#ffffff 1px, transparent 1px), radial-gradient(#ffffff 1px, #0f172a 1px)',
+                backgroundSize: '20px 20px',
+              }}
+            />
+            <div className="transform scale-[0.34] sm:scale-[0.42] md:scale-[0.48] origin-center">
+              <OverlayStage />
+            </div>
+          </div>
+        </div>
+
         {/* Versus Match Banner (Responsive Layout) */}
         <div className="w-full bg-gradient-to-r from-cyan-500 via-sky-600 to-cyan-500 text-slate-950 p-6 rounded-3xl border-4 border-cyan-300 shadow-[0_0_50px_rgba(6,182,212,0.6)] flex flex-col items-center gap-4 mb-8 text-center">
+
           <div className="flex items-center justify-between w-full gap-4">
             <h2 className="text-xl md:text-3xl font-black uppercase tracking-tight flex-1 truncate text-slate-950">
               {teamA.fullName}

@@ -6,6 +6,7 @@ import { ThemeLinksPage } from './components/control/ThemeLinksPage';
 import { TournamentPage } from './components/control/TournamentPage';
 import { TournamentDetailPage } from './components/control/TournamentDetailPage';
 import { TourMatchPage } from './components/control/TourMatchPage';
+import { LandingPage } from './components/public/LandingPage';
 
 export default function App() {
   const location = useLocation();
@@ -34,9 +35,12 @@ export default function App() {
 
   return (
     <Routes>
-      <Route path="/" element={<ControlStudio />} />
-      <Route path="/control" element={<ControlStudio />} />
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/home" element={<LandingPage />} />
+      <Route path="/control" element={<TourMatchPage />} />
+      <Route path="/control/studio" element={<ControlStudio />} />
       <Route path="/tournament" element={<TournamentPage />} />
+      <Route path="/matches" element={<TournamentPage />} />
       <Route path="/tournament/:id" element={<TournamentDetailPage />} />
       <Route path="/tournament/:tourId/match/:id" element={<TourMatchPage />} />
       <Route path="/match/:id" element={<TourMatchPage />} />
@@ -69,3 +73,4 @@ export default function App() {
     </Routes>
   );
 }
+

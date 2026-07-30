@@ -68,22 +68,21 @@ export const LandingPage: React.FC = () => {
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
           <Link
-            to="/control"
+            to="/tournament"
             className="group relative inline-flex items-center gap-2.5 bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 hover:to-blue-500 text-white font-black px-8 py-3.5 rounded-xl shadow-xl shadow-cyan-500/20 hover:shadow-cyan-500/40 transition-all text-base uppercase tracking-wider overflow-hidden"
           >
             <Sliders className="w-5 h-5 group-hover:rotate-45 transition-transform" />
-            <span>Launch Operator Studio</span>
+            <span>Tournaments & Matches</span>
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Link>
 
-          <a
-            href="#themes-gallery"
-            onClick={() => setActiveTab('themes')}
-            className="inline-flex items-center gap-2 bg-slate-900/80 hover:bg-slate-800 text-slate-200 border border-slate-700/80 hover:border-cyan-400/50 font-bold px-7 py-3.5 rounded-xl shadow-lg transition-all text-base uppercase tracking-wider"
+          <Link
+            to="/control"
+            className="inline-flex items-center gap-2 bg-slate-900/80 hover:bg-slate-800 text-cyan-300 border border-cyan-500/40 hover:border-cyan-400 font-bold px-7 py-3.5 rounded-xl shadow-lg transition-all text-base uppercase tracking-wider"
           >
-            <Palette className="w-5 h-5 text-purple-400" />
-            <span>Explore 19 Themes</span>
-          </a>
+            <Radio className="w-5 h-5 text-amber-400" />
+            <span>Control Active Match</span>
+          </Link>
 
           <Link
             to="/overlay"
@@ -94,6 +93,7 @@ export const LandingPage: React.FC = () => {
             <span>Live OBS Stage ↗</span>
           </Link>
         </div>
+
 
 
         <div className="mt-12 flex flex-wrap justify-center items-center gap-8 text-slate-400 text-xs font-bold uppercase tracking-wider">
