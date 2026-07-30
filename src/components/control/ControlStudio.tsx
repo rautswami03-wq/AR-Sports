@@ -5,7 +5,7 @@ import { OverlayStage } from './OverlayStage';
 import { EditMatchModal } from './EditMatchModal';
 import { TossMatchModal } from './TossMatchModal';
 import { OverlayType, EventAnimationType } from '../../types/cricket';
-import { PRESET_TEAMS } from '../../theme/presetThemes';
+import { PRESET_TEAMS, PRESET_TOURNAMENTS } from '../../theme/presetThemes';
 import { Radio, Tv, Zap, Palette, Layers, RefreshCw, Copy, Check, RotateCcw, Settings, Users, PlusCircle } from 'lucide-react';
 import { CricNavbar } from '../common/CricNavbar';
 
@@ -18,6 +18,9 @@ export const ControlStudio: React.FC = () => {
     activeOverlays,
     isWsConnected,
     historyStack,
+    tournamentId,
+    setTournamentId,
+    updateMatchSettings,
     toggleOverlay,
     triggerAnimation,
     clearAnimation,
@@ -786,6 +789,30 @@ export const ControlStudio: React.FC = () => {
 
             {selectedTab === 'theme' && (
               <div className="space-y-4">
+                <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2 mb-4">
+                  <span className="text-xs font-black uppercase text-amber-400 block">
+                    LEAGUE OVERLAY THEME
+                  </span>
+                  <select
+                    value={tournamentId || 'IPL'}
+                    onChange={(e) => {
+                      const newThemeId = e.target.value;
+                      const themeObj = PRESET_TOURNAMENTS[newThemeId];
+                      setTournamentId(newThemeId);
+                      if (themeObj) {
+                        updateMatchSettings({ tournament: themeObj.name });
+                      }
+                    }}
+                    className="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-lg text-white text-xs font-bold focus:outline-none focus:border-cyan-400 uppercase"
+                  >
+                    {Object.values(PRESET_TOURNAMENTS).map((t) => (
+                      <option key={t.id} value={t.id}>
+                        🏆 {t.name} ({t.id})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
                 <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
                   TEAM COLORS
                 </span>

@@ -296,3 +296,81 @@ export const PRESET_TOURNAMENTS: Record<string, TournamentTheme> = {
   },
 };
 
+export function getThemeByLeagueName(searchName: string): TournamentTheme {
+  if (!searchName) return PRESET_TOURNAMENTS['IPL'];
+
+  const normalized = searchName.trim().toLowerCase();
+
+  // 1. Direct match on key ID
+  if (PRESET_TOURNAMENTS[searchName]) return PRESET_TOURNAMENTS[searchName];
+  if (PRESET_TOURNAMENTS[normalized]) return PRESET_TOURNAMENTS[normalized];
+
+  // 2. Search entries
+  const entries = Object.values(PRESET_TOURNAMENTS);
+
+  const exactMatch = entries.find(
+    (t) => t.id.toLowerCase() === normalized || t.name.toLowerCase() === normalized
+  );
+  if (exactMatch) return exactMatch;
+
+  // Keyword matching
+  if (normalized.includes('asia cup') || normalized.includes('asia_cup')) {
+    if (normalized.includes('emerging') || normalized.includes('2024') || normalized.includes('t20_asia')) {
+      return PRESET_TOURNAMENTS['t20_asia24'];
+    }
+    return PRESET_TOURNAMENTS['asia_cup'];
+  }
+  if (normalized.includes('ipl 2025') || normalized.includes('ipl 25') || normalized.includes('ipl25')) {
+    return PRESET_TOURNAMENTS['ipl25'];
+  }
+  if (normalized.includes('ipl') || normalized.includes('cricpic')) {
+    return PRESET_TOURNAMENTS['IPL'];
+  }
+  if (normalized.includes('champions trophy') || normalized.includes('ct2025')) {
+    return PRESET_TOURNAMENTS['ct2025'];
+  }
+  if (normalized.includes('women') || normalized.includes('cwc_women')) {
+    return PRESET_TOURNAMENTS['cwc_women25'];
+  }
+  if (normalized.includes('fancode') || normalized.includes('legends') || normalized.includes('wcl')) {
+    return PRESET_TOURNAMENTS['wcl_fancode'];
+  }
+  if (normalized.includes('big bash') || normalized.includes('bbl')) {
+    if (normalized.includes('star')) return PRESET_TOURNAMENTS['bbl_star'];
+    if (normalized.includes('white')) return PRESET_TOURNAMENTS['bbl_white'];
+    return PRESET_TOURNAMENTS['bbl_black'];
+  }
+  if (normalized.includes('sa20') || normalized.includes('south africa league')) {
+    return PRESET_TOURNAMENTS['sa20'];
+  }
+  if (normalized.includes('jio') || normalized.includes('jiocinema')) {
+    return PRESET_TOURNAMENTS['jiocinema'];
+  }
+  if (normalized.includes('2024') || normalized.includes('wt20')) {
+    return PRESET_TOURNAMENTS['wt20_2024'];
+  }
+  if (normalized.includes('diwali')) {
+    return PRESET_TOURNAMENTS['cwc23_diwali'];
+  }
+  if (normalized.includes('2023') || normalized.includes('cwc23')) {
+    return PRESET_TOURNAMENTS['cwc23'];
+  }
+  if (normalized.includes('2019') || normalized.includes('cwc19')) {
+    return PRESET_TOURNAMENTS['cwc19'];
+  }
+  if (normalized.includes('2020')) {
+    return PRESET_TOURNAMENTS['cwc_t20_2020'];
+  }
+  if (normalized.includes('fusion') || normalized.includes('glass')) {
+    return PRESET_TOURNAMENTS['cricfusion'];
+  }
+
+  const partialMatch = entries.find((t) =>
+    t.name.toLowerCase().includes(normalized) || normalized.includes(t.name.toLowerCase())
+  );
+  if (partialMatch) return partialMatch;
+
+  return PRESET_TOURNAMENTS['IPL'];
+}
+
+

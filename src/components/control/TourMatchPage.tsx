@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useBroadcastStore } from '../../store/useBroadcastStore';
-import { Send, Edit3, Image, Radio, ChevronDown, ChevronUp, CheckCircle2, Tv } from 'lucide-react';
+import { PRESET_TOURNAMENTS, getThemeByLeagueName } from '../../theme/presetThemes';
+import { Send, Edit3, Image, Radio, ChevronDown, ChevronUp, CheckCircle2, Tv, Palette } from 'lucide-react';
 import { OverlayType } from '../../types/cricket';
 import { CricNavbar } from '../common/CricNavbar';
 import { ChangeBowlerModal } from './ChangeBowlerModal';
@@ -11,6 +12,7 @@ import { PlayerListModal } from './PlayerListModal';
 import { TossMatchModal } from './TossMatchModal';
 import { EditMatchModal } from './EditMatchModal';
 import { OverlayStage } from './OverlayStage';
+
 
 
 export const TourMatchPage: React.FC = () => {
@@ -40,6 +42,8 @@ export const TourMatchPage: React.FC = () => {
     updatePlayerAvatar,
     updateBatterStats,
     updateBowlerStats,
+    tournamentId,
+    setTournamentId,
   } = useBroadcastStore();
 
   const [extraWide, setExtraWide] = useState(false);
@@ -522,6 +526,32 @@ export const TourMatchPage: React.FC = () => {
               Display Input
             </button>
           </div>
+
+          {/* League Theme Overlay Selector */}
+          <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-slate-800">
+            <span className="text-xs font-black text-amber-400 uppercase w-36 flex items-center gap-1.5">
+              <Palette className="w-4 h-4 text-purple-400" /> League Theme:
+            </span>
+            <select
+              value={tournamentId || 'IPL'}
+              onChange={(e) => {
+                const newThemeId = e.target.value;
+                const themeObj = PRESET_TOURNAMENTS[newThemeId];
+                setTournamentId(newThemeId);
+                if (themeObj) {
+                  updateMatchSettings({ tournament: themeObj.name });
+                }
+              }}
+              className="flex-1 bg-slate-950 border border-slate-700 px-4 py-2 rounded-xl text-white text-xs font-bold focus:outline-none focus:border-cyan-400 uppercase"
+            >
+              {Object.values(PRESET_TOURNAMENTS).map((t) => (
+                <option key={t.id} value={t.id}>
+                  🏆 {t.name} ({t.id})
+                </option>
+              ))}
+            </select>
+          </div>
+
 
           {/* Select MOM Player */}
           <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-slate-800">
