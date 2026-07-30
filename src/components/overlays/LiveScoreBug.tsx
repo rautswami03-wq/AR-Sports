@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useBroadcastStore } from '../../store/useBroadcastStore';
-import { PRESET_TOURNAMENTS, getThemeByLeagueName } from '../../theme/presetThemes';
+import { PRESET_TOURNAMENTS } from '../../theme/presetThemes';
 
 export const LiveScoreBug: React.FC = () => {
   const { teamA, teamB, battingTeamId, matchDetails, tournamentId } = useBroadcastStore();
@@ -9,12 +9,13 @@ export const LiveScoreBug: React.FC = () => {
   const battingTeam = isTeamA ? teamA : teamB;
   const bowlingTeam = isTeamA ? teamB : teamA;
 
-  // Resolve active theme by league name or URL query or store
+  // Resolve active theme from URL query parameter or copied/selected store themeId
   const hashQuery = typeof window !== 'undefined' ? (window.location.hash.split('?')[1] || window.location.search) : '';
   const params = new URLSearchParams(hashQuery);
   const themeQuery = params.get('theme');
-  const themeKey = themeQuery || matchDetails.tournament || tournamentId || 'IPL';
-  const theme = getThemeByLeagueName(themeKey);
+  const themeKey = themeQuery || tournamentId || 'IPL';
+  const theme = PRESET_TOURNAMENTS[themeKey] || PRESET_TOURNAMENTS['IPL'];
+
 
 
   const striker = battingTeam.batters.find((b) => b.isStriker) || battingTeam.batters[0];
