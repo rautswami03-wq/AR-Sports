@@ -226,12 +226,14 @@ export const PRESET_TOURNAMENTS: Record<string, TournamentTheme> = {
   },
   t20_asia24: {
     id: 't20_asia24',
-    name: 'T20 EMERGING ASIA CUP 2024',
-    headerGradient: 'linear-gradient(90deg, #064e3b 0%, #047857 50%, #f59e0b 100%)',
-    primaryAccent: '#10b981',
+    name: 'ACC MEN\'S T20 EMERGING ASIA CUP 2024',
+    headerGradient: 'linear-gradient(90deg, #052e16 0%, #064e3b 40%, #047857 75%, #d97706 100%)',
+    primaryAccent: '#34d399',
     badgeBg: '#022c22',
+    cardBg: 'rgba(5, 46, 22, 0.92)',
+    cardBorder: '1px solid rgba(52, 211, 153, 0.4)',
     scoreBugMainBg: 'bg-emerald-600',
-    scoreBugAccentBg: 'bg-amber-500',
+    scoreBugAccentBg: 'bg-amber-600',
     scoreBugTextColor: 'text-white',
   },
   sa20: {
