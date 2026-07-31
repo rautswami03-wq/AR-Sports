@@ -50,33 +50,7 @@ export function subscribeToLiveMatch(matchId: string, onUpdate: (data: any) => v
     } catch {}
   };
 
-  // 1. Initial poll on launch to immediately fetch the latest broadcast payload
-  let lastNtfyMsgId = '';
-  const pollNtfyCache = async () => {
-    try {
-      const res = await fetch(`${NTFY_TOPIC}/json?poll=1`);
-      if (res.ok) {
-        const text = await res.text();
-        const lines = text.trim().split('\n');
-        for (let i = lines.length - 1; i >= 0; i--) {
-          if (!lines[i]) continue;
-          try {
-            const parsed = JSON.parse(lines[i]);
-            if (parsed.id && parsed.id !== lastNtfyMsgId) {
-              lastNtfyMsgId = parsed.id;
-              await processNtfyPayload(parsed);
-              break;
-            }
-          } catch {}
-        }
-      }
-    } catch {}
-  };
-
-  pollNtfyCache();
-  const pollInterval = setInterval(pollNtfyCache, 1000);
-
-  // 2. Real-time ntfy SSE connection
+  // Real-time ntfy SSE connection
   let eventSource: EventSource | null = null;
   if (typeof window !== 'undefined' && 'EventSource' in window) {
     try {
@@ -93,7 +67,6 @@ export function subscribeToLiveMatch(matchId: string, onUpdate: (data: any) => v
   return () => {
     unsubFirestore();
     if (eventSource) eventSource.close();
-    clearInterval(pollInterval);
   };
 }
 
