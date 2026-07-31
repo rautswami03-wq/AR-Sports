@@ -298,6 +298,59 @@ export const PRESET_TOURNAMENTS: Record<string, TournamentTheme> = {
   },
 };
 
+export const THEME_ID_MAP: Record<string, string> = {
+  '1': 'asia_cup',
+  '2': 'cwc19',
+  '3': 'ct2025',
+  '4': 'cwc_women25',
+  '5': 'wcl_fancode',
+  '6': 'cwc23',
+  '7': 'bbl_black',
+  '8': 'cricfusion',
+  '9': 't20_asia24',
+  '10': 'sa20',
+  '11': 'jiocinema',
+  '12': 'IPL',
+  '13': 'wt20_2024',
+  '14': 'bbl_star',
+  '15': 'ipl25',
+  '16': 'cricpic',
+  '17': 'cwc23_diwali',
+  '18': 'bbl_white',
+  '19': 'cwc_t20_2020',
+};
+
+export function resolveThemeFromUrlOrStore(tournamentIdFromStore: string): TournamentTheme {
+  if (typeof window === 'undefined') return PRESET_TOURNAMENTS['IPL'];
+
+  const hash = window.location.hash || '';
+  const search = window.location.search || '';
+
+  // 1. Check URL query param ?theme=...
+  const hashQuery = hash.includes('?') ? hash.split('?')[1] : search;
+  const params = new URLSearchParams(hashQuery);
+  const themeParam = params.get('theme');
+
+  if (themeParam) {
+    const key = THEME_ID_MAP[themeParam] || themeParam;
+    if (PRESET_TOURNAMENTS[key]) return PRESET_TOURNAMENTS[key];
+  }
+
+  // 2. Check Hash path /#/theme/:themeId
+  if (hash.includes('/theme/')) {
+    const parts = hash.split('/theme/')[1]?.split('?')[0]?.split('/');
+    if (parts && parts[0]) {
+      const themeIdFromPath = parts[0];
+      const key = THEME_ID_MAP[themeIdFromPath] || themeIdFromPath;
+      if (PRESET_TOURNAMENTS[key]) return PRESET_TOURNAMENTS[key];
+    }
+  }
+
+  // 3. Fallback to store tournamentId
+  const storeKey = THEME_ID_MAP[tournamentIdFromStore] || tournamentIdFromStore || 'IPL';
+  return PRESET_TOURNAMENTS[storeKey] || PRESET_TOURNAMENTS['IPL'];
+}
+
 export function getThemeByLeagueName(searchName: string): TournamentTheme {
   if (!searchName) return PRESET_TOURNAMENTS['IPL'];
 
