@@ -63,11 +63,82 @@ const broadcastChannel = typeof window !== 'undefined' && 'BroadcastChannel' in 
 let isReceivingBroadcast = false;
 let socket: WebSocket | null = null;
 
-function postStateSync(state: any) {
-  if (isReceivingBroadcast) return;
-  const syncPayload = {
-    teamA: state.teamA,
-    teamB: state.teamB,
+function buildCompactSyncPayload(state: any) {
+  return {
+    teamA: {
+      id: state.teamA?.id || 'teamA',
+      shortName: state.teamA?.shortName || 'T1',
+      fullName: state.teamA?.fullName || 'Team A',
+      primaryColor: state.teamA?.primaryColor || '#000080',
+      secondaryColor: state.teamA?.secondaryColor || '#ffffff',
+      accentColor: state.teamA?.accentColor || '#ffcc00',
+      logoUrl: state.teamA?.logoUrl,
+      score: state.teamA?.score || 0,
+      wickets: state.teamA?.wickets || 0,
+      overs: state.teamA?.overs || 0,
+      balls: state.teamA?.balls || 0,
+      extras: state.teamA?.extras || 0,
+      fallOfWickets: state.teamA?.fallOfWickets || [],
+      batters: (state.teamA?.batters || []).map((b: any) => ({
+        id: b.id,
+        name: b.name,
+        runs: b.runs,
+        balls: b.balls,
+        fours: b.fours,
+        sixes: b.sixes,
+        isOut: b.isOut,
+        dismissal: b.dismissal,
+        isStriker: b.isStriker,
+      })),
+      bowlers: (state.teamA?.bowlers || []).map((bw: any) => ({
+        id: bw.id,
+        name: bw.name,
+        overs: bw.overs,
+        ballsInCurrentOver: bw.ballsInCurrentOver,
+        maidens: bw.maidens,
+        runsConceded: bw.runsConceded,
+        wickets: bw.wickets,
+        economy: bw.economy,
+        isCurrent: bw.isCurrent,
+      })),
+    },
+    teamB: {
+      id: state.teamB?.id || 'teamB',
+      shortName: state.teamB?.shortName || 'T2',
+      fullName: state.teamB?.fullName || 'Team B',
+      primaryColor: state.teamB?.primaryColor || '#000080',
+      secondaryColor: state.teamB?.secondaryColor || '#ffffff',
+      accentColor: state.teamB?.accentColor || '#ffcc00',
+      logoUrl: state.teamB?.logoUrl,
+      score: state.teamB?.score || 0,
+      wickets: state.teamB?.wickets || 0,
+      overs: state.teamB?.overs || 0,
+      balls: state.teamB?.balls || 0,
+      extras: state.teamB?.extras || 0,
+      fallOfWickets: state.teamB?.fallOfWickets || [],
+      batters: (state.teamB?.batters || []).map((b: any) => ({
+        id: b.id,
+        name: b.name,
+        runs: b.runs,
+        balls: b.balls,
+        fours: b.fours,
+        sixes: b.sixes,
+        isOut: b.isOut,
+        dismissal: b.dismissal,
+        isStriker: b.isStriker,
+      })),
+      bowlers: (state.teamB?.bowlers || []).map((bw: any) => ({
+        id: bw.id,
+        name: bw.name,
+        overs: bw.overs,
+        ballsInCurrentOver: bw.ballsInCurrentOver,
+        maidens: bw.maidens,
+        runsConceded: bw.runsConceded,
+        wickets: bw.wickets,
+        economy: bw.economy,
+        isCurrent: bw.isCurrent,
+      })),
+    },
     matchDetails: state.matchDetails,
     battingTeamId: state.battingTeamId,
     bowlingTeamId: state.bowlingTeamId,
@@ -75,6 +146,11 @@ function postStateSync(state: any) {
     activeAnimation: state.activeAnimation,
     tournamentId: state.tournamentId,
   };
+}
+
+function postStateSync(state: any) {
+  if (isReceivingBroadcast) return;
+  const syncPayload = buildCompactSyncPayload(state);
 
   if (typeof window !== 'undefined') {
     try {
@@ -103,8 +179,7 @@ function postStateSync(state: any) {
   }
 
   try {
-    const cleanPayload = JSON.parse(JSON.stringify(syncPayload));
-    publishLiveMatchState('live_match_default', cleanPayload);
+    publishLiveMatchState('live_match_default', syncPayload);
   } catch {}
 }
 
