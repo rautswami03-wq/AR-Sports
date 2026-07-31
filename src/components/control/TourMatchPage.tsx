@@ -24,6 +24,7 @@ export const TourMatchPage: React.FC = () => {
     battingTeamId,
     activeOverlays,
     toggleOverlay,
+    hideAllOverlays,
     triggerAnimation,
     addRuns,
     addExtra,
@@ -441,20 +442,16 @@ export const TourMatchPage: React.FC = () => {
             Default
           </button>
           <button
+            onClick={() => hideAllOverlays()}
+            className="py-3.5 bg-rose-600 hover:bg-rose-500 text-white font-black text-base rounded-2xl shadow-lg active:scale-95 transition-all uppercase tracking-wider"
+          >
+            HIDE ALL
+          </button>
+          <button
             onClick={handleChangeToss}
             className="py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-base rounded-2xl shadow-lg active:scale-95 transition-all uppercase tracking-wider"
           >
             Change Toss
-          </button>
-          <button
-            onClick={() => {
-              toggleOverlay('tournamentTitle', false);
-              toggleOverlay('scoreBug', true);
-              toggleInnings();
-            }}
-            className="py-3.5 bg-slate-900 border-2 border-red-500 hover:border-red-400 text-white font-black text-base rounded-2xl shadow-[0_0_20px_rgba(239,68,68,0.5)] active:scale-95 transition-all uppercase tracking-wider"
-          >
-            {matchDetails.currentInnings === 1 ? 'START 1ST INNINGS' : '2ND INNINGS ACTIVE'}
           </button>
           <button
             onClick={() => {

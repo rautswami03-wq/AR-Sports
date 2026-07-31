@@ -26,6 +26,7 @@ export interface BroadcastStoreState {
 
   // Actions
   toggleOverlay: (type: OverlayType, forceState?: boolean) => void;
+  hideAllOverlays: () => void;
   triggerAnimation: (type: EventAnimationType, durationMs?: number) => void;
   clearAnimation: () => void;
   addRuns: (runs: number, isBoundary?: boolean, boundaryType?: 4 | 6) => void;
@@ -393,6 +394,18 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
       const nextState = { ...state, activeOverlays: updated };
       postStateSync(nextState);
       return { activeOverlays: updated };
+    });
+  },
+
+  hideAllOverlays: () => {
+    set((state) => {
+      const resetOverlays = (Object.keys(state.activeOverlays) as OverlayType[]).reduce((acc, key) => {
+        acc[key] = false;
+        return acc;
+      }, {} as Record<OverlayType, boolean>);
+      const nextState = { ...state, activeOverlays: resetOverlays };
+      postStateSync(nextState);
+      return { activeOverlays: resetOverlays };
     });
   },
 
