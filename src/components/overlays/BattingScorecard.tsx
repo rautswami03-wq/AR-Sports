@@ -4,73 +4,75 @@ import { useBroadcastStore } from '../../store/useBroadcastStore';
 
 export const BattingScorecard: React.FC = () => {
   const { teamA, teamB, battingTeamId, matchDetails } = useBroadcastStore();
-  const battingTeam = battingTeamId === teamA.id ? teamA : teamB;
+  const isTeamA = battingTeamId === teamA.id || battingTeamId === teamA.shortName || battingTeamId === 'teamA' || battingTeamId === teamA.fullName;
+  const battingTeam = isTeamA ? teamA : teamB;
+  const bowlingTeam = isTeamA ? teamB : teamA;
+
   const totalBalls = battingTeam.overs * 6 + battingTeam.balls;
   const crr = totalBalls > 0 ? ((battingTeam.score / totalBalls) * 6).toFixed(2) : '0.00';
+  const totalExtras = battingTeam.extras || 0;
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-40">
+    <div className="absolute inset-0 flex items-center justify-center pointer-events-auto z-40 p-6 bg-black/40 backdrop-blur-sm">
       <motion.div
-        initial={{ opacity: 0, scale: 0.9, y: 30 }}
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.9, y: 30 }}
-        transition={{ type: 'spring', damping: 24, stiffness: 220 }}
-        className="w-[1000px] pointer-events-auto shadow-[0_0_60px_rgba(249,115,22,0.8)] rounded-xl overflow-hidden border-4 border-orange-500 bg-[#090d16] font-sans text-white"
+        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+        transition={{ type: 'spring', damping: 25, stiffness: 240 }}
+        className="w-[1100px] shadow-2xl rounded-xl overflow-hidden border-2 border-purple-600 bg-slate-950 font-sans text-slate-900"
       >
-        {/* Dark Orange Pattern Header */}
-        <div className="bg-slate-950 border-b-2 border-orange-500 px-6 py-4 flex items-center justify-center relative overflow-hidden">
-          <div className="absolute inset-x-4 top-1 bottom-1 border-y border-orange-500/40 pointer-events-none" />
-          <h2 className="text-3xl font-black uppercase tracking-widest text-center text-white">
-            {battingTeam.fullName}
-          </h2>
+        {/* Top Header Banner */}
+        <div className="bg-[#4c0519] text-white py-2 px-6 flex items-center justify-center relative">
+          <span className="bg-cyan-500 text-slate-950 px-6 py-1 rounded-full font-black text-sm uppercase tracking-widest shadow">
+            {matchDetails.tournament || 'ICC WORLD CUP'}
+          </span>
         </div>
 
-        {/* Subheader */}
-        <div className="bg-slate-900 border-b border-white/10 px-6 py-2 text-center text-xs font-black uppercase tracking-widest text-slate-300">
-          {matchDetails.stage} | {matchDetails.title}
+        <div className="bg-purple-950 text-white px-8 py-3 flex items-center justify-between border-b-2 border-purple-500">
+          <span className="text-2xl font-black uppercase tracking-wider">{battingTeam.fullName}</span>
+          <div className="text-center font-extrabold text-xs text-purple-200 uppercase tracking-widest">
+            {matchDetails.stage || 'MATCH NO- 1'} | {matchDetails.title || 'NORMAL'}
+          </div>
+          <span className="text-2xl font-black uppercase tracking-wider text-purple-300">{bowlingTeam.fullName}</span>
         </div>
 
         {/* Batters Table */}
-        <div className="p-6 space-y-2.5">
-          {battingTeam.batters.map((b) => (
-            <div
-              key={b.id}
-              className={`px-5 py-3 rounded-lg flex items-center justify-between font-black text-sm border shadow ${
-                !b.isOut
-                  ? 'bg-gradient-to-r from-red-600 via-rose-600 to-red-600 text-white border-red-400/50'
-                  : 'bg-slate-950/80 text-slate-200 border-white/10'
-              }`}
-            >
-              <span className="uppercase tracking-wide w-64">{b.name}</span>
-              <span className="text-xs font-semibold text-slate-300 flex-1 text-center truncate px-4">
-                {b.isOut ? b.dismissal || 'out' : 'NOT OUT'}
-              </span>
-              <div className="flex items-center gap-6 font-black text-base">
-                <span className="text-amber-300">{b.runs}</span>
-                <span className="text-slate-300 text-xs">{b.balls}</span>
+        <div className="p-4 bg-slate-900 space-y-1.5 min-h-[300px]">
+          {battingTeam.batters.map((b) => {
+            const isCurrentBatter = b.isStriker || (!b.isOut && !b.dismissal);
+            return (
+              <div
+                key={b.id}
+                className={`px-5 py-2.5 rounded flex items-center justify-between font-black text-sm border shadow-sm ${
+                  isCurrentBatter
+                    ? 'bg-rose-600 text-white border-rose-400'
+                    : b.isOut
+                    ? 'bg-white text-slate-950 border-slate-200'
+                    : 'bg-slate-800 text-slate-200 border-slate-700'
+                }`}
+              >
+                <span className="uppercase tracking-wide w-56 truncate">{b.name}</span>
+                <span className="text-xs font-bold flex-1 text-center truncate px-4 opacity-90">
+                  {b.isOut ? (b.dismissal || 'c & b Bowler') : isCurrentBatter ? 'NOT OUT *' : ''}
+                </span>
+                <div className="flex items-center gap-8 font-black text-base w-28 justify-end">
+                  <span className={isCurrentBatter ? 'text-amber-300' : 'text-slate-950'}>{b.runs}</span>
+                  <span className={`text-xs ${isCurrentBatter ? 'text-white/80' : 'text-slate-600'}`}>{b.balls}</span>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
-        {/* Bottom Stats Footer (Screenshot 4) */}
-        <div className="bg-slate-950 border-t-2 border-orange-500 px-8 py-4 flex items-center justify-between text-base font-black uppercase">
+        {/* Bottom Footer Bar */}
+        <div className="bg-gradient-to-r from-purple-400 via-cyan-400 to-sky-400 px-8 py-3 flex items-center justify-between font-black text-slate-950 text-sm uppercase">
           <div className="flex items-center gap-8">
-            <div>
-              <span className="text-slate-400 text-xs font-bold block">RUN-RATE</span>
-              <span className="text-white text-xl">{crr}</span>
-            </div>
-            <div>
-              <span className="text-slate-400 text-xs font-bold block">EXTRAS</span>
-              <span className="text-white text-xl">0</span>
-            </div>
-            <div>
-              <span className="text-slate-400 text-xs font-bold block">OVERS</span>
-              <span className="text-white text-xl">{battingTeam.overs}</span>
-            </div>
+            <span>EXTRAS: <strong className="text-purple-950 text-lg ml-1">{totalExtras}</strong></span>
+            <span>OVERS: <strong className="text-purple-950 text-lg ml-1">{battingTeam.overs}.{battingTeam.balls}</strong></span>
+            <span>CRR: <strong className="text-purple-950 text-lg ml-1">{crr}</strong></span>
           </div>
 
-          <div className="text-right text-3xl font-black tracking-tight text-white">
+          <div className="bg-amber-400 text-slate-950 px-8 py-1.5 rounded-lg text-2xl font-black tracking-tight shadow-lg border border-amber-300">
             {battingTeam.score} - {battingTeam.wickets}
           </div>
         </div>

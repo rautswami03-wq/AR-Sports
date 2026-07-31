@@ -57,6 +57,8 @@ export interface Team {
   batters: Batter[];
   bowlers: Bowler[];
   playingXI: string[];
+  extras?: number;
+  fallOfWickets?: { score: number }[];
 }
 
 export interface MatchDetails {

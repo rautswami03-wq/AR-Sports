@@ -4,36 +4,43 @@ import { useBroadcastStore } from '../../store/useBroadcastStore';
 
 export const BowlingScorecard: React.FC = () => {
   const { teamA, teamB, bowlingTeamId, matchDetails } = useBroadcastStore();
-  const bowlingTeam = bowlingTeamId === teamA.id ? teamA : teamB;
-  const battingTeam = bowlingTeamId === teamA.id ? teamB : teamA;
+  const isTeamA = bowlingTeamId === teamA.id || bowlingTeamId === teamA.shortName || bowlingTeamId === 'teamA' || bowlingTeamId === teamA.fullName;
+  const bowlingTeam = isTeamA ? teamA : teamB;
+  const battingTeam = isTeamA ? teamB : teamA;
+
   const totalBalls = battingTeam.overs * 6 + battingTeam.balls;
   const crr = totalBalls > 0 ? ((battingTeam.score / totalBalls) * 6).toFixed(2) : '0.00';
+  const totalExtras = battingTeam.extras || 0;
+  const fowList = battingTeam.fallOfWickets || [];
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-40">
+    <div className="absolute inset-0 flex items-center justify-center pointer-events-auto z-40 p-6 bg-black/40 backdrop-blur-sm">
       <motion.div
-        initial={{ opacity: 0, scale: 0.9, y: 30 }}
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.9, y: 30 }}
-        transition={{ type: 'spring', damping: 24, stiffness: 220 }}
-        className="w-[1000px] pointer-events-auto shadow-[0_0_60px_rgba(249,115,22,0.8)] rounded-xl overflow-hidden border-4 border-orange-500 bg-[#090d16] font-sans text-white"
+        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+        transition={{ type: 'spring', damping: 25, stiffness: 240 }}
+        className="w-[1100px] shadow-2xl rounded-xl overflow-hidden border-2 border-purple-600 bg-slate-950 font-sans text-slate-900"
       >
-        {/* Dark Orange Pattern Header */}
-        <div className="bg-slate-950 border-b-2 border-orange-500 px-6 py-4 flex items-center justify-center relative overflow-hidden">
-          <div className="absolute inset-x-4 top-1 bottom-1 border-y border-orange-500/40 pointer-events-none" />
-          <h2 className="text-3xl font-black uppercase tracking-widest text-center text-white">
-            {bowlingTeam.fullName}
-          </h2>
+        {/* Top Header Banner */}
+        <div className="bg-[#4c0519] text-white py-2 px-6 flex items-center justify-center relative">
+          <span className="bg-cyan-500 text-slate-950 px-6 py-1 rounded-full font-black text-sm uppercase tracking-widest shadow">
+            {matchDetails.tournament || 'ICC WORLD CUP'}
+          </span>
         </div>
 
-        {/* Subheader */}
-        <div className="bg-slate-900 border-b border-white/10 px-6 py-2 text-center text-xs font-black uppercase tracking-widest text-slate-300">
-          {matchDetails.stage} | {matchDetails.title}
+        <div className="bg-purple-950 text-white px-8 py-3 flex items-center justify-between border-b-2 border-purple-500">
+          <span className="text-2xl font-black uppercase tracking-wider">{battingTeam.fullName}</span>
+          <div className="text-center font-extrabold text-xs text-purple-200 uppercase tracking-widest">
+            {matchDetails.stage || 'MATCH NO- 1'} | {matchDetails.title || 'NORMAL'}
+          </div>
+          <span className="text-2xl font-black uppercase tracking-wider text-purple-300">{bowlingTeam.fullName}</span>
         </div>
 
         {/* Table Header */}
-        <div className="px-8 py-2 bg-slate-950/80 border-b border-white/10 flex items-center justify-end text-xs font-black text-slate-300 uppercase tracking-wider">
-          <div className="grid grid-cols-5 gap-6 text-center w-[450px]">
+        <div className="px-8 py-2 bg-purple-900 text-white flex items-center justify-between text-xs font-black uppercase tracking-wider border-b border-purple-700">
+          <span className="w-48">BOWLER</span>
+          <div className="grid grid-cols-5 gap-6 text-center w-[500px]">
             <span>DOT BALLS</span>
             <span>OVERS</span>
             <span>RUNS</span>
@@ -42,57 +49,56 @@ export const BowlingScorecard: React.FC = () => {
           </div>
         </div>
 
-        {/* Bowlers Table (Cyan Gradient Highlight Rows) */}
-        <div className="p-6 space-y-2.5">
-          {bowlingTeam.bowlers.map((bw) => (
-            <div
-              key={bw.id}
-              className="bg-gradient-to-r from-sky-600 via-cyan-500 to-sky-600 px-6 py-3 rounded-lg flex items-center justify-between font-black text-sm text-slate-950 shadow-md border border-cyan-300/40"
-            >
-              <span className="uppercase tracking-wide text-white font-extrabold">{bw.name}</span>
-              <div className="grid grid-cols-5 gap-6 text-center w-[450px] font-black text-base text-slate-950">
-                <span>{Math.max(0, bw.overs * 6 - bw.runsConceded / 2)}</span>
-                <span>{bw.overs}</span>
-                <span>{bw.runsConceded}</span>
-                <span className="text-slate-950 font-black">{bw.wickets}</span>
-                <span>{bw.economy.toFixed(2)}</span>
+        {/* Bowlers Table */}
+        <div className="p-4 bg-slate-900 space-y-1.5 min-h-[220px]">
+          {bowlingTeam.bowlers.map((bw) => {
+            const eco = bw.overs > 0 ? (bw.runsConceded / bw.overs).toFixed(2) : '0.00';
+            const dotBalls = Math.max(0, bw.overs * 6 - Math.floor(bw.runsConceded / 2));
+            return (
+              <div
+                key={bw.id}
+                className="bg-white px-6 py-2.5 rounded flex items-center justify-between font-black text-sm text-slate-950 shadow-sm border border-slate-200"
+              >
+                <span className="uppercase tracking-wide w-48 truncate font-extrabold">{bw.name}</span>
+                <div className="grid grid-cols-5 gap-6 text-center w-[500px] font-black text-sm text-slate-950">
+                  <span>{dotBalls}</span>
+                  <span>{bw.overs}.{bw.ballsInCurrentOver}</span>
+                  <span>{bw.runsConceded}</span>
+                  <span className="text-rose-600 font-black">{bw.wickets}</span>
+                  <span>{eco}</span>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
+        </div>
 
-          {/* Fall of Wickets Mini Table (Screenshot 5) */}
-          <div className="mt-6 pt-4 border-t border-white/10 space-y-1.5 text-xs font-black">
-            <div className="flex items-center gap-3">
-              <span className="bg-amber-500 text-slate-950 px-4 py-1.5 rounded uppercase w-44 text-center">FALL OF WICKETS</span>
-              <span className="bg-sky-500 text-slate-950 px-4 py-1.5 rounded">1</span>
-              <span className="bg-sky-500 text-slate-950 px-4 py-1.5 rounded">2</span>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="bg-cyan-500 text-slate-950 px-4 py-1.5 rounded uppercase w-44 text-center">SCORE</span>
-              <span className="bg-red-600 text-white px-4 py-1.5 rounded">2</span>
-              <span className="bg-red-600 text-white px-4 py-1.5 rounded">10</span>
-            </div>
+        {/* Fall of Wickets Dynamic Section */}
+        <div className="bg-slate-950 p-4 border-t border-purple-800/60 space-y-2">
+          <div className="flex items-center gap-3">
+            <span className="bg-rose-600 text-white px-4 py-1 rounded text-xs font-black uppercase w-44 text-center shadow">
+              FALL OF WICKETS
+            </span>
+            {fowList.length > 0 ? (
+              fowList.map((fow: { score: number }, idx: number) => (
+                <span key={idx} className="bg-slate-800 text-white px-3 py-1 rounded text-xs font-black">
+                  {idx + 1} ({fow.score})
+                </span>
+              ))
+            ) : (
+              <span className="text-slate-400 text-xs font-bold italic">No wickets fallen</span>
+            )}
           </div>
         </div>
 
-        {/* Bottom Stats Footer (Screenshot 5) */}
-        <div className="bg-slate-950 border-t-2 border-orange-500 px-8 py-4 flex items-center justify-between text-base font-black uppercase">
+        {/* Bottom Footer Bar */}
+        <div className="bg-gradient-to-r from-purple-400 via-cyan-400 to-sky-400 px-8 py-3 flex items-center justify-between font-black text-slate-950 text-sm uppercase">
           <div className="flex items-center gap-8">
-            <div>
-              <span className="text-slate-400 text-xs font-bold block">RUN-RATE</span>
-              <span className="text-white text-xl">{crr}</span>
-            </div>
-            <div>
-              <span className="text-slate-400 text-xs font-bold block">EXTRAS</span>
-              <span className="text-white text-xl">0</span>
-            </div>
-            <div>
-              <span className="text-slate-400 text-xs font-bold block">OVERS</span>
-              <span className="text-white text-xl">{battingTeam.overs}</span>
-            </div>
+            <span>EXTRAS: <strong className="text-purple-950 text-lg ml-1">{totalExtras}</strong></span>
+            <span>OVERS: <strong className="text-purple-950 text-lg ml-1">{battingTeam.overs}.{battingTeam.balls}</strong></span>
+            <span>CRR: <strong className="text-purple-950 text-lg ml-1">{crr}</strong></span>
           </div>
 
-          <div className="text-right text-3xl font-black tracking-tight text-white">
+          <div className="bg-amber-400 text-slate-950 px-8 py-1.5 rounded-lg text-2xl font-black tracking-tight shadow-lg border border-amber-300">
             {battingTeam.score} - {battingTeam.wickets}
           </div>
         </div>
