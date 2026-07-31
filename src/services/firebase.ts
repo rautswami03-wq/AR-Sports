@@ -1,5 +1,6 @@
 import { initializeApp, getApps } from 'firebase/app';
 import { getFirestore, doc, onSnapshot, setDoc } from 'firebase/firestore';
+import { useBroadcastStore } from '../store/useBroadcastStore';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -37,12 +38,13 @@ export function subscribeToLiveMatch(matchId: string, onUpdate: (data: any) => v
   let lastRtdbText = '';
   const pollRtdb = async () => {
     try {
-      const res = await fetch(RTDB_URL);
+      const res = await fetch(RTDB_URL, { cache: 'no-cache' });
       if (res.ok) {
         const text = await res.text();
         if (text && text !== lastRtdbText && text !== 'null') {
           lastRtdbText = text;
           const parsed = JSON.parse(text);
+          useBroadcastStore.getState().applyExternalState(parsed);
           onUpdate(parsed);
         }
       }

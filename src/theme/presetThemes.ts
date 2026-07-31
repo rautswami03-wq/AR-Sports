@@ -321,17 +321,12 @@ export const THEME_ID_MAP: Record<string, string> = {
 };
 
 export function resolveThemeFromUrlOrStore(tournamentIdFromStore: string, tournamentName?: string): TournamentTheme {
-  if (typeof window === 'undefined') return PRESET_TOURNAMENTS['IPL'];
+  if (typeof window === 'undefined') return PRESET_TOURNAMENTS['t20_asia24'];
 
-  // 1. Give HIGHEST PRIORITY to the live store tournamentId broadcasted from Control Studio
-  if (tournamentIdFromStore && tournamentIdFromStore !== 'tour_default') {
-    const key = THEME_ID_MAP[tournamentIdFromStore] || tournamentIdFromStore;
-    if (PRESET_TOURNAMENTS[key]) return PRESET_TOURNAMENTS[key];
-  }
-
-  // 2. Check URL query param ?theme=...
   const hash = window.location.hash || '';
   const search = window.location.search || '';
+
+  // 1. Check URL query param ?theme=... (Highest priority for OBS Browser Source links)
   const hashQuery = hash.includes('?') ? hash.split('?')[1] : search;
   const params = new URLSearchParams(hashQuery);
   const themeParam = params.get('theme');
@@ -341,7 +336,7 @@ export function resolveThemeFromUrlOrStore(tournamentIdFromStore: string, tourna
     if (PRESET_TOURNAMENTS[key]) return PRESET_TOURNAMENTS[key];
   }
 
-  // 3. Check Hash path /#/theme/:themeId
+  // 2. Check Hash path /#/theme/:themeId
   if (hash.includes('/theme/')) {
     const parts = hash.split('/theme/')[1]?.split('?')[0]?.split('/');
     if (parts && parts[0]) {
@@ -351,16 +346,22 @@ export function resolveThemeFromUrlOrStore(tournamentIdFromStore: string, tourna
     }
   }
 
+  // 3. Give priority to live store tournamentId broadcasted from Control Studio
+  if (tournamentIdFromStore && tournamentIdFromStore !== 'tour_default') {
+    const key = THEME_ID_MAP[tournamentIdFromStore] || tournamentIdFromStore;
+    if (PRESET_TOURNAMENTS[key]) return PRESET_TOURNAMENTS[key];
+  }
+
   // 4. Auto-match theme from matchDetails.tournament (league name)
   if (tournamentName) {
     const themeFromLeague = getThemeByLeagueName(tournamentName);
-    if (themeFromLeague && themeFromLeague.id !== 'IPL') {
+    if (themeFromLeague) {
       return themeFromLeague;
     }
   }
 
-  // 5. Default fallback
-  return PRESET_TOURNAMENTS['IPL'];
+  // 5. Default fallback to T20 Emerging Asia Cup
+  return PRESET_TOURNAMENTS['t20_asia24'];
 }
 
 export function getThemeByLeagueName(searchName: string): TournamentTheme {

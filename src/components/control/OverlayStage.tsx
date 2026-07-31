@@ -69,7 +69,7 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
 
 
   useEffect(() => {
-    // 1. Initialize theme from URL query param if store is default
+    // 1. Initialize theme from URL query param or path
     const hash = typeof window !== 'undefined' ? window.location.hash : '';
     const search = typeof window !== 'undefined' ? window.location.search : '';
     const hashQuery = hash.includes('?') ? hash.split('?')[1] : search;
@@ -78,19 +78,13 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
 
     if (themeParam) {
       const themeKey = THEME_ID_MAP[themeParam] || themeParam;
-      const currentStoreTheme = useBroadcastStore.getState().tournamentId;
-      if (!currentStoreTheme || currentStoreTheme === 'tour_default') {
-        useBroadcastStore.getState().setTournamentId(themeKey);
-      }
+      useBroadcastStore.getState().setTournamentId(themeKey);
     } else if (hash.includes('/theme/')) {
       const parts = hash.split('/theme/')[1]?.split('?')[0]?.split('/');
       if (parts && parts[0]) {
         const themeIdFromPath = parts[0];
         const themeKey = THEME_ID_MAP[themeIdFromPath] || themeIdFromPath;
-        const currentStoreTheme = useBroadcastStore.getState().tournamentId;
-        if (!currentStoreTheme || currentStoreTheme === 'tour_default') {
-          useBroadcastStore.getState().setTournamentId(themeKey);
-        }
+        useBroadcastStore.getState().setTournamentId(themeKey);
       }
     }
 
