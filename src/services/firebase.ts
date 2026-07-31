@@ -97,28 +97,32 @@ export function subscribeToLiveMatch(matchId: string, onUpdate: (data: any) => v
   };
 }
 
-export async function publishLiveMatchState(matchId: string, state: any) {
-  const cleanState = JSON.parse(JSON.stringify(state));
+let publishTimer: any = null;
+let pendingStateToPublish: any = null;
 
-  try {
-    fetch(NTFY_TOPIC, {
-      method: 'POST',
-      body: JSON.stringify(cleanState),
-    }).catch(() => {});
-  } catch {}
+export function publishLiveMatchState(matchId: string, state: any) {
+  pendingStateToPublish = JSON.parse(JSON.stringify(state));
 
-  try {
-    const matchDoc = doc(db, 'matches', matchId);
-    await setDoc(matchDoc, cleanState, { merge: true });
-  } catch (err) {
-    console.warn('firestore write failed:', err);
-  }
+  if (publishTimer) return;
 
-  try {
-    await fetch(RTDB_URL, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(cleanState),
-    });
-  } catch {}
+  publishTimer = setTimeout(async () => {
+    publishTimer = null;
+    if (!pendingStateToPublish) return;
+
+    const stateToSend = pendingStateToPublish;
+    pendingStateToPublish = null;
+
+    try {
+      fetch(NTFY_TOPIC, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(stateToSend),
+      }).catch(() => {});
+    } catch {}
+
+    try {
+      const matchDoc = doc(db, 'matches', matchId);
+      await setDoc(matchDoc, stateToSend, { merge: true });
+    } catch {}
+  }, 200);
 }
