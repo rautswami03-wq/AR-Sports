@@ -320,7 +320,7 @@ export const THEME_ID_MAP: Record<string, string> = {
   '19': 'cwc_t20_2020',
 };
 
-export function resolveThemeFromUrlOrStore(tournamentIdFromStore: string): TournamentTheme {
+export function resolveThemeFromUrlOrStore(tournamentIdFromStore: string, tournamentName?: string): TournamentTheme {
   if (typeof window === 'undefined') return PRESET_TOURNAMENTS['IPL'];
 
   // 1. Give HIGHEST PRIORITY to the live store tournamentId broadcasted from Control Studio
@@ -351,7 +351,15 @@ export function resolveThemeFromUrlOrStore(tournamentIdFromStore: string): Tourn
     }
   }
 
-  // 4. Default fallback
+  // 4. Auto-match theme from matchDetails.tournament (league name)
+  if (tournamentName) {
+    const themeFromLeague = getThemeByLeagueName(tournamentName);
+    if (themeFromLeague && themeFromLeague.id !== 'IPL') {
+      return themeFromLeague;
+    }
+  }
+
+  // 5. Default fallback
   return PRESET_TOURNAMENTS['IPL'];
 }
 

@@ -9,8 +9,8 @@ export const LiveScoreBug: React.FC = () => {
   const battingTeam = isTeamA ? teamA : teamB;
   const bowlingTeam = isTeamA ? teamB : teamA;
 
-  // Resolve active theme deterministically from URL parameters, route path, or active store
-  const theme = resolveThemeFromUrlOrStore(tournamentId);
+  // Resolve active theme deterministically from URL parameters, route path, active store, or league title
+  const theme = resolveThemeFromUrlOrStore(tournamentId, matchDetails.tournament);
 
 
 
