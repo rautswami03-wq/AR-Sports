@@ -323,10 +323,15 @@ export const THEME_ID_MAP: Record<string, string> = {
 export function resolveThemeFromUrlOrStore(tournamentIdFromStore: string): TournamentTheme {
   if (typeof window === 'undefined') return PRESET_TOURNAMENTS['IPL'];
 
+  // 1. Give HIGHEST PRIORITY to the live store tournamentId broadcasted from Control Studio
+  if (tournamentIdFromStore && tournamentIdFromStore !== 'tour_default') {
+    const key = THEME_ID_MAP[tournamentIdFromStore] || tournamentIdFromStore;
+    if (PRESET_TOURNAMENTS[key]) return PRESET_TOURNAMENTS[key];
+  }
+
+  // 2. Check URL query param ?theme=...
   const hash = window.location.hash || '';
   const search = window.location.search || '';
-
-  // 1. Check URL query param ?theme=...
   const hashQuery = hash.includes('?') ? hash.split('?')[1] : search;
   const params = new URLSearchParams(hashQuery);
   const themeParam = params.get('theme');
@@ -336,7 +341,7 @@ export function resolveThemeFromUrlOrStore(tournamentIdFromStore: string): Tourn
     if (PRESET_TOURNAMENTS[key]) return PRESET_TOURNAMENTS[key];
   }
 
-  // 2. Check Hash path /#/theme/:themeId
+  // 3. Check Hash path /#/theme/:themeId
   if (hash.includes('/theme/')) {
     const parts = hash.split('/theme/')[1]?.split('?')[0]?.split('/');
     if (parts && parts[0]) {
@@ -346,9 +351,8 @@ export function resolveThemeFromUrlOrStore(tournamentIdFromStore: string): Tourn
     }
   }
 
-  // 3. Fallback to store tournamentId
-  const storeKey = THEME_ID_MAP[tournamentIdFromStore] || tournamentIdFromStore || 'IPL';
-  return PRESET_TOURNAMENTS[storeKey] || PRESET_TOURNAMENTS['IPL'];
+  // 4. Default fallback
+  return PRESET_TOURNAMENTS['IPL'];
 }
 
 export function getThemeByLeagueName(searchName: string): TournamentTheme {

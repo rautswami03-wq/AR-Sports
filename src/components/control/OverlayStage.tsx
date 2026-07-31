@@ -3,6 +3,7 @@ import { AnimatePresence } from 'framer-motion';
 import { useBroadcastStore } from '../../store/useBroadcastStore';
 import { OverlayType } from '../../types/cricket';
 import { subscribeToLiveMatch } from '../../services/firebase';
+import { THEME_ID_MAP } from '../../theme/presetThemes';
 
 // Overlays
 import { LiveScoreBug } from '../overlays/LiveScoreBug';
