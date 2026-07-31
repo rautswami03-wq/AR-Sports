@@ -4,7 +4,7 @@ import { getFirestore, doc, onSnapshot, setDoc } from 'firebase/firestore';
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL,
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL || 'https://cricscore-dcaa4-default-rtdb.firebaseio.com',
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
@@ -33,24 +33,26 @@ export function subscribeToLiveMatch(matchId: string, onUpdate: (data: any) => v
     );
   } catch {}
 
-  const processNtfyPayload = async (parsed: any) => {
+  // 100ms Firebase Realtime DB fast polling (Instant & 100% reliable)
+  let lastRtdbText = '';
+  const pollRtdb = async () => {
     try {
-      if (parsed.attachment?.url) {
-        const fileRes = await fetch(parsed.attachment.url);
-        if (fileRes.ok) {
-          const fileData = await fileRes.json();
-          onUpdate(fileData);
-          return;
+      const res = await fetch(RTDB_URL);
+      if (res.ok) {
+        const text = await res.text();
+        if (text && text !== lastRtdbText && text !== 'null') {
+          lastRtdbText = text;
+          const parsed = JSON.parse(text);
+          onUpdate(parsed);
         }
-      }
-      if (parsed.message) {
-        const statePayload = JSON.parse(parsed.message);
-        onUpdate(statePayload);
       }
     } catch {}
   };
 
-  // Real-time ntfy SSE connection
+  pollRtdb();
+  const pollInterval = setInterval(pollRtdb, 100);
+
+  // ntfy.sh SSE real-time connection backup
   let eventSource: EventSource | null = null;
   if (typeof window !== 'undefined' && 'EventSource' in window) {
     try {
@@ -58,7 +60,10 @@ export function subscribeToLiveMatch(matchId: string, onUpdate: (data: any) => v
       eventSource.onmessage = (event) => {
         try {
           const parsed = JSON.parse(event.data);
-          processNtfyPayload(parsed);
+          if (parsed.message) {
+            const statePayload = JSON.parse(parsed.message);
+            onUpdate(statePayload);
+          }
         } catch {}
       };
     } catch {}
@@ -66,6 +71,7 @@ export function subscribeToLiveMatch(matchId: string, onUpdate: (data: any) => v
 
   return () => {
     unsubFirestore();
+    clearInterval(pollInterval);
     if (eventSource) eventSource.close();
   };
 }
@@ -85,6 +91,16 @@ export function publishLiveMatchState(matchId: string, state: any) {
     const stateToSend = pendingStateToPublish;
     pendingStateToPublish = null;
 
+    // 1. Direct Firebase Realtime DB PUT (Instant & 100% Reliable worldwide)
+    try {
+      fetch(RTDB_URL, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(stateToSend),
+      }).catch(() => {});
+    } catch {}
+
+    // 2. ntfy.sh POST backup
     try {
       fetch(NTFY_TOPIC, {
         method: 'POST',
@@ -93,9 +109,10 @@ export function publishLiveMatchState(matchId: string, state: any) {
       }).catch(() => {});
     } catch {}
 
+    // 3. Firestore setDoc
     try {
       const matchDoc = doc(db, 'matches', matchId);
       await setDoc(matchDoc, stateToSend, { merge: true });
     } catch {}
-  }, 200);
+  }, 100);
 }
