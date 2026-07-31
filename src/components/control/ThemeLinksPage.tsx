@@ -34,6 +34,8 @@ export const THEME_LINKS_DATA: ThemeLinkItem[] = [
   { id: '17', themeKey: 'cwc23_diwali', name: 'CWC 23 India (Diwali Edition)', server1Url: '/#/theme/17/69d9cec52b632413dd8d7d48', server2Url: '/#/overlay?theme=cwc23_diwali', mobileUrl: '/#/overlay?theme=cwc23_diwali&mobile=true', badge: 'SPECIAL' },
   { id: '18', themeKey: 'bbl_white', name: 'BBL White', server1Url: '/#/theme/18/69d9cec52b632413dd8d7d48', server2Url: '/#/overlay?theme=bbl_white', mobileUrl: '/#/overlay?theme=bbl_white&mobile=true' },
   { id: '19', themeKey: 'cwc_t20_2020', name: 'ICC T20 World Cup 2020', server1Url: '/#/theme/19/69d9cec52b632413dd8d7d48', server2Url: '/#/overlay?theme=cwc_t20_2020', mobileUrl: '/#/overlay?theme=cwc_t20_2020&mobile=true' },
+  { id: '20', themeKey: 'icc_wc_vibrant', name: 'ICC World Cup (Vibrant Edition)', server1Url: '/#/theme/20/69d9cec52b632413dd8d7d48', server2Url: '/#/overlay?theme=icc_wc_vibrant', mobileUrl: '/#/overlay?theme=icc_wc_vibrant&mobile=true', badge: 'NEW' },
+  { id: '21', themeKey: 'super_fission', name: 'Super Fission (Neon Green)', server1Url: '/#/theme/21/69d9cec52b632413dd8d7d48', server2Url: '/#/overlay?theme=super_fission', mobileUrl: '/#/overlay?theme=super_fission&mobile=true', badge: 'NEW' },
 ];
 
 export const ThemeLinksPage: React.FC = () => {

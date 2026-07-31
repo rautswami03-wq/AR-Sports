@@ -296,6 +296,30 @@ export const PRESET_TOURNAMENTS: Record<string, TournamentTheme> = {
     scoreBugAccentBg: 'bg-slate-900',
     scoreBugTextColor: 'text-slate-950',
   },
+  icc_wc_vibrant: {
+    id: 'icc_wc_vibrant',
+    name: 'ICC WORLD CUP (VIBRANT SPECIAL EDITION)',
+    headerGradient: 'linear-gradient(90deg, #3b0764 0%, #7e22ce 50%, #ec4899 100%)',
+    primaryAccent: '#ec4899',
+    badgeBg: '#3b0764',
+    cardBg: '#ffffff',
+    cardBorder: '2px solid #ec4899',
+    scoreBugMainBg: 'bg-purple-950',
+    scoreBugAccentBg: 'bg-pink-600',
+    scoreBugTextColor: 'text-white',
+  },
+  super_fission: {
+    id: 'super_fission',
+    name: 'SUPER FISSION (NEON GREEN & DEEP PURPLE)',
+    headerGradient: 'linear-gradient(90deg, #090938 0%, #22c55e 50%, #090938 100%)',
+    primaryAccent: '#22c55e',
+    badgeBg: '#090938',
+    cardBg: '#ffffff',
+    cardBorder: '2px solid #22c55e',
+    scoreBugMainBg: 'bg-[#090938]',
+    scoreBugAccentBg: 'bg-emerald-500',
+    scoreBugTextColor: 'text-white',
+  },
 };
 
 export const THEME_ID_MAP: Record<string, string> = {
@@ -318,6 +342,8 @@ export const THEME_ID_MAP: Record<string, string> = {
   '17': 'cwc23_diwali',
   '18': 'bbl_white',
   '19': 'cwc_t20_2020',
+  '20': 'icc_wc_vibrant',
+  '21': 'super_fission',
 };
 
 export function resolveThemeFromUrlOrStore(tournamentIdFromStore: string, tournamentName?: string): TournamentTheme {
