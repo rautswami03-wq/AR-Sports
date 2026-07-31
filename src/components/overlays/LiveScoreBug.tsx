@@ -23,6 +23,119 @@ export const LiveScoreBug: React.FC = () => {
   const totalBalls = battingTeam.overs * 6 + battingTeam.balls;
   const crr = totalBalls > 0 ? ((battingTeam.score / totalBalls) * 6).toFixed(1) : '0.0';
 
+  if (theme.id === 't20_asia24' || theme.id === 'asia_cup') {
+    return (
+      <div className="absolute bottom-4 inset-x-4 z-40 flex flex-col items-center">
+        {matchDetails.decision && (
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            className={`px-8 py-1.5 font-black text-lg tracking-widest uppercase rounded-t-lg shadow-2xl border-t border-x border-white/30 mb-1 ${
+              matchDetails.decision === 'OUT'
+                ? 'bg-red-600 text-white'
+                : matchDetails.decision === 'NOT OUT'
+                ? 'bg-emerald-500 text-slate-950'
+                : 'bg-yellow-400 text-slate-950'
+            }`}
+          >
+            {matchDetails.decision}
+          </motion.div>
+        )}
+
+        {/* Main T20 Emerging Asia Cup Score Bug */}
+        <motion.div
+          initial={{ opacity: 0, y: 80 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="w-full flex items-stretch h-[76px] shadow-2xl rounded-2xl overflow-hidden border-2 border-amber-400 font-sans text-slate-900 bg-white"
+        >
+          {/* 1. Left Team Block */}
+          <div className="bg-gradient-to-r from-slate-100 to-white px-6 flex items-center justify-center border-r border-slate-300 font-black text-slate-950 text-xl tracking-tight uppercase min-w-[170px]">
+            {battingTeam.fullName}
+          </div>
+
+          {/* 2. Center Navy Score Badge */}
+          <div className="relative bg-[#000080] text-white px-6 flex flex-col justify-center items-center min-w-[200px] border-r border-slate-300">
+            <div className="flex items-baseline gap-3">
+              <span className="text-3xl font-black tracking-tight">{battingTeam.score} - {battingTeam.wickets}</span>
+              <span className="text-sm font-extrabold text-cyan-300">{oversFormatted}</span>
+            </div>
+            <div className="bg-[#00a8ff] text-slate-950 px-4 py-0.5 rounded-full text-[11px] font-black uppercase mt-0.5 tracking-wider shadow">
+              {matchDetails.targetRuns ? `TARGET - ${matchDetails.targetRuns}` : `CRR: ${crr}`}
+            </div>
+          </div>
+
+          {/* 3. Batting Section */}
+          <div className="bg-gradient-to-b from-slate-50 to-blue-50/40 px-5 flex flex-col justify-center border-r border-slate-300 min-w-[240px] text-xs font-black text-slate-950">
+            {striker && (
+              <div className="flex items-center justify-between text-slate-950">
+                <span className="flex items-center gap-1.5 truncate">
+                  <span className="text-amber-500 font-black">●</span>
+                  <span className="truncate uppercase">{striker.name}</span>
+                </span>
+                <span className="font-extrabold text-sm ml-2">
+                  {striker.runs} <span className="text-xs opacity-70 font-bold">{striker.balls}</span>
+                </span>
+              </div>
+            )}
+            {nonStriker && (
+              <div className="flex items-center justify-between text-slate-700 font-bold">
+                <span className="truncate uppercase pl-3">{nonStriker.name}</span>
+                <span className="text-xs ml-2">
+                  {nonStriker.runs} <span className="opacity-70 text-[11px]">{nonStriker.balls}</span>
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* 4. Bowler Section (Canary Yellow #ffcc00) */}
+          <div className="bg-[#ffcc00] px-5 flex flex-col justify-center border-r border-slate-300 min-w-[260px] text-slate-950">
+            {currentBowler && (
+              <div className="flex items-center justify-between font-black text-xs uppercase mb-1">
+                <span className="truncate">{currentBowler.name}</span>
+                <span className="font-black text-sm">
+                  {currentBowler.wickets}-{currentBowler.runsConceded} <span className="text-xs font-bold opacity-80">({currentBowler.overs}.{currentBowler.ballsInCurrentOver})</span>
+                </span>
+              </div>
+            )}
+            <div className="flex items-center gap-1.5 text-[11px] font-black uppercase">
+              <span className="text-slate-800 font-extrabold mr-1">OVER</span>
+              {matchDetails.recentBalls.slice(0, 6).map((ball, idx) => (
+                <span
+                  key={idx}
+                  className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black shadow-sm ${
+                    ball === 'W'
+                      ? 'bg-red-600 text-white'
+                      : ball === '6' || ball === '4'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-slate-950 text-amber-300'
+                  }`}
+                >
+                  {ball}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* 5. Right Team Block */}
+          <div className="bg-gradient-to-l from-slate-100 to-white px-6 flex items-center justify-center font-black text-slate-950 text-xl tracking-tight uppercase min-w-[170px]">
+            {bowlingTeam.fullName}
+          </div>
+        </motion.div>
+
+        {/* 6. Bottom Ticker Ribbon */}
+        <div className="w-full bg-[#000080] text-white px-6 py-1 flex items-center justify-between text-xs font-bold border-t border-cyan-400/40 rounded-b-xl shadow-lg mt-0.5">
+          <span className="text-cyan-300 font-extrabold uppercase">
+            {matchDetails.tournament || "ACC MEN'S T20 EMERGING ASIA CUP 2024"}
+          </span>
+          <div className="flex items-center gap-6">
+            <span>Fours: <strong className="text-amber-400 font-black">{striker?.fours || 0}</strong></span>
+            <span>Sixes: <strong className="text-amber-400 font-black">{striker?.sixes || 0}</strong></span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="absolute bottom-4 inset-x-4 z-40 flex flex-col items-end">
 
@@ -168,5 +281,6 @@ export const LiveScoreBug: React.FC = () => {
       </div>
     </motion.div>
   </div>
+
   );
 };
