@@ -29,15 +29,54 @@ export function subscribeToLiveMatch(matchId: string, onUpdate: (data: any) => v
           onUpdate(snapshot.data());
         }
       },
-      (error) => {
-        console.warn('firestore:', error.message);
-      }
+      () => {}
     );
-  } catch (err) {
-    console.warn('firestore init failed:', err);
-  }
+  } catch {}
 
-  // ntfy.sh SSE push
+  const processNtfyPayload = async (parsed: any) => {
+    try {
+      if (parsed.attachment?.url) {
+        const fileRes = await fetch(parsed.attachment.url);
+        if (fileRes.ok) {
+          const fileData = await fileRes.json();
+          onUpdate(fileData);
+          return;
+        }
+      }
+      if (parsed.message) {
+        const statePayload = JSON.parse(parsed.message);
+        onUpdate(statePayload);
+      }
+    } catch {}
+  };
+
+  // 1. Initial poll on launch to immediately fetch the latest broadcast payload
+  let lastNtfyMsgId = '';
+  const pollNtfyCache = async () => {
+    try {
+      const res = await fetch(`${NTFY_TOPIC}/json?poll=1`);
+      if (res.ok) {
+        const text = await res.text();
+        const lines = text.trim().split('\n');
+        for (let i = lines.length - 1; i >= 0; i--) {
+          if (!lines[i]) continue;
+          try {
+            const parsed = JSON.parse(lines[i]);
+            if (parsed.id && parsed.id !== lastNtfyMsgId) {
+              lastNtfyMsgId = parsed.id;
+              await processNtfyPayload(parsed);
+              break;
+            }
+          } catch {}
+        }
+      }
+    } catch {}
+  };
+
+  pollNtfyCache();
+  const pollInterval = setInterval(pollNtfyCache, 1000);
+
+  // 2. Real-time ntfy SSE connection
   let eventSource: EventSource | null = null;
   if (typeof window !== 'undefined' && 'EventSource' in window) {
     try {
@@ -45,33 +84,11 @@ export function subscribeToLiveMatch(matchId: string, onUpdate: (data: any) => v
       eventSource.onmessage = (event) => {
         try {
           const parsed = JSON.parse(event.data);
-          if (parsed.message) {
-            const statePayload = JSON.parse(parsed.message);
-            onUpdate(statePayload);
-          }
+          processNtfyPayload(parsed);
         } catch {}
       };
     } catch {}
   }
-
-  // RTDB polling fallback
-  let lastRtdbJson = '';
-  const pollRtdb = async () => {
-    try {
-      const res = await fetch(RTDB_URL);
-      if (res.ok) {
-        const text = await res.text();
-        if (text && text !== lastRtdbJson && text !== 'null') {
-          lastRtdbJson = text;
-          const parsed = JSON.parse(text);
-          onUpdate(parsed);
-        }
-      }
-    } catch {}
-  };
-
-  pollRtdb();
-  const pollInterval = setInterval(pollRtdb, 500);
 
   return () => {
     unsubFirestore();
