@@ -46,15 +46,15 @@ export const LiveScoreBug: React.FC = () => {
         <motion.div
           initial={{ opacity: 0, y: 80 }}
           animate={{ opacity: 1, y: 0 }}
-          className="w-full flex items-stretch h-[76px] shadow-2xl rounded-2xl overflow-hidden border-2 border-amber-400 font-sans text-slate-900 bg-white"
+          className="w-full flex items-stretch h-[76px] shadow-2xl rounded-2xl overflow-hidden border-2 border-amber-400 font-sans text-slate-900 bg-[#000080]"
         >
           {/* 1. Left Team Block */}
-          <div className="bg-gradient-to-r from-slate-100 to-white px-6 flex items-center justify-center border-r border-slate-300 font-black text-slate-950 text-xl tracking-tight uppercase min-w-[170px]">
+          <div className="bg-white px-5 flex items-center justify-center border-r border-slate-300 font-black text-slate-950 text-xl tracking-tight uppercase w-[200px] shrink-0">
             {battingTeam.fullName}
           </div>
 
           {/* 2. Center Navy Score Badge */}
-          <div className="relative bg-[#000080] text-white px-6 flex flex-col justify-center items-center min-w-[200px] border-r border-slate-300">
+          <div className="relative bg-[#000080] text-white px-6 flex flex-col justify-center items-center w-[220px] shrink-0 border-r border-slate-300">
             <div className="flex items-baseline gap-3">
               <span className="text-3xl font-black tracking-tight">{battingTeam.score} - {battingTeam.wickets}</span>
               <span className="text-sm font-extrabold text-cyan-300">{oversFormatted}</span>
@@ -65,7 +65,7 @@ export const LiveScoreBug: React.FC = () => {
           </div>
 
           {/* 3. Batting Section */}
-          <div className="bg-gradient-to-b from-slate-50 to-blue-50/40 px-5 flex flex-col justify-center border-r border-slate-300 min-w-[240px] text-xs font-black text-slate-950">
+          <div className="flex-1 bg-gradient-to-b from-slate-50 to-blue-50/40 px-5 flex flex-col justify-center border-r border-slate-300 text-xs font-black text-slate-950 min-w-[220px]">
             {striker && (
               <div className="flex items-center justify-between text-slate-950">
                 <span className="flex items-center gap-1.5 truncate">
@@ -88,7 +88,7 @@ export const LiveScoreBug: React.FC = () => {
           </div>
 
           {/* 4. Bowler Section (Canary Yellow #ffcc00) */}
-          <div className="bg-[#ffcc00] px-5 flex flex-col justify-center border-r border-slate-300 min-w-[260px] text-slate-950">
+          <div className="flex-1 bg-[#ffcc00] px-5 flex flex-col justify-center border-r border-slate-300 text-slate-950 min-w-[240px]">
             {currentBowler && (
               <div className="flex items-center justify-between font-black text-xs uppercase mb-1">
                 <span className="truncate">{currentBowler.name}</span>
@@ -116,8 +116,8 @@ export const LiveScoreBug: React.FC = () => {
             </div>
           </div>
 
-          {/* 5. Right Team Block */}
-          <div className="bg-gradient-to-l from-slate-100 to-white px-6 flex items-center justify-center font-black text-slate-950 text-xl tracking-tight uppercase min-w-[170px]">
+          {/* 5. Right Team Block (Far Right End) */}
+          <div className="bg-white px-5 flex items-center justify-center font-black text-slate-950 text-xl tracking-tight uppercase w-[200px] shrink-0">
             {bowlingTeam.fullName}
           </div>
         </motion.div>
