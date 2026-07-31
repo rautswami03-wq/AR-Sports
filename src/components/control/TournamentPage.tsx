@@ -140,7 +140,8 @@ export const TournamentPage: React.FC = () => {
                 {/* Share Link Icon */}
                 <button
                   onClick={() => {
-                    const shareUrl = `${window.location.origin}/#/tournament/${tour.id}`;
+                    const baseUrl = window.location.href.split('#')[0].replace(/\/$/, '');
+                    const shareUrl = `${baseUrl}/#/tournament/${tour.id}`;
                     navigator.clipboard.writeText(shareUrl);
                     alert('Tournament Link copied!');
                   }}

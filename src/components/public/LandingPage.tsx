@@ -29,7 +29,9 @@ export const LandingPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'themes' | 'features' | 'obs_setup'>('themes');
 
   const handleCopy = (path: string, key: string) => {
-    const fullUrl = `${window.location.origin}${path}`;
+    const baseUrl = window.location.href.split('#')[0].replace(/\/$/, '');
+    const cleanPath = path.startsWith('/') ? path.substring(1) : path;
+    const fullUrl = `${baseUrl}/${cleanPath}`;
     navigator.clipboard.writeText(fullUrl);
     setCopiedKey(key);
     setTimeout(() => setCopiedKey(null), 2000);

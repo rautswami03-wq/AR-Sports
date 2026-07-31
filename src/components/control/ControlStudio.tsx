@@ -59,7 +59,8 @@ export const ControlStudio: React.FC = () => {
 
   const battingTeam = battingTeamId === teamA.id ? teamA : teamB;
   const bowlingTeam = battingTeamId === teamA.id ? teamB : teamA;
-  const obsUrl = `${window.location.origin}/#/overlay`;
+  const baseUrl = typeof window !== 'undefined' ? window.location.href.split('#')[0].replace(/\/$/, '') : '';
+  const obsUrl = `${baseUrl}/#/overlay${tournamentId ? `?theme=${tournamentId}` : ''}`;
 
   const copyObsUrl = () => {
     navigator.clipboard.writeText(obsUrl);

@@ -197,7 +197,8 @@ export const TournamentDetailPage: React.FC = () => {
   };
 
   const handleCopyLink = (matchId: string) => {
-    const shareUrl = `${window.location.origin}/#/tournament/${id}/match/${matchId}`;
+    const baseUrl = window.location.href.split('#')[0].replace(/\/$/, '');
+    const shareUrl = `${baseUrl}/#/tournament/${id}/match/${matchId}`;
     navigator.clipboard.writeText(shareUrl);
     setCopiedId(matchId);
     setTimeout(() => setCopiedId(null), 2000);

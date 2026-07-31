@@ -41,7 +41,10 @@ export const ThemeLinksPage: React.FC = () => {
   const { tournamentId, setTournamentId } = useBroadcastStore();
 
   const handleCopy = (path: string, key: string, themeKey: string) => {
-    const fullUrl = `${window.location.origin}${path}`;
+    const baseUrl = window.location.href.split('#')[0].replace(/\/$/, '');
+    const cleanPath = path.startsWith('/') ? path.substring(1) : path;
+    const fullUrl = `${baseUrl}/${cleanPath}`;
+
     navigator.clipboard.writeText(fullUrl);
     setCopiedKey(key);
 
@@ -52,6 +55,7 @@ export const ThemeLinksPage: React.FC = () => {
 
     setTimeout(() => setCopiedKey(null), 2500);
   };
+
 
   return (
     <div className="min-h-screen bg-[#0a0f1d] text-slate-100 font-sans">
