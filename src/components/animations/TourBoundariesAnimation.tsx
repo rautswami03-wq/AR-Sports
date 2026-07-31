@@ -1,14 +1,25 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useBroadcastStore } from '../../store/useBroadcastStore';
 
 export const TourBoundariesAnimation: React.FC = () => {
+  const { clearAnimation } = useBroadcastStore();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      clearAnimation();
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, [clearAnimation]);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 100 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 100 }}
       transition={{ type: 'spring', damping: 20, stiffness: 220 }}
-      className="absolute bottom-0 inset-x-0 h-24 z-50 flex items-center justify-between bg-gradient-to-r from-cyan-600 via-sky-500 to-cyan-600 border-t-4 border-cyan-200 shadow-[0_-10px_50px_rgba(6,182,212,0.9)] overflow-hidden font-sans"
+      onClick={clearAnimation}
+      className="absolute bottom-0 inset-x-0 h-24 z-50 flex items-center justify-between bg-gradient-to-r from-cyan-600 via-sky-500 to-cyan-600 border-t-4 border-cyan-200 shadow-[0_-10px_50px_rgba(6,182,212,0.9)] overflow-hidden font-sans cursor-pointer"
     >
       {/* Background Watermark */}
       <div className="flex items-center gap-6 opacity-25 text-slate-950 font-black text-5xl uppercase tracking-tighter select-none whitespace-nowrap overflow-hidden">

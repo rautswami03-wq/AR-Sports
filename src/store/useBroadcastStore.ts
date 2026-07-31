@@ -397,8 +397,15 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
   },
 
   triggerAnimation: (type, durationMs = 4000) => {
-    const { animationTimeoutId } = get();
+    const { animationTimeoutId, activeAnimation } = get();
     if (animationTimeoutId) clearTimeout(animationTimeoutId);
+
+    // Toggle off if clicking the same active animation
+    if (activeAnimation === type) {
+      set({ activeAnimation: null, animationTimeoutId: null });
+      postStateSync({ ...get(), activeAnimation: null });
+      return;
+    }
 
     const newTimeout = setTimeout(() => {
       set({ activeAnimation: null, animationTimeoutId: null });

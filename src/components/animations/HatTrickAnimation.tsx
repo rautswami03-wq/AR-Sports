@@ -1,14 +1,25 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useBroadcastStore } from '../../store/useBroadcastStore';
 
 export const HatTrickAnimation: React.FC = () => {
+  const { clearAnimation } = useBroadcastStore();
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      clearAnimation();
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, [clearAnimation]);
+
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.8, y: 80 }}
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.8, y: 80 }}
       transition={{ type: 'spring', damping: 18, stiffness: 200 }}
-      className="absolute bottom-0 inset-x-0 h-24 z-50 flex items-center justify-between bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 border-t-4 border-yellow-200 shadow-[0_-10px_50px_rgba(234,179,8,0.9)] overflow-hidden font-sans"
+      onClick={clearAnimation}
+      className="absolute bottom-0 inset-x-0 h-24 z-50 flex items-center justify-between bg-gradient-to-r from-amber-600 via-yellow-500 to-amber-600 border-t-4 border-yellow-200 shadow-[0_-10px_50px_rgba(234,179,8,0.9)] overflow-hidden font-sans cursor-pointer"
     >
       {/* Background Watermark */}
       <div className="flex items-center gap-6 opacity-25 text-amber-950 font-black text-5xl uppercase tracking-tighter select-none whitespace-nowrap overflow-hidden">
