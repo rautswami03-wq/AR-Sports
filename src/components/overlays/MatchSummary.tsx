@@ -1,9 +1,13 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useBroadcastStore } from '../../store/useBroadcastStore';
+import { resolveThemeFromUrlOrStore } from '../../theme/presetThemes';
 
 export const MatchSummary: React.FC = () => {
-  const { teamA, teamB, matchDetails } = useBroadcastStore();
+  const { teamA, teamB, matchDetails, tournamentId } = useBroadcastStore();
+
+  const theme = resolveThemeFromUrlOrStore(tournamentId, matchDetails.tournament);
+  const accentColor = theme.primaryAccent || '#facc15';
 
   const getWinnerMessage = () => {
     if (matchDetails.winnerMargin) return matchDetails.winnerMargin;
@@ -16,27 +20,37 @@ export const MatchSummary: React.FC = () => {
   };
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center pointer-events-auto z-40 p-6 bg-black/40 backdrop-blur-sm">
+    <div className="absolute inset-0 flex items-center justify-center pointer-events-auto z-40 p-6 bg-black/50 backdrop-blur-md">
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
         transition={{ type: 'spring', damping: 25, stiffness: 240 }}
-        className="w-[1100px] shadow-2xl rounded-xl overflow-hidden border-2 border-purple-600 bg-slate-950 font-sans text-slate-900"
+        className="w-[1100px] shadow-2xl rounded-xl overflow-hidden border-2 bg-slate-950 font-sans text-slate-100"
+        style={{ borderColor: accentColor }}
       >
         {/* Top Header Banner */}
-        <div className="bg-[#4c0519] text-white py-2 px-6 flex items-center justify-center relative">
-          <span className="bg-cyan-500 text-slate-950 px-6 py-1 rounded-full font-black text-sm uppercase tracking-widest shadow">
-            {matchDetails.tournament || 'ICC WORLD CUP'}
+        <div
+          className="py-2.5 px-6 flex items-center justify-center relative shadow-inner"
+          style={{ background: theme.headerGradient || 'linear-gradient(90deg, #0f172a 0%, #1e293b 100%)' }}
+        >
+          <span
+            className="text-slate-950 px-6 py-1 rounded-full font-black text-sm uppercase tracking-widest shadow-md"
+            style={{ backgroundColor: accentColor }}
+          >
+            {matchDetails.tournament || theme.name}
           </span>
         </div>
 
-        <div className="bg-purple-950 text-white px-8 py-3 flex items-center justify-between border-b-2 border-purple-500">
+        <div
+          className="text-white px-8 py-3.5 flex items-center justify-between border-b-2 border-white/20"
+          style={{ background: theme.badgeBg || '#0f172a' }}
+        >
           <span className="text-2xl font-black uppercase tracking-wider">{teamA.fullName}</span>
-          <div className="text-center font-extrabold text-xs text-purple-200 uppercase tracking-widest">
-            {matchDetails.stage || 'MATCH NO- 1'} | {matchDetails.title || 'NORMAL'}
+          <div className="text-center font-extrabold text-xs uppercase tracking-widest text-slate-300">
+            {matchDetails.stage || 'MATCH NO- 1'} | {matchDetails.title || 'SUMMARY'}
           </div>
-          <span className="text-2xl font-black uppercase tracking-wider text-purple-300">{teamB.fullName}</span>
+          <span className="text-2xl font-black uppercase tracking-wider opacity-80">{teamB.fullName}</span>
         </div>
 
         {/* Dynamic Teams Summary Grid */}
