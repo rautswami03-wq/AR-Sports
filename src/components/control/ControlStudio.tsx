@@ -94,6 +94,64 @@ export const ControlStudio: React.FC = () => {
     }
   };
 
+  const [voiceCommentaryEnabled, setVoiceCommentaryEnabled] = useState(false);
+
+  const speakCommentary = (text: string) => {
+    if (!voiceCommentaryEnabled || typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+    try {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = 1.05;
+      utterance.pitch = 1.1;
+      window.speechSynthesis.speak(utterance);
+    } catch {}
+  };
+
+  // Keyboard Hotkeys listener for rapid live scoring
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const activeEl = document.activeElement;
+      if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.tagName === 'SELECT')) {
+        return;
+      }
+
+      const key = e.key.toLowerCase();
+      if (key === '0' || e.code === 'Numpad0') {
+        handleScoreClick(0);
+        speakCommentary('Dot ball.');
+      } else if (key === '1' || e.code === 'Numpad1') {
+        handleScoreClick(1);
+        speakCommentary('Single run.');
+      } else if (key === '2' || e.code === 'Numpad2') {
+        handleScoreClick(2);
+        speakCommentary('Two runs taken!');
+      } else if (key === '3' || e.code === 'Numpad3') {
+        handleScoreClick(3);
+        speakCommentary('Three runs!');
+      } else if (key === '4' || e.code === 'Numpad4') {
+        handleScoreClick(4);
+        triggerAnimation('FOUR');
+        speakCommentary('Shot! That is a FOUR!');
+      } else if (key === '6' || e.code === 'Numpad6') {
+        handleScoreClick(6);
+        triggerAnimation('SIX');
+        speakCommentary('Huge hit! SIX runs into the stands!');
+      } else if (key === 'w') {
+        addWicket();
+        triggerAnimation('WICKET');
+        speakCommentary('OUT! Wicket falls!');
+      } else if (key === 'u') {
+        undoLastBall();
+        speakCommentary('Undoing last ball.');
+      } else if (key === 'b') {
+        toggleOverlay('scoreBug');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [voiceCommentaryEnabled, extraWide, extraNoBall, extraByes, extraLegByes, extraWicket]);
+
   const overlayList: { id: OverlayType; label: string }[] = [
     { id: 'scoreBug', label: 'Live Score Bug' },
     { id: 'battingLowerThird', label: 'Batting Lower Third' },
@@ -166,6 +224,18 @@ export const ControlStudio: React.FC = () => {
 
         {/* Actions */}
         <div className="flex items-center gap-3">
+          <button
+            onClick={() => setVoiceCommentaryEnabled(!voiceCommentaryEnabled)}
+            className={`px-3 py-1.5 rounded-lg text-xs font-black uppercase transition-all flex items-center gap-1.5 shadow-md border ${
+              voiceCommentaryEnabled
+                ? 'bg-emerald-600 border-emerald-400 text-white animate-pulse'
+                : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
+            }`}
+          >
+            <Zap className="w-3.5 h-3.5 text-amber-400" />
+            {voiceCommentaryEnabled ? '🎙️ VOICE AI: ON' : '🎙️ VOICE AI: OFF'}
+          </button>
+
           <button
             onClick={() => setShowEditModal(true)}
             className="bg-blue-600 hover:bg-blue-500 text-white border border-blue-400/40 px-3.5 py-1.5 rounded-lg text-xs font-black uppercase transition-all flex items-center gap-1.5 shadow-md"
