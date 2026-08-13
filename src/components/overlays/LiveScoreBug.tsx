@@ -80,55 +80,65 @@ export const LiveScoreBug: React.FC = () => {
         transition={{ type: 'spring', damping: 24, stiffness: 220 }}
         className={`w-full max-w-[1180px] flex items-stretch h-[78px] shadow-2xl overflow-hidden font-sans pointer-events-auto transition-all duration-300 ${
           layoutStyle === 'dual-capsule'
-            ? 'rounded-3xl border-2 border-amber-400/80 bg-slate-950 text-white p-1 gap-1'
+            ? 'rounded-3xl border-2 bg-slate-950 text-white p-1 gap-1'
             : layoutStyle === 'glass-box'
-            ? 'rounded-2xl border border-white/20 bg-slate-900/80 backdrop-blur-xl text-white shadow-cyan-500/20'
+            ? 'rounded-2xl border border-white/30 bg-slate-900/85 backdrop-blur-2xl text-white'
             : layoutStyle === 'chevron'
-            ? 'rounded-xl border-l-8 border-r-8 border-emerald-400 bg-slate-950 text-white'
+            ? 'rounded-xl border-l-8 border-r-8 bg-slate-950 text-white'
             : layoutStyle === 'flat-bar'
-            ? 'rounded-lg border-t-4 border-orange-500 bg-neutral-900 text-white'
-            : 'rounded-2xl border border-white/30 bg-slate-900 text-white'
+            ? 'rounded-lg border-t-4 bg-neutral-900 text-white'
+            : 'rounded-2xl border border-white/30 bg-slate-950 text-white'
         }`}
+        style={{
+          borderColor: theme.primaryAccent || 'rgba(255,255,255,0.3)',
+          boxShadow: `0 20px 50px -10px ${theme.primaryAccent ? theme.primaryAccent + '40' : 'rgba(0,0,0,0.5)'}`
+        }}
       >
         {/* Batting Team Badge */}
         <div
-          className="px-5 flex items-center gap-3 shrink-0 border-r border-white/10"
-          style={{ background: battingTeam.primaryColor || theme.badgeBg }}
+          className="px-5 flex items-center gap-3 shrink-0 border-r border-white/10 transition-colors"
+          style={{ background: theme.badgeBg || battingTeam.primaryColor || '#0f172a' }}
         >
-          <div className="w-12 h-12 rounded-full bg-black/40 border-2 border-white/60 flex items-center justify-center font-black text-white text-base shadow-md">
+          <div
+            className="w-12 h-12 rounded-full border-2 flex items-center justify-center font-black text-white text-base shadow-lg"
+            style={{
+              borderColor: theme.primaryAccent || '#ffffff',
+              backgroundColor: battingTeam.primaryColor || 'rgba(0,0,0,0.5)'
+            }}
+          >
             {battingTeam.shortName}
           </div>
           <div className="flex flex-col leading-tight">
             <span className="font-black text-sm uppercase tracking-tight text-white drop-shadow">
               {battingTeam.fullName}
             </span>
-            <span className="font-bold text-slate-300 text-[11px]">
+            <span className="font-bold text-slate-300 text-[11px]" style={{ color: theme.primaryAccent }}>
               v {bowlingTeam.shortName}
             </span>
           </div>
         </div>
 
         {/* Score Block */}
-        <div className="px-5 flex flex-col justify-center border-r border-white/10 shrink-0 bg-black/40">
-          <div className="font-black text-3xl tracking-tight leading-none text-white flex items-baseline gap-1">
-            <span>{battingTeam.score}</span>
+        <div className="px-5 flex flex-col justify-center border-r border-white/10 shrink-0 bg-black/50">
+          <div className="font-black text-3xl tracking-tight leading-none flex items-baseline gap-1">
+            <span style={{ color: theme.primaryAccent || '#ffffff' }}>{battingTeam.score}</span>
             <span className="text-amber-400 text-2xl">-{battingTeam.wickets}</span>
           </div>
           <div className="flex items-center justify-between text-[11px] font-black text-slate-300 mt-1 gap-2">
-            <span className="text-cyan-400">{oversFormatted} OVS</span>
+            <span style={{ color: theme.primaryAccent || '#38bdf8' }}>{oversFormatted} OVS</span>
             <span>CRR: {crr}</span>
           </div>
         </div>
 
         {/* Batters Stats */}
-        <div className="flex-1 px-4 flex flex-col justify-center border-r border-white/10 min-w-[240px] bg-slate-900/60 text-xs font-black">
+        <div className="flex-1 px-4 flex flex-col justify-center border-r border-white/10 min-w-[230px] bg-slate-900/80 text-xs font-black">
           {striker && (
             <div className="flex items-center justify-between text-white mb-0.5">
               <span className="truncate flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: theme.primaryAccent || '#34d399' }} />
                 <span className="truncate uppercase font-black">{striker.name}</span>
               </span>
-              <span className="font-black text-sm text-amber-400 ml-2">
+              <span className="font-black text-sm ml-2" style={{ color: theme.primaryAccent || '#facc15' }}>
                 {striker.runs} <span className="text-xs font-bold text-slate-400">({striker.balls})</span>
               </span>
             </div>
@@ -145,20 +155,20 @@ export const LiveScoreBug: React.FC = () => {
 
         {/* Center Event Banner / Tournament Title */}
         <div
-          className="flex-1 px-4 flex items-center justify-center border-r border-white/10 text-center shadow-inner"
-          style={{ background: theme.headerGradient }}
+          className="flex-1 px-4 flex items-center justify-center border-r border-white/10 text-center shadow-inner relative overflow-hidden"
+          style={{ background: theme.headerGradient || 'linear-gradient(90deg, #0f172a 0%, #1e293b 100%)' }}
         >
-          <span className="text-white font-black text-base tracking-wider uppercase drop-shadow">
+          <span className="text-white font-black text-base tracking-wider uppercase drop-shadow-md z-10">
             {matchDetails.customInputText || matchDetails.winnerMargin || theme.name}
           </span>
         </div>
 
         {/* Bowler Stats & Over-Ball Progress Dots */}
-        <div className="px-4 flex flex-col justify-center border-r border-white/10 shrink-0 min-w-[240px] bg-black/40 text-xs font-black text-white">
+        <div className="px-4 flex flex-col justify-center border-r border-white/10 shrink-0 min-w-[230px] bg-black/50 text-xs font-black text-white">
           {currentBowler && (
             <div className="flex items-center justify-between mb-1">
               <span className="truncate uppercase text-slate-300">{currentBowler.name}</span>
-              <span className="text-amber-400 font-black text-sm">
+              <span className="font-black text-sm" style={{ color: theme.primaryAccent || '#facc15' }}>
                 {currentBowler.wickets}-{currentBowler.runsConceded} <span className="text-slate-400 text-xs">({currentBowler.overs}.{currentBowler.ballsInCurrentOver})</span>
               </span>
             </div>
@@ -178,16 +188,22 @@ export const LiveScoreBug: React.FC = () => {
 
         {/* Bowling Team Badge */}
         <div
-          className="px-5 flex items-center justify-end gap-3 shrink-0 border-l border-white/10"
-          style={{ background: bowlingTeam.primaryColor || theme.badgeBg }}
+          className="px-5 flex items-center justify-end gap-3 shrink-0 border-l border-white/10 transition-colors"
+          style={{ background: theme.badgeBg || bowlingTeam.primaryColor || '#0f172a' }}
         >
           <div className="flex flex-col text-right leading-tight">
             <span className="font-black text-sm uppercase tracking-tight text-white drop-shadow">
               {bowlingTeam.fullName}
             </span>
-            <span className="font-bold text-slate-300 text-[11px]">BOWLING</span>
+            <span className="font-bold text-slate-300 text-[11px]" style={{ color: theme.primaryAccent }}>BOWLING</span>
           </div>
-          <div className="w-12 h-12 rounded-full bg-black/40 border-2 border-white/60 flex items-center justify-center font-black text-white text-base shadow-md">
+          <div
+            className="w-12 h-12 rounded-full border-2 flex items-center justify-center font-black text-white text-base shadow-lg"
+            style={{
+              borderColor: theme.primaryAccent || '#ffffff',
+              backgroundColor: bowlingTeam.primaryColor || 'rgba(0,0,0,0.5)'
+            }}
+          >
             {bowlingTeam.shortName}
           </div>
         </div>
