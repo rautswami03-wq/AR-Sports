@@ -159,7 +159,7 @@ export const LiveScoreBug: React.FC = () => {
           style={{ background: theme.headerGradient || 'linear-gradient(90deg, #0f172a 0%, #1e293b 100%)' }}
         >
           <span className="text-white font-black text-base tracking-wider uppercase drop-shadow-md z-10">
-            {matchDetails.customInputText || matchDetails.winnerMargin || theme.name}
+            {matchDetails.customInputText || matchDetails.winnerMargin || matchDetails.tournament || 'AR SPORTS PREMIER LEAGUE 2026'}
           </span>
         </div>
 
