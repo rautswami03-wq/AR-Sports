@@ -15,7 +15,7 @@ export const CricNavbar: React.FC = () => {
       <div className="flex items-center gap-6">
         <Link to="/" className="text-3xl font-black tracking-tight text-emerald-400 flex items-center gap-1.5 drop-shadow group">
           <Radio className="w-6 h-6 text-amber-400 animate-pulse group-hover:scale-110 transition-transform" />
-          <span>CricScorer</span>
+          <span>AR Sports</span>
           <span className="text-cyan-400 font-extrabold italic">PRO</span>
         </Link>
 

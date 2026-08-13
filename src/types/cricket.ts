@@ -75,6 +75,7 @@ export interface MatchDetails {
   partnership: Partnership;
   fallOfWickets: FallOfWicket[];
   matchStatusText: string;
+  isMatchStarted?: boolean;
   winnerTeamId?: string;
   winnerMargin?: string;
   playerOfTheMatch?: {

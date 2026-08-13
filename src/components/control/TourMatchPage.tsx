@@ -2,8 +2,29 @@ import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useBroadcastStore } from '../../store/useBroadcastStore';
-import { PRESET_TOURNAMENTS, getThemeByLeagueName } from '../../theme/presetThemes';
-import { Send, Edit3, Image, Radio, ChevronDown, ChevronUp, CheckCircle2, Tv, Palette } from 'lucide-react';
+import { PRESET_TOURNAMENTS } from '../../theme/presetThemes';
+import {
+  Send,
+  Edit3,
+  ChevronDown,
+  ChevronUp,
+  CheckCircle2,
+  Tv,
+  Palette,
+  Play,
+  Square,
+  Users,
+  ShieldCheck,
+  Award,
+  Sparkles,
+  Sliders,
+  PlusCircle,
+  RotateCcw,
+  BarChart2,
+  Target,
+  AlertTriangle,
+  Zap,
+} from 'lucide-react';
 import { OverlayType } from '../../types/cricket';
 import { CricNavbar } from '../common/CricNavbar';
 import { ChangeBowlerModal } from './ChangeBowlerModal';
@@ -12,8 +33,6 @@ import { PlayerListModal } from './PlayerListModal';
 import { TossMatchModal } from './TossMatchModal';
 import { EditMatchModal } from './EditMatchModal';
 import { OverlayStage } from './OverlayStage';
-
-
 
 export const TourMatchPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -28,6 +47,7 @@ export const TourMatchPage: React.FC = () => {
     triggerAnimation,
     addRuns,
     addExtra,
+    addPenaltyRuns,
     addWicket,
     switchStrikers,
     retireBatter,
@@ -36,16 +56,38 @@ export const TourMatchPage: React.FC = () => {
     updateTeamColors,
     updateTeamDetails,
     updateMatchSettings,
-    resetMatchState,
     startNewMatchWithTeams,
     startSecondInnings,
     setDecision,
-    updatePlayerAvatar,
+    setBattingTeam,
+    setGraphType,
+    resetMatchState,
+    historyStack,
+    clearAnimation,
     updateBatterStats,
     updateBowlerStats,
     tournamentId,
     setTournamentId,
+    startMatch,
+    stopMatch,
   } = useBroadcastStore();
+
+  const isMatchStarted = matchDetails.isMatchStarted ?? false;
+
+  // Pre-Match Setup Form State
+  const [setupOvers, setSetupOvers] = useState(matchDetails.totalOvers || 20);
+  const [setupBallsPerOver, setSetupBallsPerOver] = useState(matchDetails.ballsPerOver || 6);
+  const [setupMatchType, setSetupMatchType] = useState(matchDetails.matchType || 'Group Stage');
+  const [setupMatchNo, setSetupMatchNo] = useState(matchDetails.matchNo || 1);
+  const [setupVenue, setSetupVenue] = useState(matchDetails.venue || 'Stadium Ground');
+  const [setupTossWinner, setSetupTossWinner] = useState(matchDetails.tossWinner || teamA.fullName);
+  const [setupTossDecision, setSetupTossDecision] = useState<'bat' | 'bowl'>(matchDetails.tossDecision || 'bat');
+
+  // Advanced Match Control Form State
+  const [customAnimInputText, setCustomAnimInputText] = useState('');
+  const [targetRunsInput, setTargetRunsInput] = useState<number>(matchDetails.targetRuns || 0);
+  const [statusTextInput, setStatusTextInput] = useState<string>(matchDetails.matchStatusText || '');
+  const [showResetConfirmModal, setShowResetConfirmModal] = useState(false);
 
   const [extraWide, setExtraWide] = useState(false);
   const [extraNoBall, setExtraNoBall] = useState(false);
@@ -57,6 +99,7 @@ export const TourMatchPage: React.FC = () => {
   const [showWicketModal, setShowWicketModal] = useState(false);
   const [showPlayerTeamId, setShowPlayerTeamId] = useState<'teamA' | 'teamB' | null>(null);
   const [showTossModal, setShowTossModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   const isTeamA = battingTeamId === teamA.id || battingTeamId === teamA.shortName || battingTeamId === 'teamA';
   const battingTeam = isTeamA ? teamA : teamB;
@@ -92,7 +135,6 @@ export const TourMatchPage: React.FC = () => {
     }
   };
 
-  const [showEditModal, setShowEditModal] = useState(false);
   const [editTeamA, setEditTeamA] = useState(teamA.fullName);
   const [editTeamAShort, setEditTeamAShort] = useState(teamA.shortName);
   const [editTeamB, setEditTeamB] = useState(teamB.fullName);
@@ -103,7 +145,7 @@ export const TourMatchPage: React.FC = () => {
   React.useEffect(() => {
     if (!id || typeof window === 'undefined') return;
     try {
-      const saved = localStorage.getItem('cricscorer_tournaments_v1');
+      const saved = localStorage.getItem('ar_sports_tournaments_v1') || localStorage.getItem('cricscorer_tournaments_v1');
       if (saved) {
         const items = JSON.parse(saved);
         const tour = items.find((t: any) => t.id === id);
@@ -122,11 +164,6 @@ export const TourMatchPage: React.FC = () => {
   const [tossText, setTossText] = useState(
     `${teamB.fullName.toUpperCase()} WON THE TOSS AND OPTED TO BOWL`
   );
-  const [currentInningsText, setCurrentInningsText] = useState('Start 1st Inning');
-  const [editingShortNames, setEditingShortNames] = useState(false);
-  const [teamAShort, setTeamAShort] = useState(teamA.shortName);
-  const [teamBShort, setTeamBShort] = useState(teamB.shortName);
-
 
   const [customInputText, setCustomInputText] = useState('Jagdish Pawar');
   const [selectedMOM, setSelectedMOM] = useState('nagesh chitia (ashtavinayak indians)');
@@ -149,17 +186,38 @@ export const TourMatchPage: React.FC = () => {
     setShowTossModal(true);
   };
 
-  const toggleInnings = () => {
-    if (matchDetails.currentInnings === 1) {
-      setShowTossModal(true);
-    } else {
-      startSecondInnings();
-    }
-  };
-
   const handleSaveTeamColors = () => {
     updateTeamColors('teamA', team1Color, teamA.secondaryColor);
     updateTeamColors('teamB', team2Color, teamB.secondaryColor);
+  };
+
+  // Start Match Action
+  const handleStartMatchWorkflow = () => {
+    const formattedToss = `${setupTossWinner.toUpperCase()} WON THE TOSS AND OPTED TO ${setupTossDecision.toUpperCase()}`;
+    setTossText(formattedToss);
+
+    updateMatchSettings({
+      tournament: editTourName || matchDetails.tournament,
+      totalOvers: Number(setupOvers),
+      ballsPerOver: Number(setupBallsPerOver),
+      matchType: setupMatchType,
+      matchNo: Number(setupMatchNo),
+      venue: setupVenue,
+      tossWinner: setupTossWinner,
+      tossDecision: setupTossDecision,
+      matchStatusText: formattedToss,
+    });
+
+    updateTeamColors('teamA', team1Color, teamA.secondaryColor);
+    updateTeamColors('teamB', team2Color, teamB.secondaryColor);
+    updateTeamDetails('teamA', { fullName: editTeamA, shortName: editTeamAShort });
+    updateTeamDetails('teamB', { fullName: editTeamB, shortName: editTeamBShort });
+
+    startMatch();
+  };
+
+  const handlePauseMatchWorkflow = () => {
+    stopMatch();
   };
 
   const displayButtons: { id: OverlayType; label: string; bg: string }[] = [
@@ -205,28 +263,33 @@ export const TourMatchPage: React.FC = () => {
 
       {/* Main Content */}
       <main className="max-w-5xl mx-auto py-8 px-4 flex flex-col items-center">
-        {/* Navigation Breadcrumb Links */}
-        <div className="flex flex-wrap items-center justify-between w-full mb-8 text-xl font-black uppercase tracking-wider gap-4">
-          <div className="flex items-center gap-8">
-            <span className="text-white border-b-2 border-cyan-400 pb-1">Match Scoreboard</span>
-            <Link to="/theme_links" className="text-cyan-400 hover:text-cyan-300 border-b-2 border-cyan-400 pb-1">
-              SCOREBOARD LINKS
-            </Link>
+        {/* Workflow Progress Breadcrumb Bar */}
+        <div className="w-full bg-slate-900 border border-slate-800 p-4 rounded-2xl shadow-xl mb-8 flex flex-wrap items-center justify-between gap-3 text-xs font-black uppercase">
+          <div className="flex items-center gap-2">
+            <span className="text-emerald-400 flex items-center gap-1">
+              <ShieldCheck className="w-4 h-4 text-emerald-400" /> 1. TOURNAMENT
+            </span>
+            <span className="text-slate-600">➔</span>
+            <span className="text-cyan-400 flex items-center gap-1">
+              <Users className="w-4 h-4 text-cyan-400" /> 2. MATCH & TEAMS
+            </span>
+            <span className="text-slate-600">➔</span>
+            <span className={isMatchStarted ? 'text-emerald-400' : 'text-amber-400'}>
+              {isMatchStarted ? '3. MATCH LIVE' : '3. ENTER DETAILS & START'}
+            </span>
           </div>
-          <button
-            onClick={() => {
-              setEditTeamA(teamA.fullName);
-              setEditTeamAShort(teamA.shortName);
-              setEditTeamB(teamB.fullName);
-              setEditTeamBShort(teamB.shortName);
-              setEditTourName(matchDetails.tournament);
-              setEditTotalOvers(matchDetails.totalOvers);
-              setShowEditModal(true);
-            }}
-            className="px-5 py-2 bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-500 hover:to-blue-700 text-white text-xs font-black rounded-xl border border-blue-400/50 shadow-lg flex items-center gap-2 uppercase tracking-wider transition-all transform hover:scale-105"
-          >
-            <Edit3 className="w-4 h-4 text-cyan-300" /> EDIT MATCH
-          </button>
+
+          <div className="flex items-center gap-3">
+            {isMatchStarted ? (
+              <span className="px-3 py-1 bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded-full flex items-center gap-1.5 animate-pulse">
+                <span className="w-2 h-2 rounded-full bg-emerald-400"></span> OVERLAY LIVE
+              </span>
+            ) : (
+              <span className="px-3 py-1 bg-amber-500/20 text-amber-400 border border-amber-500/40 rounded-full flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-amber-400"></span> PRE-MATCH SETUP (OVERLAY HIDDEN)
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Live Broadcast Stage Preview (1920x1080) */}
@@ -236,7 +299,7 @@ export const TourMatchPage: React.FC = () => {
               <Tv className="w-4 h-4 text-sky-400" /> Live Stage Preview (1920×1080)
             </span>
             <span className="text-[10px] bg-slate-800 text-slate-400 px-2.5 py-0.5 rounded font-mono">
-              OBS Browser Source Ready
+              {isMatchStarted ? 'OBS Broadcast Active' : 'Overlay Hidden Until Match Starts'}
             </span>
           </div>
 
@@ -249,15 +312,27 @@ export const TourMatchPage: React.FC = () => {
                 backgroundSize: '20px 20px',
               }}
             />
+
+            {!isMatchStarted && (
+              <div className="absolute inset-0 z-20 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center">
+                <Sparkles className="w-12 h-12 text-amber-400 mb-3 animate-bounce" />
+                <h3 className="text-xl font-black text-white uppercase tracking-wider mb-1">
+                  MATCH NOT STARTED YET
+                </h3>
+                <p className="text-xs font-bold text-slate-400 max-w-md uppercase mb-4">
+                  Enter match, overs & player details below, then click <span className="text-emerald-400 font-black">START MATCH & LAUNCH OVERLAY</span> to activate the broadcast graphics!
+                </p>
+              </div>
+            )}
+
             <div className="transform scale-[0.34] sm:scale-[0.42] md:scale-[0.48] origin-center">
               <OverlayStage />
             </div>
           </div>
         </div>
 
-        {/* Versus Match Banner (Responsive Layout) */}
+        {/* Versus Match Banner */}
         <div className="w-full bg-gradient-to-r from-cyan-500 via-sky-600 to-cyan-500 text-slate-950 p-6 rounded-3xl border-4 border-cyan-300 shadow-[0_0_50px_rgba(6,182,212,0.6)] flex flex-col items-center gap-4 mb-8 text-center">
-
           <div className="flex items-center justify-between w-full gap-4">
             <h2 className="text-xl md:text-3xl font-black uppercase tracking-tight flex-1 truncate text-slate-950">
               {teamA.fullName}
@@ -274,393 +349,1172 @@ export const TourMatchPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Live Match Score Overview Card */}
-        <div className="w-full bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-2xl mb-8 space-y-6">
-          <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
-            <div>
-              <span className="text-xs font-black uppercase text-cyan-400 tracking-wider block">CURRENT INNINGS</span>
-              <h3 className="text-2xl font-black text-white uppercase">{battingTeam.fullName} BATTING</h3>
-            </div>
-            <div className="text-right">
-              <span className="text-3xl font-black text-amber-400">
-                {battingTeam.score} - {battingTeam.wickets}
-              </span>
-              <span className="text-sm font-bold text-slate-400 block">
-                ({battingTeam.overs}.{battingTeam.balls} / {matchDetails.totalOvers} OVR)
-              </span>
-            </div>
-          </div>
-
-          {/* Current Batters & Bowler Bar (Editable Player Names) */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-bold bg-slate-950 p-4 rounded-2xl border border-slate-800">
-            <div>
-              <span className="text-cyan-400 block uppercase font-black mb-1">STRIKER (*)</span>
-              <input
-                type="text"
-                value={striker?.name || ''}
-                placeholder="Enter Striker Name"
-                onChange={(e) => striker && updateBatterStats(striker.id, { name: e.target.value })}
-                className="w-full bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg text-white font-black text-sm focus:outline-none focus:border-amber-400 mb-1"
-              />
-              <span className="text-amber-400 block font-bold">{striker?.runs || 0} ({striker?.balls || 0}b)</span>
-            </div>
-            <div>
-              <span className="text-cyan-400 block uppercase font-black mb-1">NON-STRIKER</span>
-              <input
-                type="text"
-                value={nonStriker?.name || ''}
-                placeholder="Enter Non-Striker Name"
-                onChange={(e) => nonStriker && updateBatterStats(nonStriker.id, { name: e.target.value })}
-                className="w-full bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg text-white font-black text-sm focus:outline-none focus:border-cyan-400 mb-1"
-              />
-              <span className="text-slate-400 block font-bold">{nonStriker?.runs || 0} ({nonStriker?.balls || 0}b)</span>
-            </div>
-            <div>
-              <span className="text-cyan-400 block uppercase font-black mb-1">CURRENT BOWLER</span>
-              <input
-                type="text"
-                value={currentBowler?.name || ''}
-                placeholder="Enter Bowler Name"
-                onChange={(e) => currentBowler && updateBowlerStats(currentBowler.id, { name: e.target.value })}
-                className="w-full bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg text-white font-black text-sm focus:outline-none focus:border-emerald-400 mb-1"
-              />
-              <span className="text-emerald-400 block font-bold">
-                {currentBowler?.wickets || 0}-{currentBowler?.runsConceded || 0} ({currentBowler?.overs || 0}.{currentBowler?.ballsInCurrentOver || 0})
+        {/* WORKFLOW STEP: PRE-MATCH DETAILS ENTRY FORM (If Match Not Started) */}
+        {!isMatchStarted ? (
+          <div className="w-full bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 border-2 border-amber-400/50 p-6 rounded-3xl shadow-2xl mb-8 space-y-6">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+              <div>
+                <span className="text-xs font-black text-amber-400 uppercase tracking-widest block">MATCH SETUP & DETAILS ENTRY</span>
+                <h3 className="text-2xl font-black text-white uppercase flex items-center gap-2">
+                  <Edit3 className="w-6 h-6 text-cyan-400" /> Enter Match, Overs & Players Details
+                </h3>
+              </div>
+              <span className="px-4 py-1.5 bg-amber-400/10 text-amber-400 border border-amber-400/30 rounded-xl text-xs font-black uppercase">
+                Step 3 of 4
               </span>
             </div>
-          </div>
 
-          {/* Extras Checkbox Selectors */}
-          <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-800 text-xs font-black uppercase">
-            <label className="flex items-center gap-2 cursor-pointer bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
-              <input type="checkbox" checked={extraWide} onChange={(e) => setExtraWide(e.target.checked)} className="w-4 h-4 accent-amber-400" />
-              <span className={extraWide ? 'text-amber-400' : 'text-slate-300'}>WIDE (+1)</span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
-              <input type="checkbox" checked={extraNoBall} onChange={(e) => setExtraNoBall(e.target.checked)} className="w-4 h-4 accent-rose-500" />
-              <span className={extraNoBall ? 'text-rose-400' : 'text-slate-300'}>NO BALL (+1)</span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
-              <input type="checkbox" checked={extraByes} onChange={(e) => setExtraByes(e.target.checked)} className="w-4 h-4 accent-sky-400" />
-              <span className={extraByes ? 'text-sky-400' : 'text-slate-300'}>BYES</span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
-              <input type="checkbox" checked={extraLegByes} onChange={(e) => setExtraLegByes(e.target.checked)} className="w-4 h-4 accent-purple-400" />
-              <span className={extraLegByes ? 'text-purple-400' : 'text-slate-300'}>LEG BYES</span>
-            </label>
-            <label className="flex items-center gap-2 cursor-pointer bg-red-950/80 border border-red-500/50 px-3 py-1.5 rounded-lg">
-              <input type="checkbox" checked={extraWicket} onChange={(e) => setExtraWicket(e.target.checked)} className="w-4 h-4 accent-red-500" />
-              <span className="text-red-400">OUT / WICKET</span>
-            </label>
-          </div>
+            {/* Section 1: Match & Overs Info */}
+            <div className="bg-slate-950/80 p-5 rounded-2xl border border-slate-800 space-y-4">
+              <h4 className="text-sm font-black text-cyan-400 uppercase tracking-wider">1. Match & Overs Details</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-slate-400 block mb-1 uppercase">Tournament Name</label>
+                  <input
+                    type="text"
+                    value={editTourName}
+                    onChange={(e) => setEditTourName(e.target.value)}
+                    className="w-full bg-slate-900 border border-slate-700 px-3.5 py-2 rounded-xl text-white font-bold text-sm focus:outline-none focus:border-cyan-400"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-400 block mb-1 uppercase">Total Overs</label>
+                  <input
+                    type="number"
+                    value={setupOvers}
+                    onChange={(e) => setSetupOvers(Number(e.target.value))}
+                    className="w-full bg-slate-900 border border-slate-700 px-3.5 py-2 rounded-xl text-white font-bold text-sm focus:outline-none focus:border-cyan-400"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-400 block mb-1 uppercase">Balls Per Over</label>
+                  <select
+                    value={setupBallsPerOver}
+                    onChange={(e) => setSetupBallsPerOver(Number(e.target.value))}
+                    className="w-full bg-slate-900 border border-slate-700 px-3.5 py-2 rounded-xl text-white font-bold text-sm focus:outline-none focus:border-cyan-400 uppercase"
+                  >
+                    <option value={6}>6 Balls</option>
+                    <option value={8}>8 Balls</option>
+                    <option value={4}>4 Balls</option>
+                  </select>
+                </div>
+              </div>
 
-          {/* Run Buttons Matrix (0, 1, 2, 3, 4, 5, 6) */}
-          <div className="grid grid-cols-7 gap-2 pt-2">
-            {[0, 1, 2, 3, 4, 5, 6].map((runVal) => (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                <div>
+                  <label className="text-xs font-bold text-slate-400 block mb-1 uppercase">Match Type</label>
+                  <select
+                    value={setupMatchType}
+                    onChange={(e) => setSetupMatchType(e.target.value)}
+                    className="w-full bg-slate-900 border border-slate-700 px-3.5 py-2 rounded-xl text-white font-bold text-sm focus:outline-none focus:border-cyan-400 uppercase"
+                  >
+                    <option value="Group Stage">Group Stage</option>
+                    <option value="Quarter Final">Quarter Final</option>
+                    <option value="Semi Final">Semi Final</option>
+                    <option value="Final font-black">Final</option>
+                    <option value="Knockout">Knockout</option>
+                    <option value="League Match">League Match</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-400 block mb-1 uppercase">Match No.</label>
+                  <input
+                    type="number"
+                    value={setupMatchNo}
+                    onChange={(e) => setSetupMatchNo(Number(e.target.value))}
+                    className="w-full bg-slate-900 border border-slate-700 px-3.5 py-2 rounded-xl text-white font-bold text-sm focus:outline-none focus:border-cyan-400"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-400 block mb-1 uppercase">Venue / Stadium</label>
+                  <input
+                    type="text"
+                    value={setupVenue}
+                    onChange={(e) => setSetupVenue(e.target.value)}
+                    className="w-full bg-slate-900 border border-slate-700 px-3.5 py-2 rounded-xl text-white font-bold text-sm focus:outline-none focus:border-cyan-400"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Section 2: Teams & Colors */}
+            <div className="bg-slate-950/80 p-5 rounded-2xl border border-slate-800 space-y-4">
+              <h4 className="text-sm font-black text-cyan-400 uppercase tracking-wider">2. Team Names & Colors</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Team A */}
+                <div className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3">
+                  <span className="text-xs font-black text-cyan-300 uppercase block">TEAM 1 / TEAM A</span>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="col-span-2">
+                      <label className="text-[10px] font-bold text-slate-400 block uppercase">Full Name</label>
+                      <input
+                        type="text"
+                        value={editTeamA}
+                        onChange={(e) => setEditTeamA(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-700 px-3 py-1.5 rounded-lg text-white font-bold text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-400 block uppercase">Code</label>
+                      <input
+                        type="text"
+                        value={editTeamAShort}
+                        onChange={(e) => setEditTeamAShort(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-700 px-3 py-1.5 rounded-lg text-white font-bold text-xs uppercase"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-300 uppercase">Primary Color:</span>
+                    <input
+                      type="color"
+                      value={team1Color}
+                      onChange={(e) => setTeam1Color(e.target.value)}
+                      className="w-10 h-8 rounded cursor-pointer border border-white"
+                    />
+                  </div>
+                </div>
+
+                {/* Team B */}
+                <div className="bg-slate-900 p-4 rounded-xl border border-slate-800 space-y-3">
+                  <span className="text-xs font-black text-cyan-300 uppercase block">TEAM 2 / TEAM B</span>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="col-span-2">
+                      <label className="text-[10px] font-bold text-slate-400 block uppercase">Full Name</label>
+                      <input
+                        type="text"
+                        value={editTeamB}
+                        onChange={(e) => setEditTeamB(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-700 px-3 py-1.5 rounded-lg text-white font-bold text-xs"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[10px] font-bold text-slate-400 block uppercase">Code</label>
+                      <input
+                        type="text"
+                        value={editTeamBShort}
+                        onChange={(e) => setEditTeamBShort(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-700 px-3 py-1.5 rounded-lg text-white font-bold text-xs uppercase"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-300 uppercase">Primary Color:</span>
+                    <input
+                      type="color"
+                      value={team2Color}
+                      onChange={(e) => setTeam2Color(e.target.value)}
+                      className="w-10 h-8 rounded cursor-pointer border border-white"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Section 3: Players & Opening Lineup */}
+            <div className="bg-slate-950/80 p-5 rounded-2xl border border-slate-800 space-y-4">
+              <h4 className="text-sm font-black text-cyan-400 uppercase tracking-wider">3. Players Lineup & Openers</h4>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowPlayerTeamId('teamA')}
+                  className="py-3 bg-slate-900 hover:bg-slate-850 text-cyan-400 font-black text-xs rounded-xl border border-cyan-500/40 uppercase flex items-center justify-center gap-2 shadow"
+                >
+                  <Users className="w-4 h-4 text-cyan-400" /> EDIT {editTeamAShort || teamA.shortName} PLAYERS LIST ({teamA.batters.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowPlayerTeamId('teamB')}
+                  className="py-3 bg-slate-900 hover:bg-slate-850 text-cyan-400 font-black text-xs rounded-xl border border-cyan-500/40 uppercase flex items-center justify-center gap-2 shadow"
+                >
+                  <Users className="w-4 h-4 text-cyan-400" /> EDIT {editTeamBShort || teamB.shortName} PLAYERS LIST ({teamB.batters.length})
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                <div>
+                  <label className="text-xs font-bold text-amber-400 block mb-1 uppercase font-black">Opening Striker (*)</label>
+                  <input
+                    type="text"
+                    value={striker?.name || ''}
+                    onChange={(e) => striker && updateBatterStats(striker.id, { name: e.target.value })}
+                    className="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-white font-black text-sm focus:outline-none focus:border-amber-400"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-cyan-400 block mb-1 uppercase font-black">Non-Striker</label>
+                  <input
+                    type="text"
+                    value={nonStriker?.name || ''}
+                    onChange={(e) => nonStriker && updateBatterStats(nonStriker.id, { name: e.target.value })}
+                    className="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-white font-black text-sm focus:outline-none focus:border-cyan-400"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-emerald-400 block mb-1 uppercase font-black">Opening Bowler</label>
+                  <input
+                    type="text"
+                    value={currentBowler?.name || ''}
+                    onChange={(e) => currentBowler && updateBowlerStats(currentBowler.id, { name: e.target.value })}
+                    className="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-white font-black text-sm focus:outline-none focus:border-emerald-400"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Section 4: Toss Setup */}
+            <div className="bg-slate-950/80 p-5 rounded-2xl border border-slate-800 space-y-4">
+              <h4 className="text-sm font-black text-cyan-400 uppercase tracking-wider">4. Toss Decision</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-bold text-slate-400 block mb-1 uppercase">Toss Winner</label>
+                  <select
+                    value={setupTossWinner}
+                    onChange={(e) => setSetupTossWinner(e.target.value)}
+                    className="w-full bg-slate-900 border border-slate-700 px-3.5 py-2 rounded-xl text-white font-bold text-sm focus:outline-none focus:border-cyan-400"
+                  >
+                    <option value={editTeamA || teamA.fullName}>{editTeamA || teamA.fullName}</option>
+                    <option value={editTeamB || teamB.fullName}>{editTeamB || teamB.fullName}</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-slate-400 block mb-1 uppercase">Opted To</label>
+                  <select
+                    value={setupTossDecision}
+                    onChange={(e) => setSetupTossDecision(e.target.value as 'bat' | 'bowl')}
+                    className="w-full bg-slate-900 border border-slate-700 px-3.5 py-2 rounded-xl text-white font-bold text-sm focus:outline-none focus:border-cyan-400 uppercase"
+                  >
+                    <option value="bat">Bat First</option>
+                    <option value="bowl">Bowl First</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Action START MATCH Button */}
+            <div className="flex flex-col items-center gap-3 pt-4">
               <button
-                key={runVal}
-                onClick={() => handleScoreClick(runVal)}
-                className={`py-4 rounded-2xl font-black text-xl shadow-lg transform active:scale-95 transition-all uppercase ${
-                  runVal === 4
-                    ? 'bg-amber-400 hover:bg-amber-300 text-slate-950'
-                    : runVal === 6
-                    ? 'bg-purple-600 hover:bg-purple-500 text-white'
-                    : 'bg-slate-800 hover:bg-slate-700 text-white'
-                }`}
+                type="button"
+                onClick={handleStartMatchWorkflow}
+                className="w-full sm:w-auto bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-500 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xl px-14 py-4 rounded-2xl border-2 border-white shadow-[0_0_50px_rgba(16,185,129,0.9)] transform hover:scale-105 active:scale-95 transition-all uppercase tracking-widest flex items-center justify-center gap-3"
               >
-                +{runVal}
+                <Play className="w-7 h-7 fill-slate-950" /> START MATCH & LAUNCH OVERLAY
               </button>
-            ))}
+              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider text-center">
+                ⚡ Overlay graphics will appear on screen & OBS stream immediately after clicking Start Match.
+              </p>
+            </div>
           </div>
+        ) : (
+          /* WORKFLOW STEP: MATCH LIVE SCORING CONTROLS (If Match Started) */
+          <>
+            {/* Live Match Control Header Bar */}
+            <div className="w-full bg-slate-900 border border-slate-800 p-4 rounded-3xl shadow-xl mb-6 flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <span className="px-4 py-1.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-2">
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span> MATCH LIVE & OVERLAY ACTIVE
+                </span>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowEditModal(true)}
+                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-cyan-400 font-black text-xs rounded-xl border border-cyan-400/40 flex items-center gap-1.5 uppercase shadow"
+                >
+                  <Edit3 className="w-4 h-4 text-cyan-400" /> EDIT MATCH
+                </button>
+                <button
+                  type="button"
+                  onClick={handlePauseMatchWorkflow}
+                  className="px-4 py-2 bg-rose-600/90 hover:bg-rose-500 text-white font-black text-xs rounded-xl border border-rose-300/40 flex items-center gap-1.5 uppercase shadow"
+                >
+                  <Square className="w-4 h-4 fill-white" /> PAUSE / PRE-MATCH SETUP
+                </button>
+              </div>
+            </div>
 
-          {/* Quick Match Action Buttons */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-            <button onClick={() => switchStrikers()} className="py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-black text-xs rounded-xl uppercase">
-              ⇄ SWAP BATTER
-            </button>
-            <button onClick={() => retireBatter()} className="py-2.5 bg-amber-600 hover:bg-amber-500 text-white font-black text-xs rounded-xl uppercase">
-              RETIRE BATTER
-            </button>
-            <button onClick={() => setShowBowlerModal(true)} className="py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white font-black text-xs rounded-xl uppercase">
-              CHANGE BOWLER
-            </button>
-            <button onClick={() => setShowWicketModal(true)} className="py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-black text-xs rounded-xl uppercase">
-              WICKET / DISMISSAL
-            </button>
-          </div>
+            {/* Live Match Score Overview Card */}
+            <div className="w-full bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-2xl mb-8 space-y-6">
+              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                <div>
+                  <span className="text-xs font-black uppercase text-cyan-400 tracking-wider block">CURRENT INNINGS</span>
+                  <h3 className="text-2xl font-black text-white uppercase">{battingTeam.fullName} BATTING</h3>
+                </div>
+                <div className="text-right">
+                  <span className="text-3xl font-black text-amber-400">
+                    {battingTeam.score} - {battingTeam.wickets}
+                  </span>
+                  <span className="text-sm font-bold text-slate-400 block">
+                    ({battingTeam.overs}.{battingTeam.balls} / {matchDetails.totalOvers} OVR)
+                  </span>
+                </div>
+              </div>
 
-          {/* Player Management Roster Buttons */}
-          <div className="grid grid-cols-2 gap-3 pt-3 border-t border-slate-800">
-            <button
-              onClick={() => setShowPlayerTeamId('teamA')}
-              className="py-2 bg-slate-950 hover:bg-slate-800 text-cyan-400 font-black text-xs rounded-xl border border-cyan-500/40 uppercase flex items-center justify-center gap-2"
-            >
-              👤+ ADD / EDIT {teamA.shortName} PLAYERS
-            </button>
-            <button
-              onClick={() => setShowPlayerTeamId('teamB')}
-              className="py-2 bg-slate-950 hover:bg-slate-800 text-cyan-400 font-black text-xs rounded-xl border border-cyan-500/40 uppercase flex items-center justify-center gap-2"
-            >
-              👤+ ADD / EDIT {teamB.shortName} PLAYERS
-            </button>
-          </div>
-        </div>
+              {/* Current Batters & Bowler Bar (Editable Player Names) */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-bold bg-slate-950 p-4 rounded-2xl border border-slate-800">
+                <div>
+                  <span className="text-cyan-400 block uppercase font-black mb-1">STRIKER (*)</span>
+                  <input
+                    type="text"
+                    value={striker?.name || ''}
+                    placeholder="Enter Striker Name"
+                    onChange={(e) => striker && updateBatterStats(striker.id, { name: e.target.value })}
+                    className="w-full bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg text-white font-black text-sm focus:outline-none focus:border-amber-400 mb-1"
+                  />
+                  <span className="text-amber-400 block font-bold">{striker?.runs || 0} ({striker?.balls || 0}b)</span>
+                </div>
+                <div>
+                  <span className="text-cyan-400 block uppercase font-black mb-1">NON-STRIKER</span>
+                  <input
+                    type="text"
+                    value={nonStriker?.name || ''}
+                    placeholder="Enter Non-Striker Name"
+                    onChange={(e) => nonStriker && updateBatterStats(nonStriker.id, { name: e.target.value })}
+                    className="w-full bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg text-white font-black text-sm focus:outline-none focus:border-cyan-400 mb-1"
+                  />
+                  <span className="text-slate-400 block font-bold">{nonStriker?.runs || 0} ({nonStriker?.balls || 0}b)</span>
+                </div>
+                <div>
+                  <span className="text-cyan-400 block uppercase font-black mb-1">CURRENT BOWLER</span>
+                  <input
+                    type="text"
+                    value={currentBowler?.name || ''}
+                    placeholder="Enter Bowler Name"
+                    onChange={(e) => currentBowler && updateBowlerStats(currentBowler.id, { name: e.target.value })}
+                    className="w-full bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg text-white font-black text-sm focus:outline-none focus:border-emerald-400 mb-1"
+                  />
+                  <span className="text-emerald-400 block font-bold">
+                    {currentBowler?.wickets || 0}-{currentBowler?.runsConceded || 0} ({currentBowler?.overs || 0}.{currentBowler?.ballsInCurrentOver || 0})
+                  </span>
+                </div>
+              </div>
 
-        {/* SEND & EDIT Buttons Bar */}
-        <div className="flex items-center gap-4 mb-10">
-          <button
-            onClick={handleSendUpdate}
-            className="bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xl px-12 py-3 rounded-2xl border-2 border-white shadow-[0_0_30px_rgba(251,191,36,0.8)] transform hover:scale-105 active:scale-95 transition-all uppercase tracking-widest flex items-center gap-2"
-          >
-            <Send className="w-6 h-6" /> SEND
-          </button>
-          <button
-            onClick={() => {
-              setEditTeamA(teamA.fullName);
-              setEditTeamAShort(teamA.shortName);
-              setEditTeamB(teamB.fullName);
-              setEditTeamBShort(teamB.shortName);
-              setEditTourName(matchDetails.tournament);
-              setEditTotalOvers(matchDetails.totalOvers);
-              setShowEditModal(true);
-            }}
-            className="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-lg px-8 py-3 rounded-2xl border-2 border-white shadow-[0_0_30px_rgba(6,182,212,0.8)] transform hover:scale-105 active:scale-95 transition-all uppercase tracking-wider flex items-center gap-2"
-          >
-            <Edit3 className="w-5 h-5" /> EDIT MATCH & TEAMS
-          </button>
-        </div>
+              {/* Extras Checkbox Selectors */}
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-slate-800 text-xs font-black uppercase">
+                <label className="flex items-center gap-2 cursor-pointer bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
+                  <input type="checkbox" checked={extraWide} onChange={(e) => setExtraWide(e.target.checked)} className="w-4 h-4 accent-amber-400" />
+                  <span className={extraWide ? 'text-amber-400' : 'text-slate-300'}>WIDE (+1)</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
+                  <input type="checkbox" checked={extraNoBall} onChange={(e) => setExtraNoBall(e.target.checked)} className="w-4 h-4 accent-rose-500" />
+                  <span className={extraNoBall ? 'text-rose-400' : 'text-slate-300'}>NO BALL (+1)</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
+                  <input type="checkbox" checked={extraByes} onChange={(e) => setExtraByes(e.target.checked)} className="w-4 h-4 accent-sky-400" />
+                  <span className={extraByes ? 'text-sky-400' : 'text-slate-300'}>BYES</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
+                  <input type="checkbox" checked={extraLegByes} onChange={(e) => setExtraLegByes(e.target.checked)} className="w-4 h-4 accent-purple-400" />
+                  <span className={extraLegByes ? 'text-purple-400' : 'text-slate-300'}>LEG BYES</span>
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer bg-red-950/80 border border-red-500/50 px-3 py-1.5 rounded-lg">
+                  <input type="checkbox" checked={extraWicket} onChange={(e) => setExtraWicket(e.target.checked)} className="w-4 h-4 accent-red-500" />
+                  <span className="text-red-400">OUT / WICKET</span>
+                </label>
+              </div>
 
-        {/* Action Controls Button Matrix */}
-        <div className="w-full grid grid-cols-2 sm:grid-cols-5 gap-4 mb-10">
-          <button
-            onClick={() => {
-              toggleOverlay('tournamentTitle', false);
-              toggleOverlay('scoreBug', true);
-            }}
-            className="py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-base rounded-2xl shadow-lg active:scale-95 transition-all uppercase tracking-wider"
-          >
-            Default
-          </button>
-          <button
-            onClick={() => hideAllOverlays()}
-            className="py-3.5 bg-rose-600 hover:bg-rose-500 text-white font-black text-base rounded-2xl shadow-lg active:scale-95 transition-all uppercase tracking-wider"
-          >
-            HIDE ALL
-          </button>
-          <button
-            onClick={handleChangeToss}
-            className="py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-base rounded-2xl shadow-lg active:scale-95 transition-all uppercase tracking-wider"
-          >
-            Change Toss
-          </button>
-          <button
-            onClick={() => {
-              toggleOverlay('scoreBug', false);
-              toggleOverlay('tournamentTitle', true);
-            }}
-            className="py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-black text-base rounded-2xl shadow-lg active:scale-95 transition-all uppercase tracking-wider"
-          >
-            Tour Name
-          </button>
-          <button
-            onClick={() => undoLastBall()}
-            className="py-3.5 bg-red-600 hover:bg-red-500 text-white font-black text-base rounded-2xl shadow-lg active:scale-95 transition-all uppercase tracking-wider col-span-2 sm:col-span-1"
-          >
-            UNDO
-          </button>
-        </div>
+              {/* Run Buttons Matrix (0, 1, 2, 3, 4, 5, 6) */}
+              <div className="grid grid-cols-7 gap-2 pt-2">
+                {[0, 1, 2, 3, 4, 5, 6].map((runVal) => (
+                  <button
+                    key={runVal}
+                    onClick={() => handleScoreClick(runVal)}
+                    className={`py-4 rounded-2xl font-black text-xl shadow-lg transform active:scale-95 transition-all uppercase ${
+                      runVal === 4
+                        ? 'bg-amber-400 hover:bg-amber-300 text-slate-950'
+                        : runVal === 6
+                        ? 'bg-purple-600 hover:bg-purple-500 text-white'
+                        : 'bg-slate-800 hover:bg-slate-700 text-white'
+                    }`}
+                  >
+                    +{runVal}
+                  </button>
+                ))}
+              </div>
 
+              {/* Quick Match Action Buttons */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+                <button onClick={() => switchStrikers()} className="py-2.5 bg-sky-600 hover:bg-sky-500 text-white font-black text-xs rounded-xl uppercase">
+                  ⇄ SWAP BATTER
+                </button>
+                <button onClick={() => retireBatter()} className="py-2.5 bg-amber-600 hover:bg-amber-500 text-white font-black text-xs rounded-xl uppercase">
+                  RETIRE BATTER
+                </button>
+                <button onClick={() => setShowBowlerModal(true)} className="py-2.5 bg-cyan-600 hover:bg-cyan-500 text-white font-black text-xs rounded-xl uppercase">
+                  CHANGE BOWLER
+                </button>
+                <button onClick={() => setShowWicketModal(true)} className="py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-black text-xs rounded-xl uppercase">
+                  WICKET / DISMISSAL
+                </button>
+              </div>
 
-        <div className="w-full bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-2xl mb-8 space-y-6">
-          <h2 className="text-xl font-black text-center text-white uppercase tracking-widest border-b border-slate-800 pb-3">
-            DISPLAY CONTROLLER
-          </h2>
+              {/* Player Management Roster Buttons */}
+              <div className="grid grid-cols-2 gap-3 pt-3 border-t border-slate-800">
+                <button
+                  onClick={() => setShowPlayerTeamId('teamA')}
+                  className="py-2 bg-slate-950 hover:bg-slate-800 text-cyan-400 font-black text-xs rounded-xl border border-cyan-500/40 uppercase flex items-center justify-center gap-2"
+                >
+                  👤+ ADD / EDIT {teamA.shortName} PLAYERS
+                </button>
+                <button
+                  onClick={() => setShowPlayerTeamId('teamB')}
+                  className="py-2 bg-slate-950 hover:bg-slate-800 text-cyan-400 font-black text-xs rounded-xl border border-cyan-500/40 uppercase flex items-center justify-center gap-2"
+                >
+                  👤+ ADD / EDIT {teamB.shortName} PLAYERS
+                </button>
+              </div>
+            </div>
 
-          {/* Overlays Buttons Bar */}
-          <div className="flex flex-wrap items-center justify-center gap-2">
-            {displayButtons.map((btn, idx) => (
+            {/* SEND & EDIT Buttons Bar */}
+            <div className="flex items-center gap-4 mb-10">
               <button
-                key={idx}
-                onClick={() => toggleOverlay(btn.id)}
-                className={`px-3 py-2 text-xs rounded-lg uppercase tracking-wider transition-all active:scale-95 ${btn.bg} ${
-                  activeOverlays[btn.id] ? 'ring-2 ring-white shadow-lg' : ''
-                }`}
+                onClick={handleSendUpdate}
+                className="bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xl px-12 py-3 rounded-2xl border-2 border-white shadow-[0_0_30px_rgba(251,191,36,0.8)] transform hover:scale-105 active:scale-95 transition-all uppercase tracking-widest flex items-center gap-2"
               >
-                {btn.label}
+                <Send className="w-6 h-6" /> SEND
               </button>
-            ))}
-          </div>
-
-          {/* DRS Decision & Animations Rows */}
-          <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-slate-800 text-xs font-black uppercase">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-cyan-400">DRS Decision:</span>
-              <button onClick={() => { setDecision('PENDING'); toggleOverlay('decision', true); }} className="bg-yellow-400 text-slate-950 font-black px-3 py-1.5 rounded-md hover:bg-yellow-300">PENDING</button>
-              <button onClick={() => { setDecision('OUT'); toggleOverlay('decision', true); }} className="bg-red-600 text-white font-black px-3 py-1.5 rounded-md hover:bg-red-500">OUT</button>
-              <button onClick={() => { setDecision('NOT OUT'); toggleOverlay('decision', true); }} className="bg-emerald-500 text-slate-950 font-black px-3 py-1.5 rounded-md hover:bg-emerald-400">NOT OUT</button>
-              <button onClick={() => { setDecision(null); toggleOverlay('decision', false); }} className="bg-slate-700 text-slate-300 font-bold px-3 py-1.5 rounded-md hover:bg-slate-600">CLEAR</button>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-cyan-400">Stings:</span>
-              <button onClick={() => triggerAnimation('HAT_TRICK')} className="bg-amber-400 text-slate-950 font-black px-3 py-1.5 rounded-md hover:bg-amber-300">HAT-TRICK BALL</button>
-              <button onClick={() => triggerAnimation('TOUR_BOUNDARIES')} className="bg-cyan-500 text-slate-950 font-black px-3 py-1.5 rounded-md hover:bg-cyan-400">TOUR BOUNDARY</button>
-            </div>
-          </div>
-
-          {/* Custom Input */}
-          <div className="flex items-center gap-3 pt-3 border-t border-slate-800">
-            <span className="text-xs font-black text-cyan-400 uppercase w-28">Custom Input:</span>
-            <input
-              type="text"
-              value={customInputText}
-              onChange={(e) => setCustomInputText(e.target.value)}
-              className="flex-1 bg-slate-950 border border-slate-700 px-4 py-2 rounded-xl text-white text-sm font-bold focus:outline-none focus:border-cyan-400"
-            />
-            <button
-              onClick={() => updateMatchSettings({ customInputText })}
-              className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs px-5 py-2.5 rounded-xl uppercase tracking-wider"
-            >
-              Display Input
-            </button>
-          </div>
-
-          {/* League Theme Overlay Selector */}
-          <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-slate-800">
-            <span className="text-xs font-black text-amber-400 uppercase w-36 flex items-center gap-1.5">
-              <Palette className="w-4 h-4 text-purple-400" /> League Theme:
-            </span>
-            <select
-              value={tournamentId || 'IPL'}
-              onChange={(e) => {
-                const newThemeId = e.target.value;
-                const themeObj = PRESET_TOURNAMENTS[newThemeId];
-                setTournamentId(newThemeId);
-                if (themeObj) {
-                  updateMatchSettings({ tournament: themeObj.name });
-                }
-              }}
-              className="flex-1 bg-slate-950 border border-slate-700 px-4 py-2 rounded-xl text-white text-xs font-bold focus:outline-none focus:border-cyan-400 uppercase"
-            >
-              {Object.values(PRESET_TOURNAMENTS).map((t) => (
-                <option key={t.id} value={t.id}>
-                  🏆 {t.name} ({t.id})
-                </option>
-              ))}
-            </select>
-          </div>
-
-
-          {/* Select MOM Player */}
-          <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-slate-800">
-            <span className="text-xs font-black text-cyan-400 uppercase w-36">Select MOM Player:</span>
-            <select
-              value={selectedMOM}
-              onChange={(e) => setSelectedMOM(e.target.value)}
-              className="flex-1 bg-slate-950 border border-slate-700 px-4 py-2 rounded-xl text-white text-xs font-bold"
-            >
-              <option value="nagesh chitia (ashtavinayak indians)">nagesh chitia (ashtavinayak indians)</option>
-              <option value="S. Yadav (India)">S. Yadav (India)</option>
-              <option value="J. Bumrah (India)">J. Bumrah (India)</option>
-            </select>
-            <button onClick={() => toggleOverlay('playerOfTheMatch')} className="bg-emerald-500 text-slate-950 font-black text-xs px-3.5 py-2 rounded-lg uppercase">Display MOM</button>
-            <button onClick={() => toggleOverlay('playerOfTheMatch')} className="bg-pink-600 text-white font-black text-xs px-3 py-2 rounded-lg uppercase">MVP_M1</button>
-            <button onClick={() => toggleOverlay('playerOfTheMatch')} className="bg-pink-600 text-white font-black text-xs px-3 py-2 rounded-lg uppercase">MVP_M2</button>
-          </div>
-
-          {/* Tournament Stats Player */}
-          <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-slate-800">
-            <span className="text-xs font-black text-cyan-400 uppercase w-36">Tournament Stats Player:</span>
-            <select
-              value={selectedTourPlayer}
-              onChange={(e) => setSelectedTourPlayer(e.target.value)}
-              className="flex-1 bg-slate-950 border border-slate-700 px-4 py-2 rounded-xl text-white text-xs font-bold"
-            >
-              <option value="ajit khade (ashtavinayak indians)">ajit khade (ashtavinayak indians)</option>
-              <option value="R. Sharma (India)">R. Sharma (India)</option>
-              <option value="V. Kohli (India)">V. Kohli (India)</option>
-            </select>
-            <button onClick={() => toggleOverlay('playerStatistics')} className="bg-emerald-500 text-slate-950 font-black text-xs px-3.5 py-2 rounded-lg uppercase">Display Player Stats</button>
-            <button onClick={() => toggleOverlay('playerOfTheTournament')} className="bg-amber-500 text-slate-950 font-black text-xs px-3 py-2 rounded-lg uppercase">MVP_T1</button>
-            <button onClick={() => toggleOverlay('playerOfTheTournament')} className="bg-amber-500 text-slate-950 font-black text-xs px-3 py-2 rounded-lg uppercase">MVP_T2</button>
-          </div>
-        </div>
-
-
-        <div className="w-full bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-2xl mb-8 space-y-4">
-          <h2 className="text-xl font-black text-center text-white uppercase tracking-widest border-b border-slate-800 pb-3">
-            TOUR STATS CONTROLLER
-          </h2>
-
-          <div className="flex flex-wrap items-center justify-center gap-2">
-            <button onClick={() => toggleOverlay('pointsTable')} className="px-3 py-2 bg-emerald-500 text-slate-950 font-black text-xs rounded-lg uppercase">POINTS TABLE</button>
-            <button onClick={() => toggleOverlay('pointsTable')} className="px-3 py-2 bg-pink-600 text-white font-black text-xs rounded-lg uppercase">PT (TIED POINT +1)</button>
-            <button onClick={() => toggleOverlay('topBatters')} className="px-3 py-2 bg-fuchsia-600 text-white font-black text-xs rounded-lg uppercase">TOP BATTERS</button>
-            <button onClick={() => toggleOverlay('topBowlers')} className="px-3 py-2 bg-fuchsia-600 text-white font-black text-xs rounded-lg uppercase">TOP BOWLERS</button>
-            <button onClick={() => toggleOverlay('topBatters')} className="px-3 py-2 bg-cyan-500 text-slate-950 font-black text-xs rounded-lg uppercase">TOP 4/6 STRIKERS</button>
-            <button onClick={() => toggleOverlay('playerOfTheTournament')} className="px-3 py-2 bg-fuchsia-600 text-white font-black text-xs rounded-lg uppercase">TOP PLAYER OF SERIES</button>
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((num) => (
-              <button key={num} onClick={() => toggleOverlay('pointsTable')} className="px-3 py-2 bg-amber-500 text-slate-950 font-black text-xs rounded-lg uppercase">
-                Group PT {num}
+              <button
+                onClick={() => {
+                  setEditTeamA(teamA.fullName);
+                  setEditTeamAShort(teamA.shortName);
+                  setEditTeamB(teamB.fullName);
+                  setEditTeamBShort(teamB.shortName);
+                  setEditTourName(matchDetails.tournament);
+                  setEditTotalOvers(matchDetails.totalOvers);
+                  setShowEditModal(true);
+                }}
+                className="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-lg px-8 py-3 rounded-2xl border-2 border-white shadow-[0_0_30px_rgba(6,182,212,0.8)] transform hover:scale-105 active:scale-95 transition-all uppercase tracking-wider flex items-center gap-2"
+              >
+                <Edit3 className="w-5 h-5" /> EDIT MATCH & TEAMS
               </button>
-            ))}
-          </div>
-        </div>
-
-
-        <div className="w-full bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-2xl mb-8 space-y-4">
-          <h2 className="text-xl font-black text-center text-white uppercase tracking-widest border-b border-slate-800 pb-3">
-            SELECT TEAM COLOR
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 bg-gradient-to-r from-purple-700 via-pink-600 to-amber-500 rounded-2xl border border-white/20">
-            <div className="flex flex-col items-center space-y-2">
-              <span className="text-white font-black uppercase text-base">{teamA.shortName.toLowerCase()}</span>
-              <input
-                type="color"
-                value={team1Color}
-                onChange={(e) => setTeam1Color(e.target.value)}
-                className="w-12 h-12 rounded-full cursor-pointer border-2 border-white"
-              />
             </div>
-            <div className="flex flex-col items-center space-y-2">
-              <span className="text-white font-black uppercase text-base">{teamB.shortName.toLowerCase()}</span>
-              <input
-                type="color"
-                value={team2Color}
-                onChange={(e) => setTeam2Color(e.target.value)}
-                className="w-12 h-12 rounded-full cursor-pointer border-2 border-white"
-              />
+
+            {/* Action Controls Button Matrix */}
+            <div className="w-full grid grid-cols-2 sm:grid-cols-5 gap-4 mb-10">
+              <button
+                onClick={() => {
+                  toggleOverlay('tournamentTitle', false);
+                  toggleOverlay('scoreBug', true);
+                }}
+                className="py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-base rounded-2xl shadow-lg active:scale-95 transition-all uppercase tracking-wider"
+              >
+                Default
+              </button>
+              <button
+                onClick={() => hideAllOverlays()}
+                className="py-3.5 bg-rose-600 hover:bg-rose-500 text-white font-black text-base rounded-2xl shadow-lg active:scale-95 transition-all uppercase tracking-wider"
+              >
+                HIDE ALL
+              </button>
+              <button
+                onClick={handleChangeToss}
+                className="py-3.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-base rounded-2xl shadow-lg active:scale-95 transition-all uppercase tracking-wider"
+              >
+                Change Toss
+              </button>
+              <button
+                onClick={() => {
+                  toggleOverlay('scoreBug', false);
+                  toggleOverlay('tournamentTitle', true);
+                }}
+                className="py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-black text-base rounded-2xl shadow-lg active:scale-95 transition-all uppercase tracking-wider"
+              >
+                Tour Name
+              </button>
+              <button
+                onClick={() => undoLastBall()}
+                className="py-3.5 bg-red-600 hover:bg-red-500 text-white font-black text-base rounded-2xl shadow-lg active:scale-95 transition-all uppercase tracking-wider col-span-2 sm:col-span-1"
+              >
+                UNDO
+              </button>
             </div>
-          </div>
-          <div className="flex justify-center">
-            <button
-              onClick={handleSaveTeamColors}
-              className="bg-slate-950 hover:bg-slate-800 text-white font-black text-xs px-8 py-2.5 rounded-xl uppercase tracking-widest border border-slate-700 shadow-lg"
-            >
-              SAVE
-            </button>
-          </div>
-        </div>
+
+            {/* DISPLAY CONTROLLER */}
+            <div className="w-full bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-2xl mb-8 space-y-6">
+              <h2 className="text-xl font-black text-center text-white uppercase tracking-widest border-b border-slate-800 pb-3">
+                DISPLAY CONTROLLER
+              </h2>
+
+              {/* Overlays Buttons Bar */}
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                {displayButtons.map((btn, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => toggleOverlay(btn.id)}
+                    className={`px-3 py-2 text-xs rounded-lg uppercase tracking-wider transition-all active:scale-95 ${btn.bg} ${
+                      activeOverlays[btn.id] ? 'ring-2 ring-white shadow-lg' : ''
+                    }`}
+                  >
+                    {btn.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* DRS Decision & Animations Rows */}
+              <div className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-slate-800 text-xs font-black uppercase">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-cyan-400">DRS Decision:</span>
+                  <button onClick={() => { setDecision('PENDING'); toggleOverlay('decision', true); }} className="bg-yellow-400 text-slate-950 font-black px-3 py-1.5 rounded-md hover:bg-yellow-300">PENDING</button>
+                  <button onClick={() => { setDecision('OUT'); toggleOverlay('decision', true); }} className="bg-red-600 text-white font-black px-3 py-1.5 rounded-md hover:bg-red-500">OUT</button>
+                  <button onClick={() => { setDecision('NOT OUT'); toggleOverlay('decision', true); }} className="bg-emerald-500 text-slate-950 font-black px-3 py-1.5 rounded-md hover:bg-emerald-400">NOT OUT</button>
+                  <button onClick={() => { setDecision(null); toggleOverlay('decision', false); }} className="bg-slate-700 text-slate-300 font-bold px-3 py-1.5 rounded-md hover:bg-slate-600">CLEAR</button>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-cyan-400 font-black">Stings:</span>
+                  <button onClick={() => triggerAnimation('HAT_TRICK')} className="bg-amber-400 text-slate-950 font-black px-3 py-1.5 rounded-md hover:bg-amber-300">HAT-TRICK BALL</button>
+                  <button onClick={() => triggerAnimation('TOUR_BOUNDARIES')} className="bg-cyan-500 text-slate-950 font-black px-3 py-1.5 rounded-md hover:bg-cyan-400">TOUR BOUNDARY</button>
+                </div>
+              </div>
+
+              {/* Custom Input */}
+              <div className="flex items-center gap-3 pt-3 border-t border-slate-800">
+                <span className="text-xs font-black text-cyan-400 uppercase w-28">Custom Input:</span>
+                <input
+                  type="text"
+                  value={customInputText}
+                  onChange={(e) => setCustomInputText(e.target.value)}
+                  className="flex-1 bg-slate-950 border border-slate-700 px-4 py-2 rounded-xl text-white text-sm font-bold focus:outline-none focus:border-cyan-400"
+                />
+                <button
+                  onClick={() => updateMatchSettings({ customInputText })}
+                  className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs px-5 py-2.5 rounded-xl uppercase tracking-wider"
+                >
+                  Display Input
+                </button>
+              </div>
+
+              {/* League Theme Overlay Selector */}
+              <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-slate-800">
+                <span className="text-xs font-black text-amber-400 uppercase w-36 flex items-center gap-1.5">
+                  <Palette className="w-4 h-4 text-purple-400" /> League Theme:
+                </span>
+                <select
+                  value={tournamentId || 'IPL'}
+                  onChange={(e) => {
+                    const newThemeId = e.target.value;
+                    const themeObj = PRESET_TOURNAMENTS[newThemeId];
+                    setTournamentId(newThemeId);
+                    if (themeObj) {
+                      updateMatchSettings({ tournament: themeObj.name });
+                    }
+                  }}
+                  className="flex-1 bg-slate-950 border border-slate-700 px-4 py-2 rounded-xl text-white text-xs font-bold focus:outline-none focus:border-cyan-400 uppercase"
+                >
+                  {Object.values(PRESET_TOURNAMENTS).map((t) => (
+                    <option key={t.id} value={t.id}>
+                      🏆 {t.name} ({t.id})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Select MOM Player */}
+              <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-slate-800">
+                <span className="text-xs font-black text-cyan-400 uppercase w-36">Select MOM Player:</span>
+                <select
+                  value={selectedMOM}
+                  onChange={(e) => setSelectedMOM(e.target.value)}
+                  className="flex-1 bg-slate-950 border border-slate-700 px-4 py-2 rounded-xl text-white text-xs font-bold"
+                >
+                  <option value="nagesh chitia (ashtavinayak indians)">nagesh chitia (ashtavinayak indians)</option>
+                  <option value="S. Yadav (India)">S. Yadav (India)</option>
+                  <option value="J. Bumrah (India)">J. Bumrah (India)</option>
+                </select>
+                <button onClick={() => toggleOverlay('playerOfTheMatch')} className="bg-emerald-500 text-slate-950 font-black text-xs px-3.5 py-2 rounded-lg uppercase">Display MOM</button>
+              </div>
+            </div>
+
+            {/* TOUR STATS CONTROLLER */}
+            <div className="w-full bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-2xl mb-8 space-y-4">
+              <h2 className="text-xl font-black text-center text-white uppercase tracking-widest border-b border-slate-800 pb-3">
+                TOUR STATS CONTROLLER
+              </h2>
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                <button onClick={() => toggleOverlay('pointsTable')} className="px-3 py-2 bg-emerald-500 text-slate-950 font-black text-xs rounded-lg uppercase">POINTS TABLE</button>
+                <button onClick={() => toggleOverlay('topBatters')} className="px-3 py-2 bg-fuchsia-600 text-white font-black text-xs rounded-lg uppercase">TOP BATTERS</button>
+                <button onClick={() => toggleOverlay('topBowlers')} className="px-3 py-2 bg-fuchsia-600 text-white font-black text-xs rounded-lg uppercase">TOP BOWLERS</button>
+                <button onClick={() => toggleOverlay('playerOfTheTournament')} className="px-3 py-2 bg-amber-500 text-slate-950 font-black text-xs rounded-lg uppercase font-black">TOP PLAYER OF SERIES</button>
+              </div>
+            </div>
+          </>
+        )}
 
         {/* Show Extra Controller Bar */}
         <button
           onClick={() => setShowExtraController(!showExtraController)}
-          className="w-full py-3 bg-red-600 hover:bg-red-500 text-white font-black text-base rounded-2xl shadow-xl uppercase tracking-wider mb-10 flex items-center justify-center gap-2"
+          className={`w-full py-3.5 px-6 rounded-2xl font-black text-sm uppercase tracking-wider mb-8 flex items-center justify-between border shadow-2xl transition-all ${
+            showExtraController
+              ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-rose-600 text-slate-950 border-amber-300 shadow-amber-500/20'
+              : 'bg-slate-900 hover:bg-slate-800 text-amber-400 border-slate-700 hover:border-amber-400/50'
+          }`}
         >
-          {showExtraController ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-          {showExtraController ? 'Hide Extra Controller' : 'Show Extra Controller'}
+          <div className="flex items-center gap-3">
+            <Sliders className="w-5 h-5" />
+            <span>ADVANCED MATCH CONTROLLER & EXTRAS MATRIX</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold px-3 py-1 rounded-full bg-slate-950/40 uppercase">
+              {showExtraController ? 'ACTIVE / OPEN' : 'CLICK TO EXPAND'}
+            </span>
+            {showExtraController ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+          </div>
         </button>
 
         {showExtraController && (
-          <div className="w-full bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-2xl mb-8 space-y-4">
-            <h3 className="text-sm font-black text-amber-400 uppercase tracking-widest text-center">ADVANCED MATCH CONTROLS</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-black">
-              <button onClick={() => addExtra('BYE', 1)} className="py-2.5 bg-slate-800 text-white rounded-xl">BYE (+1)</button>
-              <button onClick={() => addExtra('LEG_BYE', 1)} className="py-2.5 bg-slate-800 text-white rounded-xl">LEG BYE (+1)</button>
-              <button onClick={() => triggerAnimation('DRINKS_BREAK')} className="py-2.5 bg-sky-600 text-white rounded-xl">DRINKS BREAK</button>
-              <button onClick={() => triggerAnimation('STRATEGIC_TIMEOUT')} className="py-2.5 bg-slate-700 text-white rounded-xl">STRATEGIC TIMEOUT</button>
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="w-full bg-slate-900/95 backdrop-blur-xl border-2 border-amber-500/40 p-6 md:p-8 rounded-3xl shadow-[0_0_50px_rgba(245,158,11,0.15)] mb-10 space-y-8"
+          >
+            {/* Header */}
+            <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-4">
+              <div>
+                <h3 className="text-lg font-black text-amber-400 uppercase tracking-widest flex items-center gap-2">
+                  <Zap className="w-5 h-5 text-amber-400 fill-amber-400" /> ADVANCED MATCH CONTROLS & EXTRAS
+                </h3>
+                <p className="text-xs text-slate-400 font-bold mt-0.5">
+                  Direct Extra Runs Matrix, Target Adjustments, Innings Control, DRS & Broadcast Stings
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setShowExtraController(false)}
+                  className="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs rounded-xl uppercase border border-slate-700"
+                >
+                  Close Panel
+                </button>
+              </div>
             </div>
-          </div>
+
+            {/* SECTION 1: EXTRAS MATRIX */}
+            <div className="space-y-4 bg-slate-950 p-5 rounded-2xl border border-slate-800">
+              <h4 className="text-xs font-black text-cyan-400 uppercase tracking-wider flex items-center gap-2 border-b border-slate-800/80 pb-2">
+                <PlusCircle className="w-4 h-4 text-cyan-400" /> EXTRAS DIRECT ACTION MATRIX
+              </h4>
+
+              {/* Wide Runs */}
+              <div className="space-y-1.5">
+                <span className="text-[11px] font-black text-amber-400 uppercase tracking-wider block">
+                  WIDE RUNS (+1 EXTRA RUN + ACTION RUNS)
+                </span>
+                <div className="grid grid-cols-5 gap-2 text-xs font-black">
+                  {[1, 2, 3, 4, 5].map((wRun) => (
+                    <button
+                      key={`wide_${wRun}`}
+                      onClick={() => addExtra('WIDE', wRun)}
+                      className="py-2.5 bg-amber-500/20 hover:bg-amber-500 text-amber-300 hover:text-slate-950 border border-amber-500/50 rounded-xl transition-all shadow active:scale-95 uppercase"
+                    >
+                      WIDE +{wRun - 1} ({wRun})
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* No Ball Runs */}
+              <div className="space-y-1.5 pt-2">
+                <span className="text-[11px] font-black text-rose-400 uppercase tracking-wider block">
+                  NO BALL RUNS (+1 EXTRA RUN + ACTION RUNS & FREE HIT)
+                </span>
+                <div className="grid grid-cols-6 gap-2 text-xs font-black">
+                  {[1, 2, 3, 4, 6].map((nbRun) => (
+                    <button
+                      key={`nb_${nbRun}`}
+                      onClick={() => addExtra('NO_BALL', nbRun)}
+                      className="py-2.5 bg-rose-500/20 hover:bg-rose-500 text-rose-300 hover:text-white border border-rose-500/50 rounded-xl transition-all shadow active:scale-95 uppercase"
+                    >
+                      NO BALL +{nbRun - 1} ({nbRun})
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => {
+                      addExtra('NO_BALL', 1);
+                      triggerAnimation('FREE_HIT');
+                    }}
+                    className="py-2.5 bg-gradient-to-r from-yellow-500 to-amber-600 hover:from-yellow-400 hover:to-amber-500 text-slate-950 font-black rounded-xl shadow active:scale-95 uppercase border border-yellow-300"
+                  >
+                    ⚡ FREE HIT
+                  </button>
+                </div>
+              </div>
+
+              {/* Bye Runs */}
+              <div className="space-y-1.5 pt-2">
+                <span className="text-[11px] font-black text-sky-400 uppercase tracking-wider block">
+                  BYES (LEGAL BALL + NO BOWLER RUNS)
+                </span>
+                <div className="grid grid-cols-4 gap-2 text-xs font-black">
+                  {[1, 2, 3, 4].map((bRun) => (
+                    <button
+                      key={`bye_${bRun}`}
+                      onClick={() => addExtra('BYE', bRun)}
+                      className="py-2.5 bg-sky-500/20 hover:bg-sky-500 text-sky-300 hover:text-slate-950 border border-sky-500/50 rounded-xl transition-all shadow active:scale-95 uppercase"
+                    >
+                      BYE (+{bRun})
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Leg Bye Runs */}
+              <div className="space-y-1.5 pt-2">
+                <span className="text-[11px] font-black text-purple-400 uppercase tracking-wider block">
+                  LEG BYES (LEGAL BALL + NO BOWLER RUNS)
+                </span>
+                <div className="grid grid-cols-4 gap-2 text-xs font-black">
+                  {[1, 2, 3, 4].map((lbRun) => (
+                    <button
+                      key={`legbye_${lbRun}`}
+                      onClick={() => addExtra('LEG_BYE', lbRun)}
+                      className="py-2.5 bg-purple-500/20 hover:bg-purple-500 text-purple-300 hover:text-white border border-purple-500/50 rounded-xl transition-all shadow active:scale-95 uppercase"
+                    >
+                      LEG BYE (+{lbRun})
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Penalty Runs */}
+              <div className="space-y-1.5 pt-2 border-t border-slate-800">
+                <span className="text-[11px] font-black text-emerald-400 uppercase tracking-wider block">
+                  PENALTY RUNS AWARD (+5 RUNS)
+                </span>
+                <div className="grid grid-cols-2 gap-3 text-xs font-black">
+                  <button
+                    onClick={() => addPenaltyRuns('batting', 5)}
+                    className="py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl shadow-lg border border-emerald-400/40 uppercase"
+                  >
+                    🎁 +5 PENALTY RUNS TO {battingTeam.shortName} (BATTING)
+                  </button>
+                  <button
+                    onClick={() => addPenaltyRuns('bowling', 5)}
+                    className="py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow-lg border border-indigo-400/40 uppercase"
+                  >
+                    🎁 +5 PENALTY RUNS TO {bowlingTeam.shortName} (BOWLING)
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* SECTION 2: TARGET & DLS / OVERS ADJUSTMENT */}
+            <div className="space-y-4 bg-slate-950 p-5 rounded-2xl border border-slate-800">
+              <h4 className="text-xs font-black text-amber-400 uppercase tracking-wider flex items-center gap-2 border-b border-slate-800/80 pb-2">
+                <Target className="w-4 h-4 text-amber-400" /> TARGET SCORE & DLS OVERS CONTROL
+              </h4>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Target adjustment */}
+                <div className="space-y-2 bg-slate-900 p-4 rounded-xl border border-slate-800">
+                  <span className="text-xs font-bold text-slate-300 uppercase block">
+                    Target Score: <span className="text-amber-400 font-black">{matchDetails.targetRuns || 'Not Set'}</span>
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      placeholder="Target Runs"
+                      value={targetRunsInput || ''}
+                      onChange={(e) => setTargetRunsInput(Number(e.target.value))}
+                      className="w-28 bg-slate-950 border border-slate-700 px-3 py-2 rounded-lg text-white font-black text-sm focus:outline-none focus:border-amber-400"
+                    />
+                    <button
+                      onClick={() => updateMatchSettings({ targetRuns: targetRunsInput })}
+                      className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs rounded-lg uppercase shadow"
+                    >
+                      Set Target
+                    </button>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-1.5 text-xs font-black pt-1">
+                    <button
+                      onClick={() => {
+                        const newT = (matchDetails.targetRuns || 0) + 1;
+                        setTargetRunsInput(newT);
+                        updateMatchSettings({ targetRuns: newT });
+                      }}
+                      className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded-md border border-slate-700"
+                    >
+                      +1 Target
+                    </button>
+                    <button
+                      onClick={() => {
+                        const newT = Math.max(0, (matchDetails.targetRuns || 0) - 1);
+                        setTargetRunsInput(newT);
+                        updateMatchSettings({ targetRuns: newT });
+                      }}
+                      className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-rose-400 rounded-md border border-slate-700"
+                    >
+                      -1 Target
+                    </button>
+                    <button
+                      onClick={() => {
+                        const newT = (matchDetails.targetRuns || 0) + 5;
+                        setTargetRunsInput(newT);
+                        updateMatchSettings({ targetRuns: newT });
+                      }}
+                      className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-amber-400 rounded-md border border-slate-700"
+                    >
+                      +5 Target
+                    </button>
+                    <button
+                      onClick={() => {
+                        updateMatchSettings({ targetRuns: undefined });
+                        setTargetRunsInput(0);
+                      }}
+                      className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-400 rounded-md border border-slate-700"
+                    >
+                      Clear
+                    </button>
+                  </div>
+                </div>
+
+                {/* Overs adjustment */}
+                <div className="space-y-2 bg-slate-900 p-4 rounded-xl border border-slate-800">
+                  <span className="text-xs font-bold text-slate-300 uppercase block">
+                    Total Match Overs: <span className="text-cyan-400 font-black">{matchDetails.totalOvers} Overs</span>
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="number"
+                      value={setupOvers}
+                      onChange={(e) => setSetupOvers(Number(e.target.value))}
+                      className="w-28 bg-slate-950 border border-slate-700 px-3 py-2 rounded-lg text-white font-black text-sm focus:outline-none focus:border-cyan-400"
+                    />
+                    <button
+                      onClick={() => updateMatchSettings({ totalOvers: setupOvers })}
+                      className="px-4 py-2 bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black text-xs rounded-lg uppercase shadow"
+                    >
+                      Update Overs
+                    </button>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-1.5 text-xs font-black pt-1">
+                    {[5, 10, 15, 20, 50].map((ov) => (
+                      <button
+                        key={`ov_${ov}`}
+                        onClick={() => {
+                          setSetupOvers(ov);
+                          updateMatchSettings({ totalOvers: ov });
+                        }}
+                        className={`px-2.5 py-1 rounded-md border text-xs ${
+                          matchDetails.totalOvers === ov
+                            ? 'bg-cyan-500 text-slate-950 border-cyan-300'
+                            : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border-slate-700'
+                        }`}
+                      >
+                        {ov} Ov
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* SECTION 3: INNINGS & ADVANCED CONTROL OPERATIONS */}
+            <div className="space-y-4 bg-slate-950 p-5 rounded-2xl border border-slate-800">
+              <h4 className="text-xs font-black text-purple-400 uppercase tracking-wider flex items-center gap-2 border-b border-slate-800/80 pb-2">
+                <RotateCcw className="w-4 h-4 text-purple-400" /> INNINGS & ADVANCED CONTROL OPERATIONS
+              </h4>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-black">
+                <button
+                  onClick={() => {
+                    startSecondInnings();
+                    toggleOverlay('target', true);
+                  }}
+                  className="py-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white rounded-xl shadow-lg uppercase border border-emerald-400/30"
+                >
+                  🚀 START 2ND INNINGS
+                </button>
+
+                <button
+                  onClick={() => switchStrikers()}
+                  className="py-3 bg-sky-600 hover:bg-sky-500 text-white rounded-xl shadow-lg uppercase border border-sky-400/30"
+                >
+                  ⇄ SWAP STRIKERS
+                </button>
+
+                <button
+                  onClick={() => {
+                    const currentIsA = battingTeamId === 'teamA' || battingTeamId === teamA.id;
+                    setBattingTeam(currentIsA ? 'teamB' : 'teamA');
+                  }}
+                  className="py-3 bg-purple-600 hover:bg-purple-500 text-white rounded-xl shadow-lg uppercase border border-purple-400/30"
+                >
+                  ⇄ SWAP BATTING TEAM
+                </button>
+
+                <button
+                  onClick={() => undoLastBall()}
+                  className="py-3 bg-rose-700 hover:bg-rose-600 text-white rounded-xl shadow-lg uppercase border border-rose-400/30"
+                >
+                  ↩ UNDO LAST BALL ({historyStack.length})
+                </button>
+
+                <button
+                  onClick={() => toggleOverlay('superOver')}
+                  className="py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl shadow-lg uppercase border border-amber-300"
+                >
+                  ⚡ SUPER OVER GRAPHIC
+                </button>
+
+                <button
+                  onClick={() => retireBatter()}
+                  className="py-3 bg-orange-600 hover:bg-orange-500 text-white rounded-xl shadow-lg uppercase border border-orange-400/30"
+                >
+                  🤕 RETIRE BATTER
+                </button>
+
+                <button
+                  onClick={() => setShowBowlerModal(true)}
+                  className="py-3 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl shadow-lg uppercase border border-cyan-400/30"
+                >
+                  🏏 CHANGE BOWLER
+                </button>
+
+                <button
+                  onClick={() => setShowResetConfirmModal(true)}
+                  className="py-3 bg-red-950 hover:bg-red-900 border border-red-500/60 text-red-300 rounded-xl shadow-lg uppercase"
+                >
+                  🚨 RESET MATCH STATE
+                </button>
+              </div>
+            </div>
+
+            {/* SECTION 4: BROADCAST STINGS & ANIMATIONS MATRIX */}
+            <div className="space-y-4 bg-slate-950 p-5 rounded-2xl border border-slate-800">
+              <h4 className="text-xs font-black text-rose-400 uppercase tracking-wider flex items-center gap-2 border-b border-slate-800/80 pb-2">
+                <Sparkles className="w-4 h-4 text-rose-400" /> BROADCAST ANIMATIONS & STINGS MATRIX
+              </h4>
+
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 text-xs font-black">
+                <button
+                  onClick={() => triggerAnimation('FREE_HIT')}
+                  className="py-3 bg-yellow-500 hover:bg-yellow-400 text-slate-950 rounded-xl shadow border border-yellow-300 uppercase"
+                >
+                  ⚡ FREE HIT
+                </button>
+
+                <button
+                  onClick={() => triggerAnimation('POWERPLAY')}
+                  className="py-3 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl shadow border border-cyan-400/40 uppercase"
+                >
+                  ⚡ POWERPLAY
+                </button>
+
+                <button
+                  onClick={() => triggerAnimation('STRATEGIC_TIMEOUT')}
+                  className="py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl shadow border border-indigo-400/40 uppercase"
+                >
+                  ⏰ STRATEGIC TIMEOUT
+                </button>
+
+                <button
+                  onClick={() => triggerAnimation('DRINKS_BREAK')}
+                  className="py-3 bg-sky-600 hover:bg-sky-500 text-white rounded-xl shadow border border-sky-400/40 uppercase"
+                >
+                  🥤 DRINKS BREAK
+                </button>
+
+                <button
+                  onClick={() => triggerAnimation('FIFTY')}
+                  className="py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl shadow border border-emerald-400/40 uppercase"
+                >
+                  🏏 FIFTY (50)
+                </button>
+
+                <button
+                  onClick={() => triggerAnimation('CENTURY')}
+                  className="py-3 bg-fuchsia-600 hover:bg-fuchsia-500 text-white rounded-xl shadow border border-fuchsia-400/40 uppercase"
+                >
+                  💯 CENTURY (100)
+                </button>
+
+                <button
+                  onClick={() => triggerAnimation('HAT_TRICK')}
+                  className="py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl shadow border border-amber-300 uppercase"
+                >
+                  🎩 HAT-TRICK
+                </button>
+
+                <button
+                  onClick={() => triggerAnimation('TOUR_BOUNDARIES')}
+                  className="py-3 bg-purple-600 hover:bg-purple-500 text-white rounded-xl shadow border border-purple-400/40 uppercase"
+                >
+                  🔥 TOUR BOUNDARY
+                </button>
+
+                <button
+                  onClick={() => triggerAnimation('MATCH_WINNER')}
+                  className="py-3 bg-gradient-to-r from-emerald-500 to-amber-500 text-slate-950 rounded-xl shadow font-black border border-white/50 uppercase"
+                >
+                  🏆 MATCH WINNER
+                </button>
+
+                <button
+                  onClick={() => clearAnimation()}
+                  className="py-3 bg-red-800 hover:bg-red-700 text-white rounded-xl shadow border border-red-500 uppercase col-span-2 sm:col-span-1"
+                >
+                  ⛔ STOP ANIMATION
+                </button>
+              </div>
+
+              {/* Custom Animation Text Input */}
+              <div className="flex items-center gap-3 pt-3 border-t border-slate-800">
+                <span className="text-xs font-black text-rose-400 uppercase w-36">Custom Anim Banner:</span>
+                <input
+                  type="text"
+                  placeholder="e.g. SUPER OVER DRAMA! or HAT-TRICK ON THE CARDS!"
+                  value={customAnimInputText}
+                  onChange={(e) => setCustomAnimInputText(e.target.value)}
+                  className="flex-1 bg-slate-900 border border-slate-700 px-4 py-2 rounded-xl text-white text-xs font-bold focus:outline-none focus:border-rose-400"
+                />
+                <button
+                  onClick={() => {
+                    updateMatchSettings({ customAnimationText: customAnimInputText });
+                    triggerAnimation('FOUR');
+                  }}
+                  className="bg-rose-600 hover:bg-rose-500 text-white font-black text-xs px-5 py-2.5 rounded-xl uppercase tracking-wider shadow"
+                >
+                  Trigger Banner
+                </button>
+              </div>
+            </div>
+
+            {/* SECTION 5: DRS DECISION & MATCH STATUS BANNER */}
+            <div className="space-y-4 bg-slate-950 p-5 rounded-2xl border border-slate-800">
+              <h4 className="text-xs font-black text-yellow-400 uppercase tracking-wider flex items-center gap-2 border-b border-slate-800/80 pb-2">
+                <ShieldCheck className="w-4 h-4 text-yellow-400" /> DRS DECISION & MATCH STATUS TEXT
+              </h4>
+
+              <div className="flex flex-wrap items-center justify-between gap-4 text-xs font-black">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-cyan-400 uppercase">DRS Decision:</span>
+                  <button
+                    onClick={() => {
+                      setDecision('PENDING');
+                      toggleOverlay('decision', true);
+                    }}
+                    className="bg-yellow-400 text-slate-950 font-black px-4 py-2 rounded-lg hover:bg-yellow-300 uppercase shadow"
+                  >
+                    PENDING
+                  </button>
+                  <button
+                    onClick={() => {
+                      setDecision('OUT');
+                      toggleOverlay('decision', true);
+                    }}
+                    className="bg-red-600 text-white font-black px-4 py-2 rounded-lg hover:bg-red-500 uppercase shadow"
+                  >
+                    OUT
+                  </button>
+                  <button
+                    onClick={() => {
+                      setDecision('NOT OUT');
+                      toggleOverlay('decision', true);
+                    }}
+                    className="bg-emerald-500 text-slate-950 font-black px-4 py-2 rounded-lg hover:bg-emerald-400 uppercase shadow"
+                  >
+                    NOT OUT
+                  </button>
+                  <button
+                    onClick={() => {
+                      setDecision(null);
+                      toggleOverlay('decision', false);
+                    }}
+                    className="bg-slate-700 text-slate-300 font-bold px-4 py-2 rounded-lg hover:bg-slate-600 uppercase shadow"
+                  >
+                    CLEAR
+                  </button>
+                </div>
+              </div>
+
+              {/* Status Text Custom Input */}
+              <div className="flex items-center gap-3 pt-2 border-t border-slate-800">
+                <span className="text-xs font-black text-yellow-400 uppercase w-36">Match Status Banner:</span>
+                <input
+                  type="text"
+                  placeholder="e.g. INNINGS BREAK or IN NEED OF 14 RUNS IN 6 BALLS"
+                  value={statusTextInput}
+                  onChange={(e) => setStatusTextInput(e.target.value)}
+                  className="flex-1 bg-slate-900 border border-slate-700 px-4 py-2 rounded-xl text-white text-xs font-bold focus:outline-none focus:border-yellow-400"
+                />
+                <button
+                  onClick={() => updateMatchSettings({ matchStatusText: statusTextInput })}
+                  className="bg-yellow-500 hover:bg-yellow-400 text-slate-950 font-black text-xs px-5 py-2.5 rounded-xl uppercase tracking-wider shadow"
+                >
+                  Update Status
+                </button>
+              </div>
+            </div>
+
+            {/* SECTION 6: ANALYTICS & GRAPH GRAPHICS */}
+            <div className="space-y-4 bg-slate-950 p-5 rounded-2xl border border-slate-800">
+              <h4 className="text-xs font-black text-cyan-400 uppercase tracking-wider flex items-center gap-2 border-b border-slate-800/80 pb-2">
+                <BarChart2 className="w-4 h-4 text-cyan-400" /> ADVANCED ANALYTICS & GRAPH OVERLAYS
+              </h4>
+
+              <div className="flex flex-wrap items-center justify-center gap-2 text-xs font-black">
+                <button
+                  onClick={() => setGraphType('BAR')}
+                  className={`px-4 py-2 rounded-xl uppercase border transition-all ${
+                    matchDetails.graphType === 'BAR'
+                      ? 'bg-cyan-500 text-slate-950 border-cyan-300 shadow-lg'
+                      : 'bg-slate-800 hover:bg-slate-700 text-white border-slate-700'
+                  }`}
+                >
+                  📊 BAR CHART
+                </button>
+                <button
+                  onClick={() => setGraphType('LINE')}
+                  className={`px-4 py-2 rounded-xl uppercase border transition-all ${
+                    matchDetails.graphType === 'LINE'
+                      ? 'bg-cyan-500 text-slate-950 border-cyan-300 shadow-lg'
+                      : 'bg-slate-800 hover:bg-slate-700 text-white border-slate-700'
+                  }`}
+                >
+                  📈 LINE CHART
+                </button>
+                <button
+                  onClick={() => setGraphType('DOUBLE_BAR')}
+                  className={`px-4 py-2 rounded-xl uppercase border transition-all ${
+                    matchDetails.graphType === 'DOUBLE_BAR'
+                      ? 'bg-cyan-500 text-slate-950 border-cyan-300 shadow-lg'
+                      : 'bg-slate-800 hover:bg-slate-700 text-white border-slate-700'
+                  }`}
+                >
+                  📊 DOUBLE BAR CHART
+                </button>
+                <button
+                  onClick={() => toggleOverlay('wagonWheel')}
+                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-purple-300 rounded-xl uppercase border border-slate-700 shadow"
+                >
+                  🕸️ WAGON WHEEL
+                </button>
+                <button
+                  onClick={() => toggleOverlay('pitchMap')}
+                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-emerald-300 rounded-xl uppercase border border-slate-700 shadow"
+                >
+                  🎯 PITCH MAP
+                </button>
+                <button
+                  onClick={() => toggleOverlay('manhattan')}
+                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-amber-300 rounded-xl uppercase border border-slate-700 shadow"
+                >
+                  🏙️ MANHATTAN
+                </button>
+                <button
+                  onClick={() => toggleOverlay('partnership')}
+                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-sky-300 rounded-xl uppercase border border-slate-700 shadow"
+                >
+                  🤝 PARTNERSHIP
+                </button>
+                <button
+                  onClick={() => toggleOverlay('fallOfWickets')}
+                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-rose-300 rounded-xl uppercase border border-slate-700 shadow"
+                >
+                  📉 FALL OF WICKETS
+                </button>
+              </div>
+            </div>
+          </motion.div>
         )}
       </main>
 
@@ -767,6 +1621,36 @@ export const TourMatchPage: React.FC = () => {
       )}
       <TossMatchModal isOpen={showTossModal} onClose={() => setShowTossModal(false)} />
       <EditMatchModal isOpen={showEditModal} onClose={() => setShowEditModal(false)} />
+
+      {/* Reset Confirmation Modal */}
+      {showResetConfirmModal && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
+          <div className="bg-slate-900 border border-slate-700 p-6 rounded-3xl max-w-md w-full shadow-2xl space-y-4 text-center">
+            <AlertTriangle className="w-12 h-12 text-rose-500 mx-auto" />
+            <h3 className="text-xl font-black text-white uppercase">Reset Match State?</h3>
+            <p className="text-xs text-slate-300">
+              Are you sure you want to reset all scores, wickets, overs, and match state back to default? This action cannot be undone.
+            </p>
+            <div className="flex justify-center gap-3 pt-2">
+              <button
+                onClick={() => setShowResetConfirmModal(false)}
+                className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl uppercase"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  resetMatchState();
+                  setShowResetConfirmModal(false);
+                }}
+                className="px-5 py-2.5 bg-red-600 hover:bg-red-500 text-white font-black text-xs rounded-xl uppercase shadow"
+              >
+                Yes, Reset Everything
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

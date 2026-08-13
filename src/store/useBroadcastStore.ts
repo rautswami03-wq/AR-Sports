@@ -12,6 +12,7 @@ export interface HistorySnapshot {
 }
 
 export interface BroadcastStoreState {
+  lastUpdated?: number;
   teamA: Team;
   teamB: Team;
   matchDetails: MatchDetails;
@@ -31,6 +32,7 @@ export interface BroadcastStoreState {
   clearAnimation: () => void;
   addRuns: (runs: number, isBoundary?: boolean, boundaryType?: 4 | 6) => void;
   addExtra: (type: 'WIDE' | 'NO_BALL' | 'BYE' | 'LEG_BYE', runs?: number) => void;
+  addPenaltyRuns: (targetTeam: 'batting' | 'bowling' | 'teamA' | 'teamB', runs: number) => void;
   addWicket: (dismissalType?: string) => void;
   undoLastBall: () => void;
   switchStrikers: () => void;
@@ -48,6 +50,8 @@ export interface BroadcastStoreState {
   setTournament: (tournamentId: string) => void;
   setTournamentId: (tournamentId: string) => void;
   resetMatchState: () => void;
+  startMatch: () => void;
+  stopMatch: () => void;
   startNewMatchWithTeams: (teamAName: string, teamBName: string, tournamentName?: string) => void;
   startSecondInnings: () => void;
   updatePlayerAvatar: (teamId: 'teamA' | 'teamB', playerType: 'batter' | 'bowler', playerId: string, avatarUrl: string) => void;
@@ -55,17 +59,21 @@ export interface BroadcastStoreState {
   setWsConnected: (connected: boolean) => void;
 }
 
-const STORAGE_KEY = 'cricscorer_match_state_v2';
+const STORAGE_KEY = 'ar_sports_match_state_v2';
+const LEGACY_STORAGE_KEY = 'cricscorer_match_state_v2';
 
 const broadcastChannel = typeof window !== 'undefined' && 'BroadcastChannel' in window
-  ? new BroadcastChannel('cricscorer_overlay_channel_v2')
+  ? new BroadcastChannel('ar_sports_overlay_channel_v2')
   : null;
+
 
 let isReceivingBroadcast = false;
 let socket: WebSocket | null = null;
+let lastLocalUserMutationTimestamp = 0;
 
 function buildCompactSyncPayload(state: any) {
   return {
+    lastUpdated: state.lastUpdated || Date.now(),
     teamA: {
       id: state.teamA?.id || 'teamA',
       shortName: state.teamA?.shortName || 'T1',
@@ -151,19 +159,23 @@ function buildCompactSyncPayload(state: any) {
 
 function postStateSync(state: any) {
   if (isReceivingBroadcast) return;
+  const now = Date.now();
+  lastLocalUserMutationTimestamp = now;
+  state.lastUpdated = now;
+
   const syncPayload = buildCompactSyncPayload(state);
 
   if (typeof window !== 'undefined') {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(syncPayload));
-      window.dispatchEvent(new CustomEvent('cricscorer_local_update', { detail: syncPayload }));
+      window.dispatchEvent(new CustomEvent('ar_sports_local_update', { detail: syncPayload }));
     } catch {}
   }
 
   if (broadcastChannel) {
     try {
       broadcastChannel.postMessage({
-        type: 'CRICSCORER_STATE_SYNC',
+        type: 'AR_SPORTS_STATE_SYNC',
         payload: syncPayload,
       });
     } catch {}
@@ -249,6 +261,7 @@ const DEFAULT_MATCH_DETAILS: MatchDetails = {
   },
   fallOfWickets: [],
   matchStatusText: 'MATCH NOT STARTED YET',
+  isMatchStarted: false,
   pointsTable: [],
   topBatters: [],
   topBowlers: [],
@@ -313,7 +326,11 @@ function loadInitialState() {
         return {
           teamA: parsed.teamA || DEFAULT_TEAM_A,
           teamB: parsed.teamB || DEFAULT_TEAM_B,
-          matchDetails: parsed.matchDetails || DEFAULT_MATCH_DETAILS,
+          matchDetails: {
+            ...DEFAULT_MATCH_DETAILS,
+            ...(parsed.matchDetails || {}),
+            isMatchStarted: parsed.matchDetails?.isMatchStarted === true,
+          },
           battingTeamId: parsed.battingTeamId || 'teamA',
           bowlingTeamId: parsed.bowlingTeamId || 'teamB',
           activeOverlays: parsed.activeOverlays || INITIAL_OVERLAYS,
@@ -370,9 +387,23 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
 
   applyExternalState: (newState) => {
     if (!newState || typeof newState !== 'object') return;
+
+    const now = Date.now();
+    // Guard 1: Ignore external sync if user entered score/edited state within the last 3000ms
+    if (now - lastLocalUserMutationTimestamp < 3000) {
+      return;
+    }
+
+    // Guard 2: Ignore stale external updates older than current local state
+    const currentLastUpdated = get().lastUpdated || 0;
+    if (newState.lastUpdated && newState.lastUpdated < currentLastUpdated) {
+      return;
+    }
+
     isReceivingBroadcast = true;
     set((state) => ({
       ...state,
+      lastUpdated: newState.lastUpdated || now,
       ...(newState.teamA ? { teamA: { ...state.teamA, ...newState.teamA } } : {}),
       ...(newState.teamB ? { teamB: { ...state.teamB, ...newState.teamB } } : {}),
       ...(newState.matchDetails ? { matchDetails: { ...state.matchDetails, ...newState.matchDetails } } : {}),
@@ -543,22 +574,63 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
       const team = { ...state[battingTeamKey] };
       const bowlingTeam = { ...state[bowlingTeamKey] };
       team.score += extraRuns;
+      team.extras = (team.extras || 0) + extraRuns;
 
       const bowlers = [...bowlingTeam.bowlers];
       const activeBowlerIndex = bowlers.findIndex((bw) => bw.isCurrent) !== -1
         ? bowlers.findIndex((bw) => bw.isCurrent)
         : 0;
 
-      if (bowlers[activeBowlerIndex]) {
-        const bw = { ...bowlers[activeBowlerIndex] };
-        bw.runsConceded += extraRuns;
-        const totalBowlerBalls = bw.overs * 6 + bw.ballsInCurrentOver;
-        bw.economy = totalBowlerBalls > 0 ? Number(((bw.runsConceded / totalBowlerBalls) * 6).toFixed(2)) : 0;
-        bowlers[activeBowlerIndex] = bw;
-        bowlingTeam.bowlers = bowlers;
+      if (extraType === 'WIDE' || extraType === 'NO_BALL') {
+        if (bowlers[activeBowlerIndex]) {
+          const bw = { ...bowlers[activeBowlerIndex] };
+          bw.runsConceded += extraRuns;
+          const totalBowlerBalls = bw.overs * 6 + bw.ballsInCurrentOver;
+          bw.economy = totalBowlerBalls > 0 ? Number(((bw.runsConceded / totalBowlerBalls) * 6).toFixed(2)) : 0;
+          bowlers[activeBowlerIndex] = bw;
+          bowlingTeam.bowlers = bowlers;
+        }
+      } else {
+        let balls = team.balls + 1;
+        let overs = team.overs;
+        if (balls >= 6) {
+          overs += 1;
+          balls = 0;
+        }
+        team.balls = balls;
+        team.overs = overs;
+
+        const batters = [...team.batters];
+        const strikerIndex = batters.findIndex((b) => b.isStriker);
+        if (strikerIndex !== -1) {
+          batters[strikerIndex] = {
+            ...batters[strikerIndex],
+            balls: batters[strikerIndex].balls + 1,
+          };
+          team.batters = batters;
+        }
+
+        if (bowlers[activeBowlerIndex]) {
+          const bw = { ...bowlers[activeBowlerIndex] };
+          let bwBalls = bw.ballsInCurrentOver + 1;
+          let bwOvers = bw.overs;
+          if (bwBalls >= 6) {
+            bwOvers += 1;
+            bwBalls = 0;
+          }
+          bw.ballsInCurrentOver = bwBalls;
+          bw.overs = bwOvers;
+          const totalBowlerBalls = bwOvers * 6 + bwBalls;
+          bw.economy = totalBowlerBalls > 0 ? Number(((bw.runsConceded / totalBowlerBalls) * 6).toFixed(2)) : 0;
+          bowlers[activeBowlerIndex] = bw;
+          bowlingTeam.bowlers = bowlers;
+        }
       }
 
-      const symbol = extraType === 'WIDE' ? `${extraRuns}WD` : `${extraRuns}NB`;
+      const symbol = extraType === 'WIDE' ? `${extraRuns}WD`
+        : extraType === 'NO_BALL' ? `${extraRuns}NB`
+        : extraType === 'BYE' ? `${extraRuns}B`
+        : `${extraRuns}LB`;
       const recent = [symbol, ...state.matchDetails.recentBalls.slice(0, 5)];
 
       const nextState = {
@@ -573,6 +645,28 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
 
     if (extraType === 'WIDE') get().triggerAnimation('WIDE', 3000);
     if (extraType === 'NO_BALL') get().triggerAnimation('NO_BALL', 3000);
+  },
+
+  addPenaltyRuns: (targetTeam, runs) => {
+    set((state) => {
+      const snapshot = getSnapshot(state);
+      const newHistory = [...state.historyStack, snapshot].slice(-30);
+      const isTeamA = isBattingTeamA(state);
+      let key: 'teamA' | 'teamB' = 'teamA';
+      if (targetTeam === 'batting') key = isTeamA ? 'teamA' : 'teamB';
+      else if (targetTeam === 'bowling') key = isTeamA ? 'teamB' : 'teamA';
+      else key = targetTeam;
+
+      const team = { ...state[key], score: state[key].score + runs, extras: (state[key].extras || 0) + runs };
+      const recent = [`+${runs}PEN`, ...state.matchDetails.recentBalls.slice(0, 5)];
+      const nextState = {
+        [key]: team,
+        matchDetails: { ...state.matchDetails, recentBalls: recent },
+        historyStack: newHistory,
+      };
+      postStateSync({ ...state, ...nextState });
+      return nextState;
+    });
   },
 
   addWicket: (dismissalType = 'c & b Bowler') => {
@@ -898,6 +992,39 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
     postStateSync(defaultState);
   },
 
+  startMatch: () => {
+    set((state) => {
+      const nextState = {
+        matchDetails: {
+          ...state.matchDetails,
+          isMatchStarted: true,
+          matchStatusText: 'LIVE',
+        },
+        activeOverlays: {
+          ...state.activeOverlays,
+          scoreBug: true,
+        },
+      };
+      postStateSync({ ...state, ...nextState });
+      return nextState;
+    });
+  },
+
+  stopMatch: () => {
+    set((state) => {
+      const nextState = {
+        matchDetails: {
+          ...state.matchDetails,
+          isMatchStarted: false,
+          matchStatusText: 'UPCOMING',
+        },
+        activeOverlays: INITIAL_OVERLAYS,
+      };
+      postStateSync({ ...state, ...nextState });
+      return nextState;
+    });
+  },
+
   startNewMatchWithTeams: (teamAName, teamBName, tournamentName) => {
     const deriveShort = (name: string) =>
       name.split(' ').map((w) => w[0]).join('').substring(0, 4).toUpperCase() || name.substring(0, 3).toUpperCase();
@@ -945,6 +1072,8 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
         matchDetails: {
           ...state.matchDetails,
           tournament: tournamentName || state.matchDetails.tournament,
+          isMatchStarted: false,
+          matchStatusText: 'MATCH NOT STARTED YET',
           recentBalls: [],
           winnerMargin: undefined,
           customInputText: undefined,
@@ -954,7 +1083,7 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
         activeOverlays: {
           ...INITIAL_OVERLAYS,
           scoreBug: false,
-          tournamentTitle: true,
+          tournamentTitle: false,
         },
         historyStack: [],
       };
@@ -1099,16 +1228,15 @@ initWebSocketClient();
 
 if (broadcastChannel) {
   broadcastChannel.onmessage = (event) => {
-    if (event.data?.type === 'CRICSCORER_STATE_SYNC' && event.data.payload) {
+    if ((event.data?.type === 'AR_SPORTS_STATE_SYNC' || event.data?.type === 'CRICSCORER_STATE_SYNC') && event.data.payload) {
       useBroadcastStore.getState().applyExternalState(event.data.payload);
     }
   };
 }
 
-
 if (typeof window !== 'undefined') {
   window.addEventListener('storage', (e) => {
-    if (e.key === STORAGE_KEY && e.newValue) {
+    if ((e.key === STORAGE_KEY || e.key === LEGACY_STORAGE_KEY) && e.newValue) {
       try {
         const parsed = JSON.parse(e.newValue);
         useBroadcastStore.getState().applyExternalState(parsed);
@@ -1116,6 +1244,11 @@ if (typeof window !== 'undefined') {
     }
   });
 
+  window.addEventListener('ar_sports_local_update', (e: any) => {
+    if (e.detail) {
+      useBroadcastStore.getState().applyExternalState(e.detail);
+    }
+  });
   window.addEventListener('cricscorer_local_update', (e: any) => {
     if (e.detail) {
       useBroadcastStore.getState().applyExternalState(e.detail);

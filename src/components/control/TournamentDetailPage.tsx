@@ -86,7 +86,7 @@ export const TournamentDetailPage: React.FC = () => {
   const [matches, setMatches] = useState<MatchItem[]>(() => {
     if (typeof window !== 'undefined') {
       try {
-        const saved = localStorage.getItem('cricscorer_matches_v2');
+        const saved = localStorage.getItem('ar_sports_matches_v2') || localStorage.getItem('cricscorer_matches_v2');
         if (saved) return JSON.parse(saved);
       } catch (e) {
         console.warn('Failed to load matches:', e);
@@ -101,7 +101,7 @@ export const TournamentDetailPage: React.FC = () => {
   useEffect(() => {
     if (!id || typeof window === 'undefined') return;
     try {
-      const savedTours = localStorage.getItem('cricscorer_tournaments_v1');
+      const savedTours = localStorage.getItem('ar_sports_tournaments_v1') || localStorage.getItem('cricscorer_tournaments_v1');
       if (savedTours) {
         const tours = JSON.parse(savedTours);
         const current = tours.find((t: any) => t.id === id);
@@ -134,7 +134,7 @@ export const TournamentDetailPage: React.FC = () => {
   const saveMatches = (items: MatchItem[]) => {
     setMatches(items);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('cricscorer_matches_v2', JSON.stringify(items));
+      localStorage.setItem('ar_sports_matches_v2', JSON.stringify(items));
     }
   };
 

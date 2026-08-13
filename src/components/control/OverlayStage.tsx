@@ -64,7 +64,7 @@ interface OverlayStageProps {
 }
 
 export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
-  const { activeOverlays, activeAnimation } = useBroadcastStore();
+  const { activeOverlays, activeAnimation, matchDetails } = useBroadcastStore();
   const wsConnectedRef = useRef(false);
 
 
@@ -88,12 +88,23 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
       }
     }
 
+    const isStandaloneOverlay =
+      typeof window !== 'undefined' &&
+      (window.location.pathname.startsWith('/overlay') ||
+       window.location.pathname.startsWith('/theme') ||
+       window.location.hash.includes('/overlay') ||
+       window.location.hash.includes('/theme'));
+
+    if (!isStandaloneOverlay) {
+      return;
+    }
+
     let lastSavedRaw = '';
 
     const syncFromStorage = () => {
       if (typeof window === 'undefined') return;
       try {
-        const raw = localStorage.getItem('cricscorer_match_state_v2');
+        const raw = localStorage.getItem('ar_sports_match_state_v2') || localStorage.getItem('cricscorer_match_state_v2');
         if (raw && raw !== lastSavedRaw) {
           lastSavedRaw = raw;
           const parsed = JSON.parse(raw);
@@ -102,14 +113,11 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
       } catch {}
     };
 
-
     syncFromStorage();
-
     const pollInterval = setInterval(syncFromStorage, 100);
 
-
     const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'cricscorer_match_state_v2' && e.newValue) {
+      if ((e.key === 'ar_sports_match_state_v2' || e.key === 'cricscorer_match_state_v2') && e.newValue) {
         try {
           const parsed = JSON.parse(e.newValue);
           useBroadcastStore.getState().applyExternalState(parsed);
@@ -118,28 +126,26 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
     };
     window.addEventListener('storage', handleStorageChange);
 
-
     const handleCustomSync = (e: Event) => {
       const customEvent = e as CustomEvent;
       if (customEvent.detail) {
         useBroadcastStore.getState().applyExternalState(customEvent.detail);
       }
     };
+    window.addEventListener('ar_sports_local_update', handleCustomSync);
     window.addEventListener('cricscorer_local_update', handleCustomSync);
-
 
     let bc: BroadcastChannel | null = null;
     if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
       try {
-        bc = new BroadcastChannel('cricscorer_overlay_channel_v2');
+        bc = new BroadcastChannel('ar_sports_overlay_channel_v2');
         bc.onmessage = (event) => {
-          if (event.data?.type === 'CRICSCORER_STATE_SYNC' && event.data.payload) {
+          if ((event.data?.type === 'AR_SPORTS_STATE_SYNC' || event.data?.type === 'CRICSCORER_STATE_SYNC') && event.data.payload) {
             useBroadcastStore.getState().applyExternalState(event.data.payload);
           }
         };
       } catch {}
     }
-
 
     let unsubFirebase: (() => void) | null = null;
     try {
@@ -150,19 +156,10 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
       });
     } catch {}
 
-
-    if (wsConnectedRef.current) {
-      return () => {
-        clearInterval(pollInterval);
-        window.removeEventListener('storage', handleStorageChange);
-        window.removeEventListener('cricscorer_local_update', handleCustomSync);
-        if (bc) bc.close();
-        if (unsubFirebase) unsubFirebase();
-      };
-    }
     return () => {
       clearInterval(pollInterval);
       window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('ar_sports_local_update', handleCustomSync);
       window.removeEventListener('cricscorer_local_update', handleCustomSync);
       if (bc) bc.close();
       if (unsubFirebase) unsubFirebase();
@@ -173,8 +170,11 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
   const params = new URLSearchParams(window.location.hash.split('?')[1] || window.location.search);
   const forcedOverlay = params.get('overlay') as OverlayType | null;
 
+  const isMatchStarted = matchDetails?.isMatchStarted === true;
+
   const isVisible = (type: OverlayType) => {
     if (forcedOverlay) return forcedOverlay === type;
+    if (!isMatchStarted) return false;
     return !!activeOverlays[type];
   };
 

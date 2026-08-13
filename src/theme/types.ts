@@ -1,3 +1,6 @@
+export type LayoutStyle = 'pill' | 'dual-capsule' | 'chevron' | 'flat-bar' | 'glass-box';
+export type AnimationVariant = 'explosive-gold' | 'neon-pulse' | 'smooth-slide' | 'glass-fade' | 'minimal-pop';
+
 export interface ThemeColors {
   primary: string;
   secondary: string;
@@ -15,6 +18,7 @@ export interface TeamPreset {
   secondaryColor: string;
   accentColor: string;
   badgeGradient: string;
+  avatarUrl?: string;
 }
 
 export interface TournamentTheme {
@@ -29,5 +33,12 @@ export interface TournamentTheme {
   scoreBugAccentBg?: string;
   scoreBugTextColor?: string;
   fontFamily?: string;
+  layoutStyle?: LayoutStyle;
+  animationVariant?: AnimationVariant;
+  showOverDots?: boolean;
+  showAvatar?: boolean;
+  showTargetBar?: boolean;
+  sponsorBox?: boolean;
 }
+
 

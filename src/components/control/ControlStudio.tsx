@@ -154,7 +154,7 @@ export const ControlStudio: React.FC = () => {
         <div className="flex items-center gap-3">
           <div className="p-2 bg-amber-500 rounded-lg text-slate-950 font-black flex items-center gap-1.5 shadow-lg">
             <Radio className="w-5 h-5 animate-pulse" />
-            <span className="text-sm tracking-wider uppercase">CricScorer PRO</span>
+            <span className="text-sm tracking-wider uppercase">AR SPORTS STUDIO PRO</span>
           </div>
           <div className="flex items-center gap-1.5 bg-slate-950 border border-slate-800 px-2.5 py-1 rounded-full text-xs font-mono">
             <span className={`w-2 h-2 rounded-full ${isWsConnected ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`} />
@@ -234,7 +234,7 @@ export const ControlStudio: React.FC = () => {
                 TARGET - {matchDetails.targetRuns || 0}
               </span>
               <span className="text-xs font-extrabold text-amber-400 uppercase">
-                {matchDetails.tournament || 'CRICSCORER PREMIER LEAGUE'}
+                {matchDetails.tournament || 'AR SPORTS PREMIER LEAGUE 2026'}
               </span>
               <span className="text-xs font-extrabold text-slate-300">
                 NEED {matchDetails.targetRuns ? matchDetails.targetRuns - battingTeam.score : 0} RUNS FROM {((matchDetails.totalOvers || 20) * 6) - (battingTeam.overs * 6 + battingTeam.balls)} BALLS

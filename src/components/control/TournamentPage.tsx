@@ -37,7 +37,7 @@ export const TournamentPage: React.FC = () => {
   const [tournaments, setTournaments] = useState<TournamentItem[]>(() => {
     if (typeof window !== 'undefined') {
       try {
-        const saved = localStorage.getItem('cricscorer_tournaments_v1');
+        const saved = localStorage.getItem('ar_sports_tournaments_v1') || localStorage.getItem('cricscorer_tournaments_v1');
         if (saved) return JSON.parse(saved);
       } catch (e) {
         console.warn('Failed to load tournaments:', e);
@@ -49,7 +49,7 @@ export const TournamentPage: React.FC = () => {
   const saveTournaments = (items: TournamentItem[]) => {
     setTournaments(items);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('cricscorer_tournaments_v1', JSON.stringify(items));
+      localStorage.setItem('ar_sports_tournaments_v1', JSON.stringify(items));
     }
   };
 

@@ -16,7 +16,7 @@ const firebaseConfig = {
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
 export const db = getFirestore(app);
 
-const NTFY_TOPIC = 'https://ntfy.sh/cricscorer_broadcast_live_v2';
+const NTFY_TOPIC = 'https://ntfy.sh/ar_sports_broadcast_live_v2';
 const RTDB_URL = 'https://cricscore-dcaa4-default-rtdb.firebaseio.com/matches/live_match_default.json';
 
 export function subscribeToLiveMatch(matchId: string, onUpdate: (data: any) => void) {
@@ -44,8 +44,13 @@ export function subscribeToLiveMatch(matchId: string, onUpdate: (data: any) => v
         if (text && text !== lastRtdbText && text !== 'null') {
           lastRtdbText = text;
           const parsed = JSON.parse(text);
-          useBroadcastStore.getState().applyExternalState(parsed);
-          onUpdate(parsed);
+          const currentStore = useBroadcastStore.getState();
+          const currentLastUpdated = currentStore.lastUpdated || 0;
+
+          if (!parsed.lastUpdated || parsed.lastUpdated >= currentLastUpdated) {
+            useBroadcastStore.getState().applyExternalState(parsed);
+            onUpdate(parsed);
+          }
         }
       }
     } catch {}
@@ -64,7 +69,11 @@ export function subscribeToLiveMatch(matchId: string, onUpdate: (data: any) => v
           const parsed = JSON.parse(event.data);
           if (parsed.message) {
             const statePayload = JSON.parse(parsed.message);
-            onUpdate(statePayload);
+            const currentStore = useBroadcastStore.getState();
+            const currentLastUpdated = currentStore.lastUpdated || 0;
+            if (!statePayload.lastUpdated || statePayload.lastUpdated >= currentLastUpdated) {
+              onUpdate(statePayload);
+            }
           }
         } catch {}
       };
@@ -84,6 +93,15 @@ let pendingStateToPublish: any = null;
 export function publishLiveMatchState(matchId: string, state: any) {
   pendingStateToPublish = JSON.parse(JSON.stringify(state));
 
+  // Direct Firebase Realtime DB PUT (Instant & 100% Reliable worldwide without waiting)
+  try {
+    fetch(RTDB_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(pendingStateToPublish),
+    }).catch(() => {});
+  } catch {}
+
   if (publishTimer) return;
 
   publishTimer = setTimeout(async () => {
@@ -93,16 +111,7 @@ export function publishLiveMatchState(matchId: string, state: any) {
     const stateToSend = pendingStateToPublish;
     pendingStateToPublish = null;
 
-    // 1. Direct Firebase Realtime DB PUT (Instant & 100% Reliable worldwide)
-    try {
-      fetch(RTDB_URL, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(stateToSend),
-      }).catch(() => {});
-    } catch {}
-
-    // 2. ntfy.sh POST backup
+    // ntfy.sh POST backup
     try {
       fetch(NTFY_TOPIC, {
         method: 'POST',
@@ -111,7 +120,7 @@ export function publishLiveMatchState(matchId: string, state: any) {
       }).catch(() => {});
     } catch {}
 
-    // 3. Firestore setDoc
+    // Firestore setDoc
     try {
       const matchDoc = doc(db, 'matches', matchId);
       await setDoc(matchDoc, stateToSend, { merge: true });

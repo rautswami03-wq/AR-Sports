@@ -46,7 +46,7 @@ wss.on('close', () => {
 app.get('/api/health', (_req: Request, res: Response) => {
   res.json({
     status: 'online',
-    system: 'CricScorer Live Broadcast Engine',
+    system: 'AR Sports Live Broadcast Engine',
     webSocketClients: wss.clients.size,
     timestamp: new Date().toISOString(),
   });

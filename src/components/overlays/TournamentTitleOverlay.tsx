@@ -6,45 +6,49 @@ export const TournamentTitleOverlay: React.FC = () => {
   const { teamA, teamB, matchDetails } = useBroadcastStore();
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center p-8 pointer-events-none z-40">
+    <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-full max-w-5xl px-6 pointer-events-none z-40">
       <motion.div
-        initial={{ opacity: 0, scale: 0.9, y: 30 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.9, y: 30 }}
+        initial={{ opacity: 0, y: 60, scale: 0.95 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 60, scale: 0.95 }}
         transition={{ duration: 0.4, ease: 'easeOut' }}
-        className="w-full max-w-4xl bg-slate-950/90 backdrop-blur-md rounded-3xl border-2 border-cyan-400/60 shadow-[0_0_60px_rgba(6,182,212,0.6)] overflow-hidden text-center p-8 relative"
+        className="w-full bg-slate-950/95 backdrop-blur-md rounded-2xl border-2 border-cyan-400/60 shadow-[0_10px_50px_rgba(0,0,0,0.85)] overflow-hidden p-4 relative"
       >
         {/* Glowing Top Accent Line */}
-        <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-cyan-500 via-emerald-400 to-purple-600 animate-pulse" />
+        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-cyan-500 via-emerald-400 to-purple-600 animate-pulse" />
 
-        {/* Tournament Name */}
-        <span className="text-xs md:text-sm font-black uppercase text-amber-400 tracking-widest block mb-2">
-          🏆 OFFICIAL TOURNAMENT
-        </span>
-        <h1 className="text-3xl md:text-5xl font-black uppercase text-white tracking-wide drop-shadow-[0_4px_20px_rgba(255,255,255,0.4)] mb-4">
-          {matchDetails.tournament || 'ASTHAVINAYAK PREMIER LEAGUE'}
-        </h1>
+        <div className="flex items-center justify-between gap-6">
+          {/* Left Info Section */}
+          <div className="text-left space-y-1 pl-2">
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] font-black uppercase bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded tracking-widest">
+                🏆 OFFICIAL TOURNAMENT
+              </span>
+            </div>
+            <h1 className="text-2xl font-black uppercase text-white tracking-wide drop-shadow-md">
+              {matchDetails.tournament || 'ASTHAVINAYAK PREMIER LEAGUE'}
+            </h1>
+            <div className="flex items-center gap-3 text-xs font-black uppercase text-slate-300 tracking-wider">
+              <span>MATCH #{matchDetails.matchNo || 1}</span>
+              <span>•</span>
+              <span className="text-cyan-400">{matchDetails.matchType || 'GROUP STAGE'}</span>
+              <span>•</span>
+              <span>{matchDetails.totalOvers || 20} OVERS MATCH</span>
+            </div>
+          </div>
 
-        {/* Matchup Teams Banner */}
-        <div className="bg-gradient-to-r from-cyan-600 via-sky-600 to-indigo-600 py-3.5 px-8 rounded-2xl border border-cyan-300/40 shadow-xl flex items-center justify-between gap-4 max-w-2xl mx-auto my-4">
-          <h2 className="text-lg md:text-2xl font-black uppercase text-slate-950 truncate flex-1 text-left">
-            {teamA.fullName}
-          </h2>
-          <span className="bg-slate-950 text-amber-300 text-sm font-black px-4 py-1 rounded-xl border border-white/20">
-            VS
-          </span>
-          <h2 className="text-lg md:text-2xl font-black uppercase text-slate-950 truncate flex-1 text-right">
-            {teamB.fullName}
-          </h2>
-        </div>
-
-        {/* Subtitle Details */}
-        <div className="flex items-center justify-center gap-6 text-xs md:text-sm font-black uppercase text-slate-300 tracking-wider pt-2">
-          <span>MATCH #{matchDetails.matchNo || 1}</span>
-          <span>•</span>
-          <span>{matchDetails.matchType || 'GROUP STAGE'}</span>
-          <span>•</span>
-          <span>{matchDetails.totalOvers || 20} OVERS MATCH</span>
+          {/* Right Teams VS Box */}
+          <div className="bg-gradient-to-r from-cyan-600 via-sky-600 to-indigo-600 py-3 px-6 rounded-xl border border-cyan-300/40 shadow-xl flex items-center justify-between gap-4 min-w-[320px]">
+            <span className="text-base font-black uppercase text-slate-950 truncate max-w-[120px]">
+              {teamA.shortName || teamA.fullName}
+            </span>
+            <span className="bg-slate-950 text-amber-300 text-xs font-black px-3 py-1 rounded-lg border border-white/20 shadow">
+              VS
+            </span>
+            <span className="text-base font-black uppercase text-slate-950 truncate max-w-[120px] text-right">
+              {teamB.shortName || teamB.fullName}
+            </span>
+          </div>
         </div>
       </motion.div>
     </div>
