@@ -166,16 +166,25 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
     };
   }, []);
 
-  // Check URL query override (e.g., ?overlay=battingScorecard)
-  const params = new URLSearchParams(window.location.hash.split('?')[1] || window.location.search);
+  const hash = typeof window !== 'undefined' ? window.location.hash : '';
+  const search = typeof window !== 'undefined' ? window.location.search : '';
+  const hashQuery = hash.includes('?') ? hash.split('?')[1] : search;
+  const params = new URLSearchParams(hashQuery);
   const forcedOverlay = params.get('overlay') as OverlayType | null;
 
-  const isMatchStarted = matchDetails?.isMatchStarted === true;
+  const isStandaloneRoute = typeof window !== 'undefined' && (
+    window.location.pathname.includes('/overlay') ||
+    window.location.pathname.includes('/theme') ||
+    hash.includes('/overlay') ||
+    hash.includes('/theme')
+  );
 
   const isVisible = (type: OverlayType) => {
     if (forcedOverlay) return forcedOverlay === type;
-    if (!isMatchStarted) return false;
-    return !!activeOverlays[type];
+    if (activeOverlays[type]) return true;
+    if (isStandaloneRoute && type === 'scoreBug') return true;
+    if (matchDetails?.isMatchStarted && activeOverlays[type]) return true;
+    return false;
   };
 
   return (
