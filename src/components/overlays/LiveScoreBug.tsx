@@ -177,26 +177,36 @@ export const LiveScoreBug: React.FC = () => {
 
         {/* Bowler Stats & Over-Ball Progress Dots */}
         <div
-          className="px-4 flex flex-col justify-center border-r border-white/10 shrink-0 min-w-[210px] text-xs font-black"
+          className="px-4 flex flex-col justify-center border-r border-white/10 shrink-0 min-w-[210px] text-xs font-black shadow-inner"
           style={{
-            background: theme.badgeBg ? `${theme.badgeBg}dd` : 'rgba(0,0,0,0.6)',
-            color: theme.id === 'bbl_white' ? '#0f172a' : '#ffffff'
+            background: layoutStyle === 'cricscorer-broadcast' || theme.id === 'asl26'
+              ? 'linear-gradient(180deg, #facc15 0%, #eab308 100%)'
+              : theme.badgeBg ? `${theme.badgeBg}dd` : 'rgba(0,0,0,0.6)',
+            color: (layoutStyle === 'cricscorer-broadcast' || theme.id === 'asl26' || theme.id === 'bbl_white') ? '#0f172a' : '#ffffff'
           }}
         >
           {currentBowler && (
             <div className="flex items-center justify-between mb-1">
-              <span className="truncate uppercase max-w-[110px]" style={{ color: theme.id === 'bbl_white' ? '#334155' : '#cbd5e1' }}>{currentBowler.name}</span>
-              <span className="font-black text-sm shrink-0" style={{ color: theme.primaryAccent || '#facc15' }}>
-                {currentBowler.wickets}-{currentBowler.runsConceded} <span className="text-xs opacity-75">({currentBowler.overs}.{currentBowler.ballsInCurrentOver})</span>
+              <span
+                className="truncate uppercase font-black max-w-[110px]"
+                style={{ color: (layoutStyle === 'cricscorer-broadcast' || theme.id === 'asl26' || theme.id === 'bbl_white') ? '#0f172a' : '#cbd5e1' }}
+              >
+                {currentBowler.name}
+              </span>
+              <span
+                className="font-black text-sm shrink-0"
+                style={{ color: (layoutStyle === 'cricscorer-broadcast' || theme.id === 'asl26') ? '#000000' : theme.primaryAccent || '#facc15' }}
+              >
+                {currentBowler.wickets}-{currentBowler.runsConceded} <span className="text-xs font-bold opacity-75">({currentBowler.overs}.{currentBowler.ballsInCurrentOver})</span>
               </span>
             </div>
           )}
           {theme.showOverDots ? (
-            <OverProgressDots recentBalls={matchDetails.recentBalls} accentColor={theme.primaryAccent} />
+            <OverProgressDots recentBalls={matchDetails.recentBalls} accentColor={(layoutStyle === 'cricscorer-broadcast' || theme.id === 'asl26') ? '#000000' : theme.primaryAccent} />
           ) : (
             <div className="flex items-center gap-1">
               {matchDetails.recentBalls.slice(0, 6).map((ball, idx) => (
-                <span key={idx} className="w-5 h-5 rounded bg-slate-800 flex items-center justify-center font-black text-[10px] text-white">
+                <span key={idx} className="w-5 h-5 rounded bg-slate-900 flex items-center justify-center font-black text-[10px] text-white">
                   {ball}
                 </span>
               ))}
@@ -207,18 +217,30 @@ export const LiveScoreBug: React.FC = () => {
         {/* Bowling Team Badge */}
         <div
           className="px-5 flex items-center justify-end gap-3 shrink-0 border-l border-white/10 transition-colors max-w-[220px]"
-          style={{ background: theme.badgeBg || '#0f172a' }}
+          style={{
+            background: layoutStyle === 'cricscorer-broadcast' || theme.id === 'asl26'
+              ? 'linear-gradient(135deg, #eab308 0%, #ca8a04 100%)'
+              : theme.badgeBg || '#0f172a'
+          }}
         >
           <div className="flex flex-col text-right leading-tight min-w-0">
-            <span className="font-black text-sm uppercase tracking-tight text-white drop-shadow truncate">
+            <span
+              className="font-black text-sm uppercase tracking-tight drop-shadow truncate"
+              style={{ color: (layoutStyle === 'cricscorer-broadcast' || theme.id === 'asl26') ? '#0f172a' : '#ffffff' }}
+            >
               {bowlingTeam.fullName}
             </span>
-            <span className="font-bold text-slate-300 text-[11px] truncate" style={{ color: theme.primaryAccent }}>BOWLING</span>
+            <span
+              className="font-bold text-[11px] truncate"
+              style={{ color: (layoutStyle === 'cricscorer-broadcast' || theme.id === 'asl26') ? '#000000' : theme.primaryAccent }}
+            >
+              BOWLING
+            </span>
           </div>
           <div
             className="w-11 h-11 rounded-full border-2 flex items-center justify-center font-black text-white text-base shadow-lg shrink-0"
             style={{
-              borderColor: theme.primaryAccent || '#ffffff',
+              borderColor: '#ffffff',
               backgroundColor: bowlingTeam.primaryColor || 'rgba(0,0,0,0.6)'
             }}
           >

@@ -1,4 +1,4 @@
-export type LayoutStyle = 'pill' | 'dual-capsule' | 'chevron' | 'flat-bar' | 'glass-box';
+export type LayoutStyle = 'pill' | 'dual-capsule' | 'chevron' | 'flat-bar' | 'glass-box' | 'cricscorer-broadcast';
 export type AnimationVariant = 'explosive-gold' | 'neon-pulse' | 'smooth-slide' | 'glass-fade' | 'minimal-pop';
 
 export interface ThemeColors {
