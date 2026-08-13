@@ -123,7 +123,7 @@ export function publishLiveMatchState(matchId: string, state: any) {
     // Firestore setDoc
     try {
       const matchDoc = doc(db, 'matches', matchId);
-      await setDoc(matchDoc, stateToSend, { merge: true });
+      await setDoc(matchDoc, stateToSend, { merge: true }).catch(() => {});
     } catch {}
   }, 100);
 }
