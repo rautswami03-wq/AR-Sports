@@ -97,13 +97,13 @@ export const LiveScoreBug: React.FC = () => {
         {/* Batting Team Badge */}
         <div
           className="px-5 flex items-center gap-3 shrink-0 border-r border-white/10 transition-colors"
-          style={{ background: theme.badgeBg || battingTeam.primaryColor || '#0f172a' }}
+          style={{ background: theme.badgeBg || '#0f172a' }}
         >
           <div
             className="w-12 h-12 rounded-full border-2 flex items-center justify-center font-black text-white text-base shadow-lg"
             style={{
               borderColor: theme.primaryAccent || '#ffffff',
-              backgroundColor: battingTeam.primaryColor || 'rgba(0,0,0,0.5)'
+              backgroundColor: battingTeam.primaryColor || 'rgba(0,0,0,0.6)'
             }}
           >
             {battingTeam.shortName}
@@ -119,7 +119,10 @@ export const LiveScoreBug: React.FC = () => {
         </div>
 
         {/* Score Block */}
-        <div className="px-5 flex flex-col justify-center border-r border-white/10 shrink-0 bg-black/50">
+        <div
+          className="px-5 flex flex-col justify-center border-r border-white/10 shrink-0"
+          style={{ background: theme.badgeBg ? `${theme.badgeBg}dd` : 'rgba(0,0,0,0.6)' }}
+        >
           <div className="font-black text-3xl tracking-tight leading-none flex items-baseline gap-1">
             <span style={{ color: theme.primaryAccent || '#ffffff' }}>{battingTeam.score}</span>
             <span className="text-amber-400 text-2xl">-{battingTeam.wickets}</span>
@@ -131,7 +134,10 @@ export const LiveScoreBug: React.FC = () => {
         </div>
 
         {/* Batters Stats */}
-        <div className="flex-1 px-4 flex flex-col justify-center border-r border-white/10 min-w-[230px] bg-slate-900/80 text-xs font-black">
+        <div
+          className="flex-1 px-4 flex flex-col justify-center border-r border-white/10 min-w-[230px] text-xs font-black"
+          style={{ background: theme.cardBg || 'rgba(15, 23, 42, 0.85)' }}
+        >
           {striker && (
             <div className="flex items-center justify-between text-white mb-0.5">
               <span className="truncate flex items-center gap-1.5">
@@ -164,7 +170,10 @@ export const LiveScoreBug: React.FC = () => {
         </div>
 
         {/* Bowler Stats & Over-Ball Progress Dots */}
-        <div className="px-4 flex flex-col justify-center border-r border-white/10 shrink-0 min-w-[230px] bg-black/50 text-xs font-black text-white">
+        <div
+          className="px-4 flex flex-col justify-center border-r border-white/10 shrink-0 min-w-[230px] text-xs font-black text-white"
+          style={{ background: theme.badgeBg ? `${theme.badgeBg}dd` : 'rgba(0,0,0,0.6)' }}
+        >
           {currentBowler && (
             <div className="flex items-center justify-between mb-1">
               <span className="truncate uppercase text-slate-300">{currentBowler.name}</span>
@@ -189,7 +198,7 @@ export const LiveScoreBug: React.FC = () => {
         {/* Bowling Team Badge */}
         <div
           className="px-5 flex items-center justify-end gap-3 shrink-0 border-l border-white/10 transition-colors"
-          style={{ background: theme.badgeBg || bowlingTeam.primaryColor || '#0f172a' }}
+          style={{ background: theme.badgeBg || '#0f172a' }}
         >
           <div className="flex flex-col text-right leading-tight">
             <span className="font-black text-sm uppercase tracking-tight text-white drop-shadow">
