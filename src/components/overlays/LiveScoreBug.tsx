@@ -109,10 +109,13 @@ export const LiveScoreBug: React.FC = () => {
             {battingTeam.shortName}
           </div>
           <div className="flex flex-col leading-tight min-w-0">
-            <span className="font-black text-sm uppercase tracking-tight text-white drop-shadow truncate">
+            <span
+              className="font-black text-sm uppercase tracking-tight drop-shadow truncate"
+              style={{ color: theme.id === 'bbl_white' ? '#0f172a' : '#ffffff' }}
+            >
               {battingTeam.fullName}
             </span>
-            <span className="font-bold text-slate-300 text-[11px] truncate" style={{ color: theme.primaryAccent }}>
+            <span className="font-bold text-[11px] truncate" style={{ color: theme.primaryAccent }}>
               v {bowlingTeam.shortName}
             </span>
           </div>
@@ -124,10 +127,13 @@ export const LiveScoreBug: React.FC = () => {
           style={{ background: theme.badgeBg ? `${theme.badgeBg}dd` : 'rgba(0,0,0,0.6)' }}
         >
           <div className="font-black text-3xl tracking-tight leading-none flex items-baseline gap-1">
-            <span style={{ color: theme.primaryAccent || '#ffffff' }}>{battingTeam.score}</span>
+            <span style={{ color: theme.primaryAccent || (theme.id === 'bbl_white' ? '#0f172a' : '#ffffff') }}>{battingTeam.score}</span>
             <span className="text-amber-400 text-2xl">-{battingTeam.wickets}</span>
           </div>
-          <div className="flex items-center justify-between text-[11px] font-black text-slate-300 mt-1 gap-2">
+          <div
+            className="flex items-center justify-between text-[11px] font-black mt-1 gap-2"
+            style={{ color: theme.id === 'bbl_white' ? '#334155' : '#cbd5e1' }}
+          >
             <span style={{ color: theme.primaryAccent || '#38bdf8' }}>{oversFormatted} OVS</span>
             <span>CRR: {crr}</span>
           </div>
@@ -136,21 +142,21 @@ export const LiveScoreBug: React.FC = () => {
         {/* Batters Stats */}
         <div
           className="flex-1 px-4 flex flex-col justify-center border-r border-white/10 min-w-[200px] text-xs font-black"
-          style={{ background: theme.cardBg || 'rgba(15, 23, 42, 0.85)' }}
+          style={{ background: theme.cardBg || (theme.id === 'bbl_white' ? '#f8fafc' : 'rgba(15, 23, 42, 0.85)') }}
         >
           {striker && (
-            <div className="flex items-center justify-between text-white mb-0.5">
+            <div className="flex items-center justify-between mb-0.5" style={{ color: theme.id === 'bbl_white' ? '#0f172a' : '#ffffff' }}>
               <span className="truncate flex items-center gap-1.5 min-w-0">
                 <span className="w-2 h-2 rounded-full animate-pulse shrink-0" style={{ backgroundColor: theme.primaryAccent || '#34d399' }} />
                 <span className="truncate uppercase font-black">{striker.name}</span>
               </span>
               <span className="font-black text-sm ml-2 shrink-0" style={{ color: theme.primaryAccent || '#facc15' }}>
-                {striker.runs} <span className="text-xs font-bold text-slate-400">({striker.balls})</span>
+                {striker.runs} <span className="text-xs font-bold opacity-75">({striker.balls})</span>
               </span>
             </div>
           )}
           {nonStriker && (
-            <div className="flex items-center justify-between text-slate-400 font-bold">
+            <div className="flex items-center justify-between opacity-75 font-bold" style={{ color: theme.id === 'bbl_white' ? '#475569' : '#94a3b8' }}>
               <span className="truncate uppercase pl-3.5 min-w-0">{nonStriker.name}</span>
               <span className="text-xs ml-2 shrink-0">
                 {nonStriker.runs} <span className="text-[11px] opacity-75">({nonStriker.balls})</span>
@@ -171,14 +177,17 @@ export const LiveScoreBug: React.FC = () => {
 
         {/* Bowler Stats & Over-Ball Progress Dots */}
         <div
-          className="px-4 flex flex-col justify-center border-r border-white/10 shrink-0 min-w-[210px] text-xs font-black text-white"
-          style={{ background: theme.badgeBg ? `${theme.badgeBg}dd` : 'rgba(0,0,0,0.6)' }}
+          className="px-4 flex flex-col justify-center border-r border-white/10 shrink-0 min-w-[210px] text-xs font-black"
+          style={{
+            background: theme.badgeBg ? `${theme.badgeBg}dd` : 'rgba(0,0,0,0.6)',
+            color: theme.id === 'bbl_white' ? '#0f172a' : '#ffffff'
+          }}
         >
           {currentBowler && (
             <div className="flex items-center justify-between mb-1">
-              <span className="truncate uppercase text-slate-300 max-w-[110px]">{currentBowler.name}</span>
+              <span className="truncate uppercase max-w-[110px]" style={{ color: theme.id === 'bbl_white' ? '#334155' : '#cbd5e1' }}>{currentBowler.name}</span>
               <span className="font-black text-sm shrink-0" style={{ color: theme.primaryAccent || '#facc15' }}>
-                {currentBowler.wickets}-{currentBowler.runsConceded} <span className="text-slate-400 text-xs">({currentBowler.overs}.{currentBowler.ballsInCurrentOver})</span>
+                {currentBowler.wickets}-{currentBowler.runsConceded} <span className="text-xs opacity-75">({currentBowler.overs}.{currentBowler.ballsInCurrentOver})</span>
               </span>
             </div>
           )}
