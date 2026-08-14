@@ -427,30 +427,30 @@ export const LiveScoreBug: React.FC = () => {
           <div
             className="px-4 flex flex-col justify-center border-r border-white/10 shrink-0 min-w-[210px] text-xs font-black shadow-inner"
             style={{
-              background: layoutStyle === 'cricscorer-broadcast' || theme.id === 'asl26'
+              background: layoutStyle === 'cricscorer-broadcast'
                 ? 'linear-gradient(180deg, #facc15 0%, #eab308 100%)'
                 : theme.badgeBg ? `${theme.badgeBg}dd` : 'rgba(0,0,0,0.6)',
-              color: (layoutStyle === 'cricscorer-broadcast' || theme.id === 'asl26' || theme.id === 'bbl_white') ? '#0f172a' : '#ffffff'
+              color: (layoutStyle === 'cricscorer-broadcast' || theme.id === 'bbl_white') ? '#0f172a' : '#ffffff'
             }}
           >
             {currentBowler && (
               <div className="flex items-center justify-between mb-1">
                 <span
                   className="truncate uppercase font-black max-w-[110px]"
-                  style={{ color: (layoutStyle === 'cricscorer-broadcast' || theme.id === 'asl26' || theme.id === 'bbl_white') ? '#0f172a' : '#cbd5e1' }}
+                  style={{ color: (layoutStyle === 'cricscorer-broadcast' || theme.id === 'bbl_white') ? '#0f172a' : '#cbd5e1' }}
                 >
                   {currentBowler.name}
                 </span>
                 <span
                   className="font-black text-sm shrink-0"
-                  style={{ color: (layoutStyle === 'cricscorer-broadcast' || theme.id === 'asl26') ? '#000000' : theme.primaryAccent || '#facc15' }}
+                  style={{ color: layoutStyle === 'cricscorer-broadcast' ? '#000000' : theme.primaryAccent || '#facc15' }}
                 >
                   {currentBowler.wickets}-{currentBowler.runsConceded} <span className="text-xs font-bold opacity-75">({currentBowler.overs}.{currentBowler.ballsInCurrentOver})</span>
                 </span>
               </div>
             )}
             {theme.showOverDots ? (
-              <OverProgressDots recentBalls={matchDetails.recentBalls} accentColor={(layoutStyle === 'cricscorer-broadcast' || theme.id === 'asl26') ? '#000000' : theme.primaryAccent} />
+              <OverProgressDots recentBalls={matchDetails.recentBalls} accentColor={layoutStyle === 'cricscorer-broadcast' ? '#000000' : theme.primaryAccent} />
             ) : (
               <div className="flex items-center gap-1">
                 {matchDetails.recentBalls.slice(0, 6).map((ball, idx) => (
@@ -466,7 +466,7 @@ export const LiveScoreBug: React.FC = () => {
           <div
             className="px-5 flex items-center justify-end gap-3 shrink-0 border-l border-white/10 transition-colors max-w-[220px]"
             style={{
-              background: layoutStyle === 'cricscorer-broadcast' || theme.id === 'asl26'
+              background: layoutStyle === 'cricscorer-broadcast'
                 ? 'linear-gradient(135deg, #eab308 0%, #ca8a04 100%)'
                 : theme.badgeBg || '#0f172a'
             }}
@@ -474,13 +474,13 @@ export const LiveScoreBug: React.FC = () => {
             <div className="flex flex-col text-right leading-tight min-w-0">
               <span
                 className="font-black text-sm uppercase tracking-tight drop-shadow truncate"
-                style={{ color: (layoutStyle === 'cricscorer-broadcast' || theme.id === 'asl26') ? '#0f172a' : '#ffffff' }}
+                style={{ color: layoutStyle === 'cricscorer-broadcast' ? '#0f172a' : '#ffffff' }}
               >
                 {bowlingTeam.fullName}
               </span>
               <span
                 className="font-bold text-[11px] truncate"
-                style={{ color: (layoutStyle === 'cricscorer-broadcast' || theme.id === 'asl26') ? '#000000' : theme.primaryAccent }}
+                style={{ color: layoutStyle === 'cricscorer-broadcast' ? '#000000' : theme.primaryAccent }}
               >
                 BOWLING
               </span>
