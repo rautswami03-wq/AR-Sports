@@ -4,6 +4,8 @@ import { useBroadcastStore } from '../../store/useBroadcastStore';
 import { resolveThemeFromUrlOrStore } from '../../theme/presetThemes';
 import { OverProgressDots } from './OverProgressDots';
 import { TargetProgressBar } from './TargetProgressBar';
+import { AsiaCupLeftCyanWings, AsiaCupRightYellowWings } from '../theme-graphics/AsiaCupGraphics';
+import { NavarasaVerticalRibbon } from '../theme-graphics/NavarasaGraphics';
 
 export const LiveScoreBug: React.FC = () => {
   const { teamA, teamB, battingTeamId, matchDetails, tournamentId } = useBroadcastStore();
@@ -29,6 +31,8 @@ export const LiveScoreBug: React.FC = () => {
   const isWicket = lastBall === 'W' || matchDetails.decision === 'OUT' || matchDetails.customInputText?.includes('WICKET');
 
   const layoutStyle = theme.layoutStyle || 'pill';
+  const totalFours = battingTeam.batters.reduce((acc, b) => acc + (b.fours || 0), 0);
+  const totalSixes = battingTeam.batters.reduce((acc, b) => acc + (b.sixes || 0), 0);
 
   return (
     <div className="absolute bottom-4 inset-x-4 z-40 flex flex-col items-center gap-1.5 pointer-events-none">
@@ -61,7 +65,7 @@ export const LiveScoreBug: React.FC = () => {
       </AnimatePresence>
 
       {/* 2. Target Progress Bar Header (if chasing second innings) */}
-      {theme.showTargetBar && matchDetails.targetRuns && (
+      {theme.showTargetBar && matchDetails.targetRuns && layoutStyle !== 't20-asia-cup' && layoutStyle !== 'icc-navarasa' && (
         <div className="w-full max-w-[1080px] pointer-events-auto">
           <TargetProgressBar
             targetRuns={matchDetails.targetRuns}
@@ -73,182 +77,428 @@ export const LiveScoreBug: React.FC = () => {
         </div>
       )}
 
-      {/* 3. Main Scorebug (Dynamic Layout Renderer) */}
-      <motion.div
-        initial={{ opacity: 0, y: 60 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ type: 'spring', damping: 24, stiffness: 220 }}
-        className={`w-full max-w-[1180px] flex items-stretch h-[78px] shadow-2xl overflow-hidden font-sans pointer-events-auto transition-all duration-300 ${
-          layoutStyle === 'dual-capsule'
-            ? 'rounded-3xl border-2 bg-slate-950 text-white p-1 gap-1'
-            : layoutStyle === 'glass-box'
-            ? 'rounded-2xl border border-white/30 bg-slate-900/85 backdrop-blur-2xl text-white'
-            : layoutStyle === 'chevron'
-            ? 'rounded-xl border-l-8 border-r-8 bg-slate-950 text-white'
-            : layoutStyle === 'flat-bar'
-            ? 'rounded-lg border-t-4 bg-neutral-900 text-white'
-            : 'rounded-2xl border border-white/30 bg-slate-950 text-white'
-        }`}
-        style={{
-          borderColor: theme.primaryAccent || 'rgba(255,255,255,0.3)',
-          boxShadow: `0 20px 50px -10px ${theme.primaryAccent ? theme.primaryAccent + '40' : 'rgba(0,0,0,0.5)'}`
-        }}
-      >
-        {/* Batting Team Badge */}
-        <div
-          className="px-5 flex items-center gap-3 shrink-0 border-r border-white/10 transition-colors max-w-[220px]"
-          style={{ background: theme.badgeBg || '#0f172a' }}
+      {/* ---------------------------------------------------- */}
+      {/* 3A. T20 EMERGING ASIA CUP THEME (Exact Screenshot Replica) */}
+      {/* ---------------------------------------------------- */}
+      {layoutStyle === 't20-asia-cup' ? (
+        <motion.div
+          initial={{ opacity: 0, y: 60 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: 'spring', damping: 24, stiffness: 220 }}
+          className="w-full max-w-[1260px] flex flex-col font-sans pointer-events-auto shadow-2xl overflow-hidden rounded-md"
         >
-          <div
-            className="w-11 h-11 rounded-full border-2 flex items-center justify-center font-black text-white text-base shadow-lg shrink-0"
-            style={{
-              borderColor: theme.primaryAccent || '#ffffff',
-              backgroundColor: battingTeam.primaryColor || 'rgba(0,0,0,0.6)'
-            }}
-          >
-            {battingTeam.shortName}
-          </div>
-          <div className="flex flex-col leading-tight min-w-0">
-            <span
-              className="font-black text-sm uppercase tracking-tight drop-shadow truncate"
-              style={{ color: theme.id === 'bbl_white' ? '#0f172a' : '#ffffff' }}
-            >
-              {battingTeam.fullName}
-            </span>
-            <span className="font-bold text-[11px] truncate" style={{ color: theme.primaryAccent }}>
-              v {bowlingTeam.shortName}
-            </span>
-          </div>
-        </div>
+          {/* Main Top White Bar */}
+          <div className="h-[74px] bg-white flex items-stretch relative border-t-2 border-b-2 border-cyan-400">
+            {/* Left Asia Cup Wings */}
+            <div className="w-16 h-full flex-shrink-0 flex items-center">
+              <AsiaCupLeftCyanWings className="w-full h-full" />
+            </div>
 
-        {/* Score Block */}
-        <div
-          className="px-5 flex flex-col justify-center border-r border-white/10 shrink-0"
-          style={{ background: theme.badgeBg ? `${theme.badgeBg}dd` : 'rgba(0,0,0,0.6)' }}
-        >
-          <div className="font-black text-3xl tracking-tight leading-none flex items-baseline gap-1">
-            <span style={{ color: theme.primaryAccent || (theme.id === 'bbl_white' ? '#0f172a' : '#ffffff') }}>{battingTeam.score}</span>
-            <span className="text-amber-400 text-2xl">-{battingTeam.wickets}</span>
-          </div>
-          <div
-            className="flex items-center justify-between text-[11px] font-black mt-1 gap-2"
-            style={{ color: theme.id === 'bbl_white' ? '#334155' : '#cbd5e1' }}
-          >
-            <span style={{ color: theme.primaryAccent || '#38bdf8' }}>{oversFormatted} OVS</span>
-            <span>CRR: {crr}</span>
-          </div>
-        </div>
-
-        {/* Batters Stats */}
-        <div
-          className="flex-1 px-4 flex flex-col justify-center border-r border-white/10 min-w-[200px] text-xs font-black"
-          style={{ background: theme.cardBg || (theme.id === 'bbl_white' ? '#f8fafc' : 'rgba(15, 23, 42, 0.85)') }}
-        >
-          {striker && (
-            <div className="flex items-center justify-between mb-0.5" style={{ color: theme.id === 'bbl_white' ? '#0f172a' : '#ffffff' }}>
-              <span className="truncate flex items-center gap-1.5 min-w-0">
-                <span className="w-2 h-2 rounded-full animate-pulse shrink-0" style={{ backgroundColor: theme.primaryAccent || '#34d399' }} />
-                <span className="truncate uppercase font-black">{striker.name}</span>
-              </span>
-              <span className="font-black text-sm ml-2 shrink-0" style={{ color: theme.primaryAccent || '#facc15' }}>
-                {striker.runs} <span className="text-xs font-bold opacity-75">({striker.balls})</span>
+            {/* Left Batting Team Name */}
+            <div className="px-4 flex items-center justify-center flex-shrink-0 min-w-[150px]">
+              <span className="font-black text-xl tracking-tight text-slate-950 uppercase">
+                {battingTeam.fullName || battingTeam.shortName}
               </span>
             </div>
-          )}
-          {nonStriker && (
-            <div className="flex items-center justify-between opacity-75 font-bold" style={{ color: theme.id === 'bbl_white' ? '#475569' : '#94a3b8' }}>
-              <span className="truncate uppercase pl-3.5 min-w-0">{nonStriker.name}</span>
-              <span className="text-xs ml-2 shrink-0">
-                {nonStriker.runs} <span className="text-[11px] opacity-75">({nonStriker.balls})</span>
+
+            {/* Center Dark Navy Shield Score Container */}
+            <div className="flex-shrink-0 relative flex flex-col items-center justify-center bg-[#000865] px-6 text-white min-w-[210px] rounded-b-2xl shadow-xl border-x border-[#ffc72c]">
+              <div className="font-black text-3xl tracking-tight leading-none flex items-baseline gap-2">
+                <span>{battingTeam.score} - {battingTeam.wickets}</span>
+                <span className="text-sm font-bold opacity-90 text-slate-200">{oversFormatted} ({matchDetails.totalOvers || 20})</span>
+              </div>
+              <div className="bg-[#00b4d8] text-slate-950 text-[11px] font-black px-4 py-0.5 rounded-full mt-1 uppercase tracking-wider">
+                {matchDetails.targetRuns ? `TARGET - ${matchDetails.targetRuns}` : `CRR: ${crr}`}
+              </div>
+            </div>
+
+            {/* Batters Information */}
+            <div className="flex-1 px-4 flex flex-col justify-center text-slate-950 font-bold min-w-[180px]">
+              {nonStriker && (
+                <div className="flex items-center justify-between text-sm py-0.5">
+                  <span className="truncate uppercase">{nonStriker.name}</span>
+                  <span className="font-black text-sm ml-2">{nonStriker.runs} <span className="font-medium opacity-75">{nonStriker.balls}</span></span>
+                </div>
+              )}
+              {striker && (
+                <div className="flex items-center justify-between text-sm py-0.5">
+                  <span className="truncate uppercase flex items-center gap-1.5 font-black">
+                    <span className="text-black text-xs">●</span>
+                    {striker.name}
+                  </span>
+                  <span className="font-black text-sm ml-2">{striker.runs} <span className="font-medium opacity-75">{striker.balls}</span></span>
+                </div>
+              )}
+            </div>
+
+            {/* Bowler & Over Balls Block (Yellow Background) */}
+            <div className="bg-[#ffc72c] px-4 flex flex-col justify-center flex-shrink-0 min-w-[230px] border-l-4 border-cyan-400 text-slate-950">
+              {currentBowler && (
+                <div className="flex items-center justify-between font-black text-sm mb-0.5">
+                  <span className="truncate uppercase">{currentBowler.name}</span>
+                  <span className="ml-2 font-black">{currentBowler.wickets}-{currentBowler.runsConceded} <span className="text-xs font-bold opacity-80">({currentBowler.overs}.{currentBowler.ballsInCurrentOver})</span></span>
+                </div>
+              )}
+              <div className="flex items-center gap-1.5 text-xs font-black">
+                <span className="uppercase tracking-wider text-[11px]">OVER</span>
+                <div className="flex items-center gap-1">
+                  {matchDetails.recentBalls.length > 0 ? (
+                    matchDetails.recentBalls.slice(-6).map((ball, idx) => (
+                      <span key={idx} className="w-5 h-5 rounded-full border border-slate-900 flex items-center justify-center font-black text-[10px] bg-white">
+                        {ball === '0' ? '●' : ball}
+                      </span>
+                    ))
+                  ) : (
+                    <span className="text-xs opacity-75">0 0 0 0 0 0</span>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Right Bowling Team Name */}
+            <div className="px-4 flex items-center justify-center flex-shrink-0 min-w-[150px]">
+              <span className="font-black text-xl tracking-tight text-slate-950 uppercase">
+                {bowlingTeam.fullName || bowlingTeam.shortName}
               </span>
             </div>
-          )}
-        </div>
 
-        {/* Center Event Banner / Tournament Title */}
-        <div
-          className="flex-1 px-4 flex items-center justify-center border-r border-white/10 text-center shadow-inner relative overflow-hidden min-w-[180px]"
-          style={{ background: theme.headerGradient || 'linear-gradient(90deg, #0f172a 0%, #1e293b 100%)' }}
-        >
-          <span className="text-white font-black text-sm tracking-wider uppercase drop-shadow-md z-10 whitespace-nowrap truncate max-w-[250px] px-1">
-            {matchDetails.customInputText || matchDetails.winnerMargin || matchDetails.tournament || theme.name}
-          </span>
-        </div>
+            {/* Right Asia Cup Yellow Wings */}
+            <div className="w-16 h-full flex-shrink-0 flex items-center">
+              <AsiaCupRightYellowWings className="w-full h-full" />
+            </div>
+          </div>
 
-        {/* Bowler Stats & Over-Ball Progress Dots */}
-        <div
-          className="px-4 flex flex-col justify-center border-r border-white/10 shrink-0 min-w-[210px] text-xs font-black shadow-inner"
-          style={{
-            background: layoutStyle === 'cricscorer-broadcast' || theme.id === 'asl26'
-              ? 'linear-gradient(180deg, #facc15 0%, #eab308 100%)'
-              : theme.badgeBg ? `${theme.badgeBg}dd` : 'rgba(0,0,0,0.6)',
-            color: (layoutStyle === 'cricscorer-broadcast' || theme.id === 'asl26' || theme.id === 'bbl_white') ? '#0f172a' : '#ffffff'
-          }}
+          {/* Bottom Deep Blue Ticker */}
+          <div className="h-6 bg-gradient-to-r from-[#000865] via-[#00127a] to-[#000865] flex items-center justify-center text-white text-xs font-black uppercase tracking-widest px-4">
+            <span>{matchDetails.customInputText || matchDetails.winnerMargin || `Fours ${totalFours}   Sixes ${totalSixes}`}</span>
+          </div>
+        </motion.div>
+      ) : layoutStyle === 'icc-navarasa' ? (
+        /* ---------------------------------------------------- */
+        /* 3B. ICC CRICKET WORLD CUP NAVARASA (Exact Replica)   */
+        /* ---------------------------------------------------- */
+        <motion.div
+          initial={{ opacity: 0, y: 60 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: 'spring', damping: 24, stiffness: 220 }}
+          className="w-full max-w-[1240px] flex flex-col font-sans pointer-events-auto shadow-2xl relative"
         >
-          {currentBowler && (
-            <div className="flex items-center justify-between mb-1">
-              <span
-                className="truncate uppercase font-black max-w-[110px]"
-                style={{ color: (layoutStyle === 'cricscorer-broadcast' || theme.id === 'asl26' || theme.id === 'bbl_white') ? '#0f172a' : '#cbd5e1' }}
-              >
-                {currentBowler.name}
-              </span>
-              <span
-                className="font-black text-sm shrink-0"
-                style={{ color: (layoutStyle === 'cricscorer-broadcast' || theme.id === 'asl26') ? '#000000' : theme.primaryAccent || '#facc15' }}
-              >
-                {currentBowler.wickets}-{currentBowler.runsConceded} <span className="text-xs font-bold opacity-75">({currentBowler.overs}.{currentBowler.ballsInCurrentOver})</span>
-              </span>
+          {/* Top Target Pill (if target exists) */}
+          {matchDetails.targetRuns && (
+            <div className="self-center -mb-2 z-10">
+              <div className="bg-[#20003b] text-white text-xs font-black px-6 py-1 rounded-t-lg tracking-wider uppercase border-t border-x border-pink-500 shadow-md">
+                TARGET - {matchDetails.targetRuns}
+              </div>
             </div>
           )}
-          {theme.showOverDots ? (
-            <OverProgressDots recentBalls={matchDetails.recentBalls} accentColor={(layoutStyle === 'cricscorer-broadcast' || theme.id === 'asl26') ? '#000000' : theme.primaryAccent} />
-          ) : (
-            <div className="flex items-center gap-1">
-              {matchDetails.recentBalls.slice(0, 6).map((ball, idx) => (
-                <span key={idx} className="w-5 h-5 rounded bg-slate-900 flex items-center justify-center font-black text-[10px] text-white">
-                  {ball}
+
+          <div className="h-[74px] bg-white flex items-stretch relative rounded-xl overflow-hidden shadow-2xl border border-white/40">
+            {/* Left Bowling / Batting Team Chevron Yellow */}
+            <div className="bg-[#ffd700] text-slate-950 font-black text-lg uppercase px-6 flex items-center justify-center min-w-[160px] shadow-md">
+              {battingTeam.fullName || battingTeam.shortName}
+            </div>
+
+            {/* Batters Box */}
+            <div className="px-4 flex flex-col justify-center text-[#20003b] font-black min-w-[180px] bg-white border-r border-slate-200">
+              {striker && (
+                <div className="flex items-center justify-between text-sm py-0.5">
+                  <span className="truncate uppercase flex items-center gap-1.5 text-[#e91e63]">
+                    <span>▶</span>
+                    <span className="text-[#20003b]">{striker.name}</span>
+                  </span>
+                  <span className="ml-2 font-black">{striker.runs} <span className="text-xs opacity-75 font-semibold">{striker.balls}</span></span>
+                </div>
+              )}
+              {nonStriker && (
+                <div className="flex items-center justify-between text-sm py-0.5 pl-3.5 opacity-85">
+                  <span className="truncate uppercase">{nonStriker.name}</span>
+                  <span className="ml-2 font-black">{nonStriker.runs} <span className="text-xs opacity-75 font-semibold">{nonStriker.balls}</span></span>
+                </div>
+              )}
+            </div>
+
+            {/* Center Purple Navarasa Match Status Shield */}
+            <div className="bg-[#20003b] text-white px-6 flex flex-col items-center justify-center min-w-[280px] shadow-inner relative">
+              <div className="flex items-center gap-2">
+                <span className="font-black text-sm uppercase tracking-wider">{battingTeam.shortName} v {bowlingTeam.shortName}</span>
+                <span className="bg-[#e91e63] text-white font-black text-base px-2.5 py-0.5 rounded-md shadow-md">
+                  {battingTeam.score}-{battingTeam.wickets}
                 </span>
-              ))}
+                <span className="bg-[#ffd700] text-slate-950 font-black text-xs px-1.5 py-0.5 rounded">P</span>
+                <span className="font-black text-sm">{oversFormatted}({matchDetails.totalOvers || 20})</span>
+              </div>
+              <div className="text-[11px] font-bold text-amber-300 uppercase tracking-wide mt-1">
+                {matchDetails.winnerMargin || matchDetails.customInputText || `${battingTeam.shortName} INNINGS`}
+              </div>
+            </div>
+
+            {/* Bowler Section */}
+            <div className="flex-1 px-4 flex flex-col justify-center text-[#20003b] font-black bg-white min-w-[220px]">
+              {currentBowler && (
+                <div className="flex items-center justify-between text-sm mb-1">
+                  <span className="truncate uppercase font-black">{currentBowler.name}</span>
+                  <span className="ml-2">{currentBowler.wickets} - {currentBowler.runsConceded} <span className="text-xs font-semibold opacity-75">{currentBowler.overs}</span></span>
+                </div>
+              )}
+              <div className="flex items-center gap-1.5">
+                {matchDetails.recentBalls.length > 0 ? (
+                  matchDetails.recentBalls.slice(-6).map((ball, idx) => {
+                    const isBoundary = ball === '4' || ball === '6';
+                    const isW = ball === 'W';
+                    return (
+                      <span
+                        key={idx}
+                        className={`w-5 h-5 rounded-full flex items-center justify-center font-black text-[10px] text-white shadow-sm ${
+                          isBoundary ? 'bg-[#e91e63]' : isW ? 'bg-red-600' : ball === '0' ? 'bg-slate-950' : 'bg-[#20003b]'
+                        }`}
+                      >
+                        {ball === '0' ? '●' : ball}
+                      </span>
+                    );
+                  })
+                ) : (
+                  <span className="text-xs opacity-75 font-semibold">0 0 0 0 0 0</span>
+                )}
+              </div>
+            </div>
+
+            {/* Right Bowling Team Blue Chevron */}
+            <div className="bg-[#00529b] text-white font-black text-lg uppercase px-6 flex items-center justify-center min-w-[160px] shadow-md">
+              {bowlingTeam.fullName || bowlingTeam.shortName}
+            </div>
+
+            {/* Navarasa Vertical Ribbon border on right */}
+            <div className="w-5 h-full flex-shrink-0">
+              <NavarasaVerticalRibbon className="w-full h-full" />
+            </div>
+          </div>
+        </motion.div>
+      ) : layoutStyle === 'super-fission' ? (
+        /* ---------------------------------------------------- */
+        /* 3C. SUPER FISSION NEON GREEN & MIDNIGHT THEME        */
+        /* ---------------------------------------------------- */
+        <motion.div
+          initial={{ opacity: 0, y: 60 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: 'spring', damping: 24, stiffness: 220 }}
+          className="w-full max-w-[1200px] flex flex-col font-sans pointer-events-auto shadow-2xl relative"
+        >
+          {matchDetails.targetRuns && (
+            <div className="self-start ml-28 -mb-2 z-10">
+              <div className="bg-[#09093b] text-[#00ff22] text-xs font-black px-5 py-1 rounded-t-lg tracking-wider uppercase border-t border-x border-[#00ff22]/50">
+                TARGET - {matchDetails.targetRuns}
+              </div>
             </div>
           )}
-        </div>
 
-        {/* Bowling Team Badge */}
-        <div
-          className="px-5 flex items-center justify-end gap-3 shrink-0 border-l border-white/10 transition-colors max-w-[220px]"
+          <div className="h-[68px] flex items-stretch gap-2 bg-transparent">
+            {/* Left Neon Green Pill */}
+            <div className="bg-[#00ff22] text-[#09093b] font-black text-lg uppercase px-8 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+              {battingTeam.fullName || battingTeam.shortName}
+            </div>
+
+            {/* Center Capsule */}
+            <div className="flex-1 bg-[#09093b] text-white rounded-full px-6 flex items-center justify-between border-2 border-white/20 shadow-2xl">
+              <div className="flex items-center gap-3">
+                <span className="text-[#00ff22] font-black text-sm uppercase">{battingTeam.shortName} V {bowlingTeam.shortName}</span>
+                <span className="bg-white text-[#09093b] font-black text-xl px-4 py-0.5 rounded-full shadow-inner">
+                  {battingTeam.score}-{battingTeam.wickets}
+                </span>
+                <span className="text-[#00ff22] font-black text-sm">{oversFormatted}/{matchDetails.totalOvers || 20} OVERS</span>
+              </div>
+
+              <div className="font-black text-sm tracking-wide text-white uppercase text-center truncate max-w-[320px]">
+                {matchDetails.winnerMargin || matchDetails.customInputText || `${battingTeam.fullName} BATTING`}
+              </div>
+            </div>
+
+            {/* Right Neon Green Pill */}
+            <div className="bg-[#00ff22] text-[#09093b] font-black text-lg uppercase px-8 rounded-full flex items-center justify-center shadow-lg border-2 border-white">
+              {bowlingTeam.fullName || bowlingTeam.shortName}
+            </div>
+          </div>
+        </motion.div>
+      ) : (
+        /* ---------------------------------------------------- */
+        /* 3D. STANDARD BROADCAST SCOREBUG                      */
+        /* ---------------------------------------------------- */
+        <motion.div
+          initial={{ opacity: 0, y: 60 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: 'spring', damping: 24, stiffness: 220 }}
+          className={`w-full max-w-[1180px] flex items-stretch h-[78px] shadow-2xl overflow-hidden font-sans pointer-events-auto transition-all duration-300 ${
+            layoutStyle === 'dual-capsule'
+              ? 'rounded-3xl border-2 bg-slate-950 text-white p-1 gap-1'
+              : layoutStyle === 'glass-box'
+              ? 'rounded-2xl border border-white/30 bg-slate-900/85 backdrop-blur-2xl text-white'
+              : layoutStyle === 'chevron'
+              ? 'rounded-xl border-l-8 border-r-8 bg-slate-950 text-white'
+              : layoutStyle === 'flat-bar'
+              ? 'rounded-lg border-t-4 bg-neutral-900 text-white'
+              : 'rounded-2xl border border-white/30 bg-slate-950 text-white'
+          }`}
           style={{
-            background: layoutStyle === 'cricscorer-broadcast' || theme.id === 'asl26'
-              ? 'linear-gradient(135deg, #eab308 0%, #ca8a04 100%)'
-              : theme.badgeBg || '#0f172a'
+            borderColor: theme.primaryAccent || 'rgba(255,255,255,0.3)',
+            boxShadow: `0 20px 50px -10px ${theme.primaryAccent ? theme.primaryAccent + '40' : 'rgba(0,0,0,0.5)'}`
           }}
         >
-          <div className="flex flex-col text-right leading-tight min-w-0">
-            <span
-              className="font-black text-sm uppercase tracking-tight drop-shadow truncate"
-              style={{ color: (layoutStyle === 'cricscorer-broadcast' || theme.id === 'asl26') ? '#0f172a' : '#ffffff' }}
+          {/* Batting Team Badge */}
+          <div
+            className="px-5 flex items-center gap-3 shrink-0 border-r border-white/10 transition-colors max-w-[220px]"
+            style={{ background: theme.badgeBg || '#0f172a' }}
+          >
+            <div
+              className="w-11 h-11 rounded-full border-2 flex items-center justify-center font-black text-white text-base shadow-lg shrink-0"
+              style={{
+                borderColor: theme.primaryAccent || '#ffffff',
+                backgroundColor: battingTeam.primaryColor || 'rgba(0,0,0,0.6)'
+              }}
             >
-              {bowlingTeam.fullName}
-            </span>
-            <span
-              className="font-bold text-[11px] truncate"
-              style={{ color: (layoutStyle === 'cricscorer-broadcast' || theme.id === 'asl26') ? '#000000' : theme.primaryAccent }}
+              {battingTeam.shortName}
+            </div>
+            <div className="flex flex-col leading-tight min-w-0">
+              <span
+                className="font-black text-sm uppercase tracking-tight drop-shadow truncate"
+                style={{ color: theme.id === 'bbl_white' ? '#0f172a' : '#ffffff' }}
+              >
+                {battingTeam.fullName}
+              </span>
+              <span className="font-bold text-[11px] truncate" style={{ color: theme.primaryAccent }}>
+                v {bowlingTeam.shortName}
+              </span>
+            </div>
+          </div>
+
+          {/* Score Block */}
+          <div
+            className="px-5 flex flex-col justify-center border-r border-white/10 shrink-0"
+            style={{ background: theme.badgeBg ? `${theme.badgeBg}dd` : 'rgba(0,0,0,0.6)' }}
+          >
+            <div className="font-black text-3xl tracking-tight leading-none flex items-baseline gap-1">
+              <span style={{ color: theme.primaryAccent || (theme.id === 'bbl_white' ? '#0f172a' : '#ffffff') }}>{battingTeam.score}</span>
+              <span className="text-amber-400 text-2xl">-{battingTeam.wickets}</span>
+            </div>
+            <div
+              className="flex items-center justify-between text-[11px] font-black mt-1 gap-2"
+              style={{ color: theme.id === 'bbl_white' ? '#334155' : '#cbd5e1' }}
             >
-              BOWLING
+              <span style={{ color: theme.primaryAccent || '#38bdf8' }}>{oversFormatted} OVS</span>
+              <span>CRR: {crr}</span>
+            </div>
+          </div>
+
+          {/* Batters Stats */}
+          <div
+            className="flex-1 px-4 flex flex-col justify-center border-r border-white/10 min-w-[200px] text-xs font-black"
+            style={{ background: theme.cardBg || (theme.id === 'bbl_white' ? '#f8fafc' : 'rgba(15, 23, 42, 0.85)') }}
+          >
+            {striker && (
+              <div className="flex items-center justify-between mb-0.5" style={{ color: theme.id === 'bbl_white' ? '#0f172a' : '#ffffff' }}>
+                <span className="truncate flex items-center gap-1.5 min-w-0">
+                  <span className="w-2 h-2 rounded-full animate-pulse shrink-0" style={{ backgroundColor: theme.primaryAccent || '#34d399' }} />
+                  <span className="truncate uppercase font-black">{striker.name}</span>
+                </span>
+                <span className="font-black text-sm ml-2 shrink-0" style={{ color: theme.primaryAccent || '#facc15' }}>
+                  {striker.runs} <span className="text-xs font-bold opacity-75">({striker.balls})</span>
+                </span>
+              </div>
+            )}
+            {nonStriker && (
+              <div className="flex items-center justify-between opacity-75 font-bold" style={{ color: theme.id === 'bbl_white' ? '#475569' : '#94a3b8' }}>
+                <span className="truncate uppercase pl-3.5 min-w-0">{nonStriker.name}</span>
+                <span className="text-xs ml-2 shrink-0">
+                  {nonStriker.runs} <span className="text-[11px] opacity-75">({nonStriker.balls})</span>
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Center Event Banner / Tournament Title */}
+          <div
+            className="flex-1 px-4 flex items-center justify-center border-r border-white/10 text-center shadow-inner relative overflow-hidden min-w-[180px]"
+            style={{ background: theme.headerGradient || 'linear-gradient(90deg, #0f172a 0%, #1e293b 100%)' }}
+          >
+            <span className="text-white font-black text-sm tracking-wider uppercase drop-shadow-md z-10 whitespace-nowrap truncate max-w-[250px] px-1">
+              {matchDetails.customInputText || matchDetails.winnerMargin || matchDetails.tournament || theme.name}
             </span>
           </div>
+
+          {/* Bowler Stats & Over-Ball Progress Dots */}
           <div
-            className="w-11 h-11 rounded-full border-2 flex items-center justify-center font-black text-white text-base shadow-lg shrink-0"
+            className="px-4 flex flex-col justify-center border-r border-white/10 shrink-0 min-w-[210px] text-xs font-black shadow-inner"
             style={{
-              borderColor: '#ffffff',
-              backgroundColor: bowlingTeam.primaryColor || 'rgba(0,0,0,0.6)'
+              background: layoutStyle === 'cricscorer-broadcast' || theme.id === 'asl26'
+                ? 'linear-gradient(180deg, #facc15 0%, #eab308 100%)'
+                : theme.badgeBg ? `${theme.badgeBg}dd` : 'rgba(0,0,0,0.6)',
+              color: (layoutStyle === 'cricscorer-broadcast' || theme.id === 'asl26' || theme.id === 'bbl_white') ? '#0f172a' : '#ffffff'
             }}
           >
-            {bowlingTeam.shortName}
+            {currentBowler && (
+              <div className="flex items-center justify-between mb-1">
+                <span
+                  className="truncate uppercase font-black max-w-[110px]"
+                  style={{ color: (layoutStyle === 'cricscorer-broadcast' || theme.id === 'asl26' || theme.id === 'bbl_white') ? '#0f172a' : '#cbd5e1' }}
+                >
+                  {currentBowler.name}
+                </span>
+                <span
+                  className="font-black text-sm shrink-0"
+                  style={{ color: (layoutStyle === 'cricscorer-broadcast' || theme.id === 'asl26') ? '#000000' : theme.primaryAccent || '#facc15' }}
+                >
+                  {currentBowler.wickets}-{currentBowler.runsConceded} <span className="text-xs font-bold opacity-75">({currentBowler.overs}.{currentBowler.ballsInCurrentOver})</span>
+                </span>
+              </div>
+            )}
+            {theme.showOverDots ? (
+              <OverProgressDots recentBalls={matchDetails.recentBalls} accentColor={(layoutStyle === 'cricscorer-broadcast' || theme.id === 'asl26') ? '#000000' : theme.primaryAccent} />
+            ) : (
+              <div className="flex items-center gap-1">
+                {matchDetails.recentBalls.slice(0, 6).map((ball, idx) => (
+                  <span key={idx} className="w-5 h-5 rounded bg-slate-900 flex items-center justify-center font-black text-[10px] text-white">
+                    {ball}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
-        </div>
-      </motion.div>
+
+          {/* Bowling Team Badge */}
+          <div
+            className="px-5 flex items-center justify-end gap-3 shrink-0 border-l border-white/10 transition-colors max-w-[220px]"
+            style={{
+              background: layoutStyle === 'cricscorer-broadcast' || theme.id === 'asl26'
+                ? 'linear-gradient(135deg, #eab308 0%, #ca8a04 100%)'
+                : theme.badgeBg || '#0f172a'
+            }}
+          >
+            <div className="flex flex-col text-right leading-tight min-w-0">
+              <span
+                className="font-black text-sm uppercase tracking-tight drop-shadow truncate"
+                style={{ color: (layoutStyle === 'cricscorer-broadcast' || theme.id === 'asl26') ? '#0f172a' : '#ffffff' }}
+              >
+                {bowlingTeam.fullName}
+              </span>
+              <span
+                className="font-bold text-[11px] truncate"
+                style={{ color: (layoutStyle === 'cricscorer-broadcast' || theme.id === 'asl26') ? '#000000' : theme.primaryAccent }}
+              >
+                BOWLING
+              </span>
+            </div>
+            <div
+              className="w-11 h-11 rounded-full border-2 flex items-center justify-center font-black text-white text-base shadow-lg shrink-0"
+              style={{
+                borderColor: '#ffffff',
+                backgroundColor: bowlingTeam.primaryColor || 'rgba(0,0,0,0.6)'
+              }}
+            >
+              {bowlingTeam.shortName}
+            </div>
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 };
+
 

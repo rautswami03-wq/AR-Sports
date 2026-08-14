@@ -1,17 +1,57 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Rajdhani:wght@500;600;700&family=Bebas+Neue&display=swap');
 @import "tailwindcss";
 
-html,
-body,
-#root {
+/* ================================================
+   AR SPORTS PRO — PREMIUM BROADCAST STUDIO DESIGN
+   ================================================ */
+
+:root {
+  /* Core palette */
+  --bg-void: #020408;
+  --bg-deep: #070c16;
+  --bg-panel: #0c1220;
+  --bg-panel-alt: #101826;
+  --bg-surface: #141e2e;
+  --bg-surface-alt: #1a2438;
+  --bg-raised: #1e293b;
+  --border-subtle: rgba(255,255,255,0.06);
+  --border-medium: rgba(255,255,255,0.12);
+  --border-accent: rgba(56,189,248,0.3);
+
+  /* Brand accents */
+  --accent-cyan: #06b6d4;
+  --accent-amber: #f59e0b;
+  --accent-emerald: #10b981;
+  --accent-rose: #f43f5e;
+  --accent-purple: #8b5cf6;
+  --accent-red: #ef4444;
+
+  /* Glow shadows */
+  --glow-cyan: 0 0 20px rgba(6,182,212,0.4);
+  --glow-amber: 0 0 20px rgba(245,158,11,0.4);
+  --glow-emerald: 0 0 20px rgba(16,185,129,0.4);
+  --glow-rose: 0 0 20px rgba(244,63,94,0.4);
+
+  /* Typography */
+  --font-display: 'Bebas Neue', 'Rajdhani', sans-serif;
+  --font-ui: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-score: 'Rajdhani', 'Inter', sans-serif;
+}
+
+html, body, #root {
   width: 100%;
   min-height: 100vh;
   margin: 0;
+  padding: 0;
   overflow-x: hidden;
-  background: transparent !important;
-  background-color: transparent !important;
-  font-family: Inter, sans-serif;
+  background: var(--bg-deep) !important;
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  user-select: none;
 }
 
+/* Overlay mode — transparent bg for OBS */
 body.overlay-mode,
 html.overlay-mode,
 #root.overlay-mode {
@@ -26,6 +66,75 @@ html.overlay-mode,
   height: 1080px;
 }
 
+/* ================================================
+   CUSTOM SCROLLBAR
+   ================================================ */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--bg-void); }
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #06b6d4, #8b5cf6);
+  border-radius: 6px;
+}
+::-webkit-scrollbar-thumb:hover { background: #06b6d4; }
+
+/* ================================================
+   GLASS PANELS
+   ================================================ */
+.glass {
+  background: rgba(12, 18, 32, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border-subtle);
+}
+
+.glass-strong {
+  background: rgba(7, 12, 22, 0.95);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--border-medium);
+  box-shadow: 0 25px 60px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.08);
+}
+
+.glass-accent {
+  background: rgba(6, 182, 212, 0.06);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(6,182,212,0.2);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 0 24px rgba(6,182,212,0.04);
+}
+
+/* ================================================
+   PREMIUM PANEL
+   ================================================ */
+.studio-panel {
+  background: linear-gradient(145deg, var(--bg-panel) 0%, var(--bg-deep) 100%);
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+  border-radius: 16px;
+}
+
+.studio-panel-accent {
+  background: linear-gradient(145deg, rgba(6,182,212,0.08) 0%, var(--bg-panel) 100%);
+  border: 1px solid rgba(6,182,212,0.25);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.5), 0 0 40px rgba(6,182,212,0.04), inset 0 1px 0 rgba(255,255,255,0.06);
+  border-radius: 16px;
+}
+
+/* ================================================
+   BROADCAST CANVAS (OBS OVERLAY SIZE)
+   ================================================ */
+.broadcast-canvas {
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  background: transparent;
+  transform-origin: top left;
+  will-change: transform;
+}
+
+/* ================================================
+   SCORE BUG BASE (legacy override)
+   ================================================ */
 .scorebug {
   position: absolute;
   bottom: 40px;
@@ -39,13 +148,194 @@ html.overlay-mode,
   color: white;
 }
 
-.team {
-  display: flex;
-  align-items: center;
-  gap: 15px;
+.team { display: flex; align-items: center; gap: 15px; }
+.team img { width: 55px; height: 55px; }
+
+/* ================================================
+   PREMIUM BUTTON VARIANTS
+   ================================================ */
+.btn-score {
+  position: relative;
+  overflow: hidden;
+  font-family: var(--font-score);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  transition: all 0.12s ease;
+}
+.btn-score::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255,255,255,0.12) 0%, transparent 60%);
+  pointer-events: none;
+}
+.btn-score:active { transform: scale(0.94); }
+
+.btn-run-4 {
+  background: linear-gradient(135deg, #d97706, #f59e0b, #fbbf24);
+  box-shadow: 0 4px 20px rgba(245,158,11,0.5), inset 0 1px 0 rgba(255,255,255,0.3);
+  color: #0c1220;
+}
+.btn-run-6 {
+  background: linear-gradient(135deg, #7c3aed, #8b5cf6, #a78bfa);
+  box-shadow: 0 4px 20px rgba(139,92,246,0.5), inset 0 1px 0 rgba(255,255,255,0.2);
+  color: white;
+}
+.btn-run-0 {
+  background: linear-gradient(135deg, #1e293b, #273449);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
+  color: #94a3b8;
+}
+.btn-run-normal {
+  background: linear-gradient(135deg, #1e3a5f, #1e4976);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
+  color: #e2e8f0;
 }
 
-.team img {
-  width: 55px;
-  height: 55px;
+/* ================================================
+   LIVE INDICATOR PULSE
+   ================================================ */
+.live-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #10b981;
+  animation: live-pulse 2s ease-in-out infinite;
 }
+
+@keyframes live-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0.7); }
+  50% { box-shadow: 0 0 0 6px rgba(16,185,129,0); }
+}
+
+/* ================================================
+   SECTION LABEL DIVIDER
+   ================================================ */
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: #475569;
+}
+.section-label::before,
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+}
+
+/* ================================================
+   OVERLAY TOGGLE BUTTON (active glow)
+   ================================================ */
+.overlay-btn {
+  position: relative;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: all 0.15s ease;
+  border-radius: 8px;
+}
+
+.overlay-btn.active::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+  z-index: -1;
+}
+
+/* ================================================
+   BROADCAST TEXT GRADIENTS
+   ================================================ */
+.text-broadcast-gold {
+  background: linear-gradient(180deg, #FFFFFF 0%, #FDE047 60%, #EAB308 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));
+}
+.text-broadcast-silver {
+  background: linear-gradient(180deg, #FFFFFF 0%, #E2E8F0 50%, #94A3B8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.text-broadcast-crimson {
+  background: linear-gradient(180deg, #FFFFFF 0%, #FCA5A5 50%, #EF4444 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 6px rgba(225,29,72,0.6));
+}
+
+/* ================================================
+   ANIMATIONS
+   ================================================ */
+@keyframes sheen-sweep {
+  0% { transform: translateX(-100%) skewX(-25deg); }
+  100% { transform: translateX(200%) skewX(-25deg); }
+}
+.animate-sheen { position: relative; overflow: hidden; }
+.animate-sheen::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 40%; height: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.18) 50%, transparent 100%);
+  animation: sheen-sweep 3.5s infinite linear;
+}
+
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 15px rgba(56,189,248,0.4); }
+  50% { box-shadow: 0 0 40px rgba(56,189,248,0.8); }
+}
+.glow-pulse-blue { animation: glow-pulse 2s infinite ease-in-out; }
+
+@keyframes float-up {
+  0% { opacity: 0; transform: translateY(8px) scale(0.96); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.animate-float-up { animation: float-up 0.25s ease forwards; }
+
+/* ================================================
+   SCORE DISPLAY TYPOGRAPHY
+   ================================================ */
+.score-number {
+  font-family: var(--font-score);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ================================================
+   INPUT PREMIUM STYLE
+   ================================================ */
+.studio-input {
+  background: rgba(2, 4, 8, 0.8);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
+  color: #e2e8f0;
+  font-weight: 600;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.studio-input:focus {
+  outline: none;
+  border-color: rgba(6,182,212,0.5);
+  box-shadow: 0 0 0 3px rgba(6,182,212,0.12);
+}
+
+/* ================================================
+   TEAM COLOR SWATCH
+   ================================================ */
+.team-swatch {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 2px solid rgba(255,255,255,0.2);
+  cursor: pointer;
+  transition: transform 0.15s;
+}
+.team-swatch:hover { transform: scale(1.1); }

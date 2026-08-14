@@ -243,7 +243,7 @@ export const TourMatchPage: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-[#070b15] text-slate-100 font-sans pb-32 overflow-y-auto w-full">
+    <div style={{ minHeight: "100vh", background: "linear-gradient(180deg, #020408 0%, #070c16 100%)", color: "#f1f5f9", fontFamily: "Inter, sans-serif", overflowY: "auto", paddingBottom: "80px" }}>
       <CricNavbar />
 
       {/* Floating OBS Broadcast Confirmation Toast Popup */}
@@ -253,7 +253,7 @@ export const TourMatchPage: React.FC = () => {
             initial={{ opacity: 0, y: -40, scale: 0.9 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -40, scale: 0.9 }}
-            className="fixed top-20 z-50 bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-500 text-slate-950 px-8 py-3.5 rounded-2xl shadow-[0_0_50px_rgba(16,185,129,0.9)] border-2 border-white font-black text-sm uppercase tracking-wider flex items-center gap-3 drop-shadow-2xl"
+            style={{ position: "fixed", top: "72px", left: "50%", transform: "translateX(-50%)", zIndex: 60, background: "linear-gradient(135deg, #059669, #10b981)", border: "1px solid rgba(255,255,255,0.25)", borderRadius: "12px", padding: "12px 24px", display: "flex", alignItems: "center", gap: "10px", boxShadow: "0 8px 40px rgba(16,185,129,0.6)", color: "#fff", fontSize: "13px", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase" }}
           >
             <CheckCircle2 className="w-6 h-6 text-slate-950 animate-pulse" />
             <span>⚡ OBS BROADCAST UPDATED! OVERLAY SYNC ACTIVE</span>
@@ -262,7 +262,7 @@ export const TourMatchPage: React.FC = () => {
       </AnimatePresence>
 
       {/* Main Content */}
-      <main className="max-w-5xl mx-auto py-8 px-4 flex flex-col items-center">
+      <main style={{ maxWidth: "920px", margin: "0 auto", padding: "28px 16px 60px", display: "flex", flexDirection: "column", alignItems: "stretch" }}>
         {/* Workflow Progress Breadcrumb Bar */}
         <div className="w-full bg-slate-900 border border-slate-800 p-4 rounded-2xl shadow-xl mb-8 flex flex-wrap items-center justify-between gap-3 text-xs font-black uppercase">
           <div className="flex items-center gap-2">
@@ -332,7 +332,7 @@ export const TourMatchPage: React.FC = () => {
         </div>
 
         {/* Versus Match Banner */}
-        <div className="w-full bg-gradient-to-r from-cyan-500 via-sky-600 to-cyan-500 text-slate-950 p-6 rounded-3xl border-4 border-cyan-300 shadow-[0_0_50px_rgba(6,182,212,0.6)] flex flex-col items-center gap-4 mb-8 text-center">
+        <div style={{ background: "linear-gradient(145deg, #0c1220, #070c16)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", padding: "20px 22px", marginBottom: "20px", display: "flex", flexDirection: "column", alignItems: "center", gap: "12px" }}>
           <div className="flex items-center justify-between w-full gap-4">
             <h2 className="text-xl md:text-3xl font-black uppercase tracking-tight flex-1 truncate text-slate-950">
               {teamA.fullName}

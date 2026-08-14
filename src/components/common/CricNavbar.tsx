@@ -1,9 +1,10 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Home, Radio, Tv, Palette, Trophy } from 'lucide-react';
+import { Home, Radio, Tv, Palette, Trophy, Wifi, WifiOff } from 'lucide-react';
 
 export const CricNavbar: React.FC = () => {
   const location = useLocation();
+  const isCloud = typeof window !== 'undefined' && window.location.protocol === 'https:';
 
   const isActive = (path: string) => {
     if (path === '/' && (location.pathname === '/' || location.pathname === '/home')) return true;
@@ -11,61 +12,127 @@ export const CricNavbar: React.FC = () => {
   };
 
   return (
-    <header className="bg-[#0b1329] border-b border-slate-800 px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 shadow-2xl sticky top-0 z-50">
-      <div className="flex items-center gap-6">
-        <Link to="/" className="text-3xl font-black tracking-tight text-emerald-400 flex items-center gap-1.5 drop-shadow group">
-          <Radio className="w-6 h-6 text-amber-400 animate-pulse group-hover:scale-110 transition-transform" />
-          <span>AR Sports</span>
-          <span className="text-cyan-400 font-extrabold italic">PRO</span>
+    <header
+      style={{
+        background: 'linear-gradient(180deg, rgba(7,12,22,0.98) 0%, rgba(7,12,22,0.95) 100%)',
+        borderBottom: '1px solid rgba(255,255,255,0.07)',
+        boxShadow: '0 4px 40px rgba(0,0,0,0.6)',
+      }}
+      className="px-5 py-0 flex items-center justify-between gap-4 sticky top-0 z-50 h-14"
+    >
+      {/* Left: Logo + Nav */}
+      <div className="flex items-center gap-8">
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-2.5 group">
+          <div
+            style={{
+              background: 'linear-gradient(135deg, #06b6d4, #8b5cf6)',
+              borderRadius: '8px',
+              padding: '5px',
+              boxShadow: '0 0 16px rgba(6,182,212,0.4)',
+            }}
+            className="flex items-center justify-center"
+          >
+            <Radio className="w-4 h-4 text-white" />
+          </div>
+          <div className="flex items-baseline gap-1">
+            <span
+              style={{
+                fontFamily: "'Rajdhani', sans-serif",
+                fontWeight: 700,
+                fontSize: '20px',
+                letterSpacing: '-0.01em',
+                color: '#f1f5f9',
+              }}
+            >
+              AR Sports
+            </span>
+            <span
+              style={{
+                fontFamily: "'Rajdhani', sans-serif",
+                fontWeight: 700,
+                fontSize: '13px',
+                background: 'linear-gradient(135deg, #06b6d4, #8b5cf6)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                letterSpacing: '0.08em',
+              }}
+            >
+              PRO
+            </span>
+          </div>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-6 font-bold text-sm text-slate-300">
-          <Link
-            to="/"
-            className={`flex items-center gap-1.5 transition-all ${
-              location.pathname === '/' || location.pathname === '/home'
-                ? 'text-cyan-400 border-b-2 border-cyan-400 pb-1 font-extrabold'
-                : 'hover:text-cyan-300'
-            }`}
-          >
-            <Home className="w-4 h-4 text-emerald-400" /> Home
-          </Link>
-          <Link
-            to="/tournament"
-            className={`flex items-center gap-1.5 transition-all ${
-              isActive('/tournament') || isActive('/matches') || isActive('/match')
-                ? 'text-cyan-400 border-b-2 border-cyan-400 pb-1 font-extrabold'
-                : 'hover:text-cyan-300'
-            }`}
-          >
-            <Trophy className="w-4 h-4 text-amber-400" /> Tournaments & Matches
-          </Link>
-          <Link
-            to="/theme_links"
-            className={`flex items-center gap-1.5 transition-all ${
-              isActive('/theme_links') ? 'text-cyan-400 border-b-2 border-cyan-400 pb-1 font-extrabold' : 'hover:text-cyan-300'
-            }`}
-          >
-            <Palette className="w-4 h-4 text-purple-400" /> Scoreboard Links
-          </Link>
-          <Link
-            to="/overlay"
+        {/* Nav links */}
+        <nav className="hidden md:flex items-center gap-1">
+          {[
+            { to: '/', label: 'Home', icon: <Home className="w-3.5 h-3.5" />, match: (p: string) => p === '/' || p === '/home' },
+            {
+              to: '/tournament',
+              label: 'Tournaments',
+              icon: <Trophy className="w-3.5 h-3.5" />,
+              match: (p: string) => p.startsWith('/tournament') || p.startsWith('/match'),
+            },
+            {
+              to: '/theme_links',
+              label: 'Overlay Links',
+              icon: <Palette className="w-3.5 h-3.5" />,
+              match: (p: string) => p.startsWith('/theme_links'),
+            },
+          ].map(({ to, label, icon, match }) => {
+            const active = match(location.pathname);
+            return (
+              <Link
+                key={to}
+                to={to}
+                className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all duration-150"
+                style={{
+                  color: active ? '#06b6d4' : '#94a3b8',
+                  background: active ? 'rgba(6,182,212,0.1)' : 'transparent',
+                  border: `1px solid ${active ? 'rgba(6,182,212,0.25)' : 'transparent'}`,
+                  letterSpacing: '0.02em',
+                }}
+              >
+                {icon} {label}
+              </Link>
+            );
+          })}
+
+          {/* OBS View — external */}
+          <a
+            href="#/overlay"
             target="_blank"
-            className="flex items-center gap-1.5 text-sky-400 hover:text-sky-300 transition-all"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all duration-150"
+            style={{
+              color: '#818cf8',
+              border: '1px solid transparent',
+            }}
           >
-            <Tv className="w-4 h-4" /> OBS View ↗
-          </Link>
+            <Tv className="w-3.5 h-3.5" /> OBS View ↗
+          </a>
         </nav>
       </div>
 
-
-
+      {/* Right: Status pill */}
       <div className="flex items-center gap-3">
-        <div className="bg-emerald-500/10 border border-emerald-400/40 text-emerald-300 px-3 py-1.5 rounded-md text-xs font-semibold flex items-center gap-1.5 font-mono">
-          <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
-          {typeof window !== 'undefined' && window.location.protocol === 'https:'
-            ? 'Cloud Sync'
-            : 'Local Sync'}
+        <div
+          className="flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold"
+          style={{
+            background: isCloud ? 'rgba(16,185,129,0.08)' : 'rgba(245,158,11,0.08)',
+            border: `1px solid ${isCloud ? 'rgba(16,185,129,0.25)' : 'rgba(245,158,11,0.25)'}`,
+            color: isCloud ? '#34d399' : '#fbbf24',
+          }}
+        >
+          <span
+            className="w-1.5 h-1.5 rounded-full"
+            style={{
+              background: isCloud ? '#10b981' : '#f59e0b',
+              boxShadow: isCloud ? '0 0 6px #10b981' : '0 0 6px #f59e0b',
+              animation: 'live-pulse 2s ease-in-out infinite',
+            }}
+          />
+          {isCloud ? 'Cloud Sync' : 'Local Sync'}
         </div>
       </div>
     </header>

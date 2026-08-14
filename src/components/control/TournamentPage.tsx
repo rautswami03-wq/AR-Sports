@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Plus, Trash2, Link as LinkIcon, Info } from 'lucide-react';
+import { Plus, Trash2, Link as LinkIcon, ChevronRight, Trophy, Calendar, Users } from 'lucide-react';
 import { CricNavbar } from '../common/CricNavbar';
-import { useBroadcastStore } from '../../store/useBroadcastStore';
 
 export interface TournamentItem {
   id: string;
@@ -73,7 +72,6 @@ export const TournamentPage: React.FC = () => {
     saveTournaments(updatedList);
     setShowCreateModal(false);
     setNewTourName('');
-
     navigate(`/tournament/${newItem.id}`);
   };
 
@@ -82,62 +80,168 @@ export const TournamentPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#070b15] text-slate-100 font-sans pb-20">
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(180deg, #020408 0%, #070c16 100%)', color: '#f1f5f9' }}>
       <CricNavbar />
 
-      <main className="max-w-4xl mx-auto py-10 px-4 flex flex-col items-center">
-        {/* Quick Nav Links */}
-        <div className="flex items-center gap-12 mb-10 text-xl font-black uppercase tracking-wider">
-          <Link
-            to="/theme_links"
-            className="text-cyan-400 hover:text-cyan-300 border-b-2 border-cyan-400 pb-1 flex items-center gap-2"
-          >
-            SCOREBOARD LINKS
-          </Link>
-          <span className="text-cyan-400 border-b-2 border-cyan-400 pb-1">
-            ALL DELETED TOURNAMENTS
-          </span>
+      <main style={{ maxWidth: '860px', margin: '0 auto', padding: '40px 20px 80px' }}>
+
+        {/* Page Header */}
+        <div style={{ marginBottom: '36px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
+            <div style={{
+              width: '3px', height: '28px',
+              background: 'linear-gradient(180deg, #06b6d4, #8b5cf6)',
+              borderRadius: '2px',
+            }} />
+            <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.18em', color: '#475569', textTransform: 'uppercase' }}>
+              Broadcast Studio
+            </span>
+          </div>
+          <h1 style={{
+            fontFamily: "'Rajdhani', sans-serif",
+            fontWeight: 700,
+            fontSize: '42px',
+            letterSpacing: '-0.01em',
+            color: '#f1f5f9',
+            lineHeight: 1,
+            marginBottom: '8px',
+          }}>
+            Tournaments
+          </h1>
+          <p style={{ fontSize: '13px', color: '#64748b', fontWeight: 500 }}>
+            Create and manage tournaments. Click a tournament to set up matches and go live.
+          </p>
         </div>
 
-        {/* Page Title */}
-        <h1 className="text-5xl font-black uppercase text-red-600 drop-shadow-[0_2px_10px_rgba(239,68,68,0.6)] mb-8">
-          Tournament
-        </h1>
+        {/* Top bar: Nav + Create Button */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '28px', gap: '12px', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <Link
+              to="/theme_links"
+              style={{
+                display: 'flex', alignItems: 'center', gap: '6px',
+                padding: '8px 14px', borderRadius: '8px',
+                background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.25)',
+                color: '#a78bfa', fontSize: '12px', fontWeight: 600,
+                textDecoration: 'none', letterSpacing: '0.04em',
+                transition: 'all 0.15s',
+              }}
+            >
+              <LinkIcon style={{ width: '13px', height: '13px' }} /> Overlay Links
+            </Link>
+          </div>
 
-        {/* Green Glow CREATE TOURNAMENT Button (Screenshot 1) */}
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="bg-gradient-to-r from-teal-500 via-emerald-500 to-cyan-500 hover:from-teal-400 hover:to-cyan-400 text-white font-black text-sm px-10 py-3 rounded-2xl shadow-[0_0_35px_rgba(16,185,129,0.7)] border border-emerald-300/40 uppercase tracking-widest transition-all transform hover:scale-105 mb-12"
-        >
-          CREATE TOURNAMENT
-        </button>
+          <button
+            onClick={() => setShowCreateModal(true)}
+            style={{
+              display: 'flex', alignItems: 'center', gap: '7px',
+              padding: '10px 20px',
+              background: 'linear-gradient(135deg, #0891b2, #06b6d4)',
+              border: '1px solid rgba(6,182,212,0.4)',
+              borderRadius: '10px',
+              color: '#fff',
+              fontSize: '13px',
+              fontWeight: 700,
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+              cursor: 'pointer',
+              boxShadow: '0 4px 20px rgba(6,182,212,0.3)',
+              transition: 'all 0.15s',
+            }}
+          >
+            <Plus style={{ width: '15px', height: '15px' }} /> New Tournament
+          </button>
+        </div>
 
-        {/* Tournament Cards List (Screenshot 1) */}
-        <div className="w-full space-y-5">
-          {tournaments.map((tour) => (
+        {/* Tournament Cards */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {tournaments.length === 0 && (
+            <div style={{
+              textAlign: 'center', padding: '60px 20px',
+              background: 'rgba(12,18,32,0.6)',
+              border: '1px dashed rgba(255,255,255,0.08)',
+              borderRadius: '16px',
+              color: '#475569',
+            }}>
+              <Trophy style={{ width: '40px', height: '40px', margin: '0 auto 12px', color: '#334155' }} />
+              <p style={{ fontWeight: 600, fontSize: '14px' }}>No tournaments yet</p>
+              <p style={{ fontSize: '12px', marginTop: '4px' }}>Click "New Tournament" to create your first one</p>
+            </div>
+          )}
+
+          {tournaments.map((tour, idx) => (
             <div
               key={tour.id}
-              className="bg-gradient-to-r from-cyan-500 via-indigo-600 to-purple-600 p-6 rounded-3xl border border-white/20 shadow-2xl flex items-center justify-between gap-4"
+              style={{
+                background: 'linear-gradient(135deg, rgba(14,20,36,0.95) 0%, rgba(10,15,28,0.98) 100%)',
+                border: '1px solid rgba(255,255,255,0.07)',
+                borderRadius: '14px',
+                padding: '20px 22px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '16px',
+                boxShadow: '0 2px 20px rgba(0,0,0,0.4)',
+                transition: 'border-color 0.15s, box-shadow 0.15s',
+                position: 'relative',
+                overflow: 'hidden',
+              }}
             >
-              <div>
-                <h3 className="text-white text-xl md:text-2xl font-black uppercase tracking-wide drop-shadow-md">
-                  {tour.name}
-                </h3>
-                <p className="text-[11px] font-bold text-slate-200 mt-1 uppercase tracking-wider opacity-80">
-                  Click TOUR PAGE to view & create matches
-                </p>
+              {/* Left accent bar */}
+              <div style={{
+                position: 'absolute', left: 0, top: 0, bottom: 0,
+                width: '3px',
+                background: `linear-gradient(180deg, ${idx % 3 === 0 ? '#06b6d4, #0284c7' : idx % 3 === 1 ? '#8b5cf6, #7c3aed' : '#10b981, #059669'})`,
+                borderRadius: '14px 0 0 14px',
+              }} />
+
+              <div style={{ paddingLeft: '12px', flex: 1, minWidth: 0 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                  <Trophy style={{ width: '14px', height: '14px', color: '#f59e0b', flexShrink: 0 }} />
+                  <h3 style={{
+                    fontFamily: "'Rajdhani', sans-serif",
+                    fontSize: '18px', fontWeight: 700,
+                    color: '#f1f5f9',
+                    letterSpacing: '0.01em',
+                    textTransform: 'uppercase',
+                    whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                  }}>
+                    {tour.name}
+                  </h3>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: '#64748b', fontWeight: 600 }}>
+                    <Users style={{ width: '11px', height: '11px' }} />
+                    {tour.teamA} <span style={{ color: '#334155' }}>vs</span> {tour.teamB}
+                  </span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', color: '#475569', fontWeight: 500 }}>
+                    <Calendar style={{ width: '11px', height: '11px' }} />
+                    {tour.createdAt}
+                  </span>
+                </div>
               </div>
 
-              <div className="flex items-center gap-3">
-                {/* Purple TOUR PAGE Button */}
+              {/* Actions */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexShrink: 0 }}>
                 <Link
                   to={`/tournament/${tour.id}`}
-                  className="bg-purple-900/90 hover:bg-purple-800 text-white font-black text-xs px-6 py-2.5 rounded-xl shadow-lg border border-purple-300/30 uppercase tracking-wider transition-all transform hover:scale-105"
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: '6px',
+                    padding: '8px 16px',
+                    background: 'linear-gradient(135deg, #0891b2, #06b6d4)',
+                    border: '1px solid rgba(6,182,212,0.35)',
+                    borderRadius: '9px',
+                    color: '#fff',
+                    fontSize: '12px', fontWeight: 700,
+                    letterSpacing: '0.06em',
+                    textDecoration: 'none',
+                    textTransform: 'uppercase',
+                    boxShadow: '0 2px 12px rgba(6,182,212,0.25)',
+                  }}
                 >
-                  TOUR PAGE
+                  Open <ChevronRight style={{ width: '13px', height: '13px' }} />
                 </Link>
 
-                {/* Share Link Icon */}
                 <button
                   onClick={() => {
                     const baseUrl = window.location.href.split('#')[0].replace(/\/$/, '');
@@ -145,28 +249,30 @@ export const TournamentPage: React.FC = () => {
                     navigator.clipboard.writeText(shareUrl);
                     alert('Tournament Link copied!');
                   }}
-                  className="p-2.5 bg-purple-900/80 hover:bg-purple-800 text-white rounded-xl border border-purple-400/40 shadow transition-all"
-                  title="Copy Tournament Link"
+                  title="Copy link"
+                  style={{
+                    width: '34px', height: '34px',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: 'rgba(139,92,246,0.1)', border: '1px solid rgba(139,92,246,0.2)',
+                    borderRadius: '8px', color: '#a78bfa', cursor: 'pointer',
+                    transition: 'all 0.15s',
+                  }}
                 >
-                  <LinkIcon className="w-4 h-4" />
+                  <LinkIcon style={{ width: '13px', height: '13px' }} />
                 </button>
 
-                {/* Delete Icon */}
                 <button
                   onClick={() => handleDelete(tour.id)}
-                  className="p-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl border border-red-400/40 shadow transition-all"
-                  title="Delete Tournament"
+                  title="Delete"
+                  style={{
+                    width: '34px', height: '34px',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)',
+                    borderRadius: '8px', color: '#f87171', cursor: 'pointer',
+                    transition: 'all 0.15s',
+                  }}
                 >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-
-                {/* Info Icon */}
-                <button
-                  onClick={() => alert(`Tournament: ${tour.name}`)}
-                  className="p-2.5 bg-slate-900/60 hover:bg-slate-900 text-white rounded-full border border-white/20 transition-all"
-                  title="Tournament Info"
-                >
-                  <Info className="w-4 h-4 text-slate-300" />
+                  <Trash2 style={{ width: '13px', height: '13px' }} />
                 </button>
               </div>
             </div>
@@ -174,39 +280,88 @@ export const TournamentPage: React.FC = () => {
         </div>
       </main>
 
-      {/* CREATE TOURNAMENT Modal (Screenshot 1) */}
+      {/* CREATE MODAL */}
       {showCreateModal && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
-          <div className="bg-slate-900 border border-slate-700 p-8 rounded-3xl max-w-md w-full shadow-2xl">
-            <h2 className="text-2xl font-black text-white uppercase mb-6 flex items-center gap-2">
-              <Plus className="w-6 h-6 text-emerald-400" /> Create New Tournament
-            </h2>
-            <form onSubmit={handleCreateTournament} className="space-y-4">
+        <div
+          style={{
+            position: 'fixed', inset: 0, zIndex: 60,
+            background: 'rgba(2,4,8,0.85)',
+            backdropFilter: 'blur(16px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '16px',
+          }}
+          onClick={(e) => e.target === e.currentTarget && setShowCreateModal(false)}
+        >
+          <div style={{
+            background: 'linear-gradient(145deg, #0c1220, #070c16)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            borderRadius: '18px',
+            padding: '32px',
+            maxWidth: '440px', width: '100%',
+            boxShadow: '0 40px 80px rgba(0,0,0,0.8), 0 0 0 1px rgba(6,182,212,0.1)',
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px' }}>
+              <div style={{
+                width: '36px', height: '36px', borderRadius: '10px',
+                background: 'linear-gradient(135deg, #0891b2, #8b5cf6)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <Plus style={{ width: '18px', height: '18px', color: '#fff' }} />
+              </div>
               <div>
-                <label className="text-xs font-bold uppercase text-slate-400 block mb-1">Tournament Name</label>
+                <h2 style={{ fontSize: '17px', fontWeight: 800, color: '#f1f5f9', letterSpacing: '-0.01em', textTransform: 'uppercase', fontFamily: "'Rajdhani', sans-serif" }}>
+                  New Tournament
+                </h2>
+                <p style={{ fontSize: '11px', color: '#64748b', fontWeight: 500, marginTop: '2px' }}>Set up a new tournament to manage matches</p>
+              </div>
+            </div>
+
+            <form onSubmit={handleCreateTournament}>
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', fontSize: '11px', fontWeight: 700, color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.12em', marginBottom: '8px' }}>
+                  Tournament Name
+                </label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Premier League 2026"
                   value={newTourName}
                   onChange={(e) => setNewTourName(e.target.value)}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-white font-bold focus:outline-none focus:border-cyan-400"
+                  autoFocus
+                  style={{
+                    width: '100%', boxSizing: 'border-box',
+                    background: 'rgba(2,4,8,0.8)', border: '1px solid rgba(255,255,255,0.1)',
+                    borderRadius: '10px', padding: '12px 14px',
+                    color: '#f1f5f9', fontSize: '14px', fontWeight: 600,
+                    outline: 'none', transition: 'border-color 0.15s',
+                  }}
                 />
               </div>
 
-              <div className="flex justify-end gap-3 mt-6">
+              <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
                 <button
                   type="button"
                   onClick={() => setShowCreateModal(false)}
-                  className="px-5 py-2.5 bg-slate-800 text-slate-300 rounded-xl font-bold hover:bg-slate-700 text-xs uppercase"
+                  style={{
+                    padding: '10px 20px',
+                    background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)',
+                    borderRadius: '9px', color: '#94a3b8', fontSize: '12px', fontWeight: 600,
+                    cursor: 'pointer', letterSpacing: '0.04em', textTransform: 'uppercase',
+                  }}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs uppercase shadow-lg"
+                  style={{
+                    padding: '10px 22px',
+                    background: 'linear-gradient(135deg, #0891b2, #06b6d4)',
+                    border: '1px solid rgba(6,182,212,0.4)', borderRadius: '9px',
+                    color: '#fff', fontSize: '12px', fontWeight: 700,
+                    cursor: 'pointer', letterSpacing: '0.06em', textTransform: 'uppercase',
+                    boxShadow: '0 4px 16px rgba(6,182,212,0.3)',
+                  }}
                 >
-                  Create & Launch
+                  Create & Open
                 </button>
               </div>
             </form>
