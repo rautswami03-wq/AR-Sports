@@ -178,7 +178,8 @@ export type OverlayType =
   | 'commentator'
   | 'watermark'
   | 'manOfTheMatchCard'
-  | 'tournamentTitle';
+  | 'tournamentTitle'
+  | 'winPredictor';
 
 export type EventAnimationType =
   | 'FOUR'

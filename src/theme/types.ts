@@ -1,4 +1,17 @@
-export type LayoutStyle = 'pill' | 'dual-capsule' | 'chevron' | 'flat-bar' | 'glass-box' | 'cricscorer-broadcast' | 't20-asia-cup' | 'icc-navarasa' | 'super-fission';
+export type LayoutStyle =
+  | 'broadcast-full'   // NEW: full-width flat bar with team flanks (most themes)
+  | 'centered-pill'    // NEW: compact centered pill (CT2025)
+  | 'minimal-center'   // NEW: minimal center-only box (BBL Star)
+  | 't20-asia-cup'     // two-row white bar (T20 Emerging Asia Cup)
+  | 'icc-navarasa'     // Navarasa CWC23 India layout
+  | 'super-fission'    // Neon green pill layout
+  | 'pill'             // legacy (falls to broadcast-full)
+  | 'dual-capsule'     // legacy (falls to broadcast-full)
+  | 'chevron'          // legacy (falls to broadcast-full)
+  | 'flat-bar'         // legacy (falls to broadcast-full)
+  | 'glass-box'        // legacy (falls to broadcast-full)
+  | 'cricscorer-broadcast'; // legacy
+
 export type AnimationVariant = 'explosive-gold' | 'neon-pulse' | 'smooth-slide' | 'glass-fade' | 'minimal-pop';
 
 export interface ThemeColors {
@@ -39,6 +52,12 @@ export interface TournamentTheme {
   showAvatar?: boolean;
   showTargetBar?: boolean;
   sponsorBox?: boolean;
+  // Broadcast-full layout specific overrides
+  teamLabelBg?: string;    // bg color of left/right team name flanks (defaults to badgeBg)
+  teamLabelColor?: string; // text color of team name (defaults to white)
+  scoreColor?: string;     // color of the score number (defaults to primaryAccent)
+  scoreBoxBg?: string;     // bg of the score highlight box (defaults to badgeBg shade)
+  battersBg?: string;      // bg of batters section (defaults to dark translucent)
+  centerBoxBg?: string;    // bg of CRR/RRR or status center box
+  bowlerBg?: string;       // bg of bowler stats + ball dots section
 }
-
-

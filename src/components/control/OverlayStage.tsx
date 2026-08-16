@@ -41,6 +41,7 @@ import { ManhattanOverlay } from '../overlays/ManhattanOverlay';
 import { CommentatorOverlay } from '../overlays/CommentatorOverlay';
 import { WatermarkOverlay } from '../overlays/WatermarkOverlay';
 import { TournamentTitleOverlay } from '../overlays/TournamentTitleOverlay';
+import { WinPredictorOverlay } from '../overlays/WinPredictorOverlay';
 
 // Animations
 import { FourAnimation } from '../animations/FourAnimation';
@@ -58,6 +59,7 @@ import { FiftyAnimation } from '../animations/FiftyAnimation';
 import { CenturyAnimation } from '../animations/CenturyAnimation';
 import { HatTrickAnimation } from '../animations/HatTrickAnimation';
 import { TourBoundariesAnimation } from '../animations/TourBoundariesAnimation';
+import { IPLSuperAnimation } from '../animations/IPLSuperAnimation';
 
 interface OverlayStageProps {
   scale?: number;
@@ -227,6 +229,7 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
         {isVisible('decision') && <DecisionOverlay key="decision" />}
         {isVisible('pitchMap') && <PitchMapOverlay key="pitchMap" />}
         {isVisible('manhattan') && <ManhattanOverlay key="manhattan" />}
+        {isVisible('winPredictor') && <WinPredictorOverlay key="winPredictor" />}
         {isVisible('commentator') && <CommentatorOverlay key="commentator" />}
         {isVisible('watermark') && <WatermarkOverlay key="watermark" />}
 
@@ -246,6 +249,7 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
         {activeAnimation === 'CENTURY' && <CenturyAnimation key="animCentury" />}
         {activeAnimation === 'HAT_TRICK' && <HatTrickAnimation key="animHatTrick" />}
         {activeAnimation === 'TOUR_BOUNDARIES' && <TourBoundariesAnimation key="animTourBoundaries" />}
+        {activeAnimation && <IPLSuperAnimation key="animIPLSuper" />}
       </AnimatePresence>
     </div>
   );

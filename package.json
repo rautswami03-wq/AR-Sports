@@ -9,7 +9,7 @@
     "build": "tsc && vite build",
     "build:backend": "npm --prefix apps/backend run build",
     "preview": "vite preview",
-    "lint": "eslint . --ext ts,tsx",
+    "lint": "eslint .",
     "format": "prettier --write ."
   },
   "dependencies": {

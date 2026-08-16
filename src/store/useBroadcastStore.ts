@@ -315,6 +315,7 @@ const INITIAL_OVERLAYS: Record<OverlayType, boolean> = {
   watermark: false,
   manOfTheMatchCard: false,
   tournamentTitle: false,
+  winPredictor: false,
 };
 
 function loadInitialState() {
@@ -364,11 +365,21 @@ function getSnapshot(state: { teamA: Team; teamB: Team; matchDetails: MatchDetai
   }));
 }
 
-const isBattingTeamA = (state: any) =>
-  state.battingTeamId === 'teamA' ||
-  state.battingTeamId === state.teamA.id ||
-  state.battingTeamId === state.teamA.shortName ||
-  state.battingTeamId === state.teamA.fullName;
+const isBattingTeamA = (state: any) => {
+  if (!state || !state.battingTeamId) return true;
+  return (
+    state.battingTeamId === 'teamA' ||
+    state.battingTeamId === state.teamA?.id
+  );
+};
+
+function calcEconomy(runsConceded: number, overs: number, balls: number): number {
+  const totalBalls = (overs || 0) * 6 + (balls || 0);
+  const runs = runsConceded || 0;
+  if (totalBalls <= 0 || isNaN(runs) || isNaN(totalBalls)) return 0;
+  const econ = Number(((runs / totalBalls) * 6).toFixed(2));
+  return isNaN(econ) ? 0 : econ;
+}
 
 export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
   teamA: loadedState.teamA,
@@ -526,8 +537,7 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
         }
         bw.ballsInCurrentOver = bwBalls;
         bw.overs = bwOvers;
-        const totalBowlerBalls = bwOvers * 6 + bwBalls;
-        bw.economy = totalBowlerBalls > 0 ? Number(((bw.runsConceded / totalBowlerBalls) * 6).toFixed(2)) : 0;
+        bw.economy = calcEconomy(bw.runsConceded, bwOvers, bwBalls);
         bowlers[activeBowlerIndex] = bw;
         bowlingTeam.bowlers = bowlers;
       }
@@ -585,8 +595,7 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
         if (bowlers[activeBowlerIndex]) {
           const bw = { ...bowlers[activeBowlerIndex] };
           bw.runsConceded += extraRuns;
-          const totalBowlerBalls = bw.overs * 6 + bw.ballsInCurrentOver;
-          bw.economy = totalBowlerBalls > 0 ? Number(((bw.runsConceded / totalBowlerBalls) * 6).toFixed(2)) : 0;
+          bw.economy = calcEconomy(bw.runsConceded, bw.overs, bw.ballsInCurrentOver);
           bowlers[activeBowlerIndex] = bw;
           bowlingTeam.bowlers = bowlers;
         }
@@ -620,8 +629,7 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
           }
           bw.ballsInCurrentOver = bwBalls;
           bw.overs = bwOvers;
-          const totalBowlerBalls = bwOvers * 6 + bwBalls;
-          bw.economy = totalBowlerBalls > 0 ? Number(((bw.runsConceded / totalBowlerBalls) * 6).toFixed(2)) : 0;
+          bw.economy = calcEconomy(bw.runsConceded, bwOvers, bwBalls);
           bowlers[activeBowlerIndex] = bw;
           bowlingTeam.bowlers = bowlers;
         }
@@ -727,8 +735,7 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
         }
         bw.ballsInCurrentOver = bwBalls;
         bw.overs = bwOvers;
-        const totalBowlerBalls = bwOvers * 6 + bwBalls;
-        bw.economy = totalBowlerBalls > 0 ? Number(((bw.runsConceded / totalBowlerBalls) * 6).toFixed(2)) : 0;
+        bw.economy = calcEconomy(bw.runsConceded, bwOvers, bwBalls);
         bowlers[activeBowlerIndex] = bw;
         bowlingTeam.bowlers = bowlers;
       }
