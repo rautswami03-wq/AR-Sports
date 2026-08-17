@@ -233,22 +233,7 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
         {isVisible('commentator') && <CommentatorOverlay key="commentator" />}
         {isVisible('watermark') && <WatermarkOverlay key="watermark" />}
 
-        {/* Animations */}
-        {activeAnimation === 'FOUR' && <FourAnimation key="animFour" />}
-        {activeAnimation === 'SIX' && <SixAnimation key="animSix" />}
-        {activeAnimation === 'WICKET' && <WicketAnimation key="animWicket" />}
-        {activeAnimation === 'WIDE' && <WideAnimation key="animWide" />}
-        {activeAnimation === 'NO_BALL' && <NoBallAnimation key="animNoBall" />}
-        {activeAnimation === 'FREE_HIT' && <FreeHitAnimation key="animFreeHit" />}
-        {activeAnimation === 'POWERPLAY' && <PowerplayAnimation key="animPowerplay" />}
-        {activeAnimation === 'STRATEGIC_TIMEOUT' && <StrategicTimeoutAnimation key="animTimeout" />}
-        {activeAnimation === 'DRINKS_BREAK' && <DrinksBreakAnimation key="animDrinks" />}
-        {activeAnimation === 'END_OF_INNINGS' && <EndOfInningsAnimation key="animInnings" />}
-        {activeAnimation === 'MATCH_WINNER' && <MatchWinnerAnimation key="animMatchWinner" />}
-        {activeAnimation === 'FIFTY' && <FiftyAnimation key="animFifty" />}
-        {activeAnimation === 'CENTURY' && <CenturyAnimation key="animCentury" />}
-        {activeAnimation === 'HAT_TRICK' && <HatTrickAnimation key="animHatTrick" />}
-        {activeAnimation === 'TOUR_BOUNDARIES' && <TourBoundariesAnimation key="animTourBoundaries" />}
+        {/* Animations - Unified IPL Super Animation Engine */}
         {activeAnimation && <IPLSuperAnimation key="animIPLSuper" />}
       </AnimatePresence>
     </div>
