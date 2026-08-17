@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>AR Sports Live Broadcast Overlay</title>
+    <script type="text/javascript">
+      // Auto-redirect to hash route for GitHub Pages SPA
+      var l = window.location;
+      var path = l.pathname;
+      if (path.indexOf('/AR-Sports') !== -1) {
+        var subPath = path.substring(path.indexOf('/AR-Sports') + 10);
+        if (subPath && subPath !== '/' && subPath !== '/index.html') {
+          l.replace(l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') + '/AR-Sports/#' + subPath + l.search + l.hash);
+        }
+      }
+    </script>
+  </head>
+  <body>
+  </body>
+</html>
