@@ -132,16 +132,29 @@ export const EditMatchModal: React.FC<EditMatchModalProps> = ({ isOpen, onClose 
 
 
           <div className="flex items-center justify-between gap-2">
-            <label className="text-sm font-bold uppercase">Balls Per Over :</label>
+            <label className="text-sm font-bold uppercase">Cricket Format :</label>
             <select
-              value={ballsPerOver}
-              onChange={(e) => setBallsPerOver(Number(e.target.value))}
-              className="w-48 px-3 py-1.5 text-slate-900 font-bold bg-slate-100 rounded-md focus:outline-none"
+              value={
+                overs === 5 ? 'T5' : overs === 10 ? 'T10' : overs === 20 ? 'T20' : overs === 50 ? 'ODI' : overs === 1 ? 'Super Over' : 'Custom'
+              }
+              onChange={(e) => {
+                const fmt = e.target.value;
+                if (fmt === 'T5') { setOvers(5); setBallsPerOver(6); }
+                else if (fmt === 'T10') { setOvers(10); setBallsPerOver(6); }
+                else if (fmt === 'T20') { setOvers(20); setBallsPerOver(6); }
+                else if (fmt === 'ODI') { setOvers(50); setBallsPerOver(6); }
+                else if (fmt === 'The Hundred') { setOvers(17); setBallsPerOver(5); }
+                else if (fmt === 'Super Over') { setOvers(1); setBallsPerOver(6); }
+              }}
+              className="w-48 px-3 py-1.5 text-slate-900 font-bold bg-amber-400 rounded-md focus:outline-none"
             >
-              <option value={6}>6</option>
-              <option value={8}>8</option>
-              <option value={10}>10</option>
-              <option value={4}>4</option>
+              <option value="T20">T20 (20 Overs)</option>
+              <option value="T10">T10 (10 Overs)</option>
+              <option value="T5">T5 (5 Overs)</option>
+              <option value="ODI">ODI (50 Overs)</option>
+              <option value="The Hundred">The Hundred (100 Balls)</option>
+              <option value="Super Over">Super Over (1 Over)</option>
+              <option value="Custom">Custom Format</option>
             </select>
           </div>
 
