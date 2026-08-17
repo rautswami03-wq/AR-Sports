@@ -2,6 +2,8 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useBroadcastStore } from '../../store/useBroadcastStore';
 import { resolveThemeFromUrlOrStore } from '../../theme/presetThemes';
+import { AsiaCupLeftCyanWings, AsiaCupRightYellowWings } from '../theme-graphics/AsiaCupGraphics';
+import { NavarasaVerticalRibbon } from '../theme-graphics/NavarasaGraphics';
 
 export const IPLSuperAnimation: React.FC = () => {
   const { activeAnimation, teamA, teamB, battingTeamId, tournamentId, matchDetails } = useBroadcastStore();
@@ -11,7 +13,7 @@ export const IPLSuperAnimation: React.FC = () => {
   const isBattingA = battingTeamId === 'teamA' || battingTeamId === teamA.id;
   const activeTeam = isBattingA ? teamA : teamB;
   const theme = resolveThemeFromUrlOrStore(tournamentId, matchDetails.tournament);
-  const variant = theme.animationVariant || 'explosive-gold';
+  const layoutStyle = theme.layoutStyle || 'broadcast-full';
 
   // Comprehensive configuration map for all cricket event types
   const configMap: Record<string, { title: string; subtitle: string; bgGradient: string; glowColor: string; accentColor: string; icon?: string }> = {
@@ -146,7 +148,75 @@ export const IPLSuperAnimation: React.FC = () => {
     icon: '✨',
   };
 
-  // 60 FPS Optimized 3D Card Animation
+  // ORIGINAL BROADCAST MOTION 1: T20 Emerging Asia Cup Original Telecast Motion
+  if (layoutStyle === 't20-asia-cup') {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        className="fixed inset-0 w-full h-full flex items-center justify-center pointer-events-none z-[100] transform-gpu"
+      >
+        <motion.div
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          exit={{ scaleX: 0 }}
+          transition={{ type: 'spring', stiffness: 320, damping: 24 }}
+          className="relative z-20 flex items-center bg-[#000865] border-2 border-[#ffc72c] rounded-2xl shadow-2xl overflow-hidden px-8 py-6 max-w-2xl text-white transform-gpu"
+        >
+          <div className="w-12 h-16 mr-4 flex-shrink-0">
+            <AsiaCupLeftCyanWings className="w-full h-full" />
+          </div>
+          <div className="flex-1 text-center">
+            <h1 className="text-4xl md:text-6xl font-black italic tracking-tighter text-white uppercase drop-shadow-md">
+              {config.icon} {config.title}
+            </h1>
+            <p className="text-sm md:text-lg font-black tracking-widest text-[#ffc72c] uppercase mt-1">
+              {config.subtitle}
+            </p>
+          </div>
+          <div className="w-12 h-16 ml-4 flex-shrink-0">
+            <AsiaCupRightYellowWings className="w-full h-full" />
+          </div>
+        </motion.div>
+      </motion.div>
+    );
+  }
+
+  // ORIGINAL BROADCAST MOTION 2: ICC Navarasa World Cup Original Telecast Motion
+  if (layoutStyle === 'icc-navarasa') {
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        className="fixed inset-0 w-full h-full flex items-center justify-center pointer-events-none z-[100] transform-gpu"
+      >
+        <motion.div
+          initial={{ y: 150, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: -150, opacity: 0 }}
+          transition={{ type: 'spring', stiffness: 350, damping: 25 }}
+          className="relative z-20 bg-white border-2 border-[#ff007f] rounded-2xl shadow-2xl px-12 py-7 max-w-2xl text-center overflow-hidden transform-gpu"
+        >
+          <div className="absolute left-0 top-0 bottom-0 w-3 bg-[#ff007f]" />
+          <div className="flex justify-center mb-2">
+            <NavarasaVerticalRibbon className="w-16 h-8" />
+          </div>
+          <h1 className="text-4xl md:text-6xl font-black italic tracking-tighter text-[#20003b] uppercase">
+            {config.icon} {config.title}
+          </h1>
+          <p className="text-sm md:text-xl font-extrabold tracking-widest text-[#ff007f] uppercase mt-1">
+            {config.subtitle}
+          </p>
+        </motion.div>
+      </motion.div>
+    );
+  }
+
+  // ORIGINAL BROADCAST MOTION 3: Star Sports / IPL 3D Metallic Telecast Motion (Default)
   return (
     <motion.div
       initial={{ opacity: 0 }}
