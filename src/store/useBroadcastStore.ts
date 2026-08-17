@@ -381,6 +381,27 @@ function calcEconomy(runsConceded: number, overs: number, balls: number): number
   return isNaN(econ) ? 0 : econ;
 }
 
+const FULL_CARD_OVERLAYS: OverlayType[] = [
+  'battingScorecard',
+  'bowlingScorecard',
+  'matchSummary',
+  'playingXI',
+  'toss',
+  'pointsTable',
+  'wagonWheel',
+  'pitchMap',
+  'manhattan',
+  'winPredictor',
+  'winnerScreen',
+  'manOfTheMatchCard',
+  'playerStatistics',
+  'bowlerStatistics',
+  'playerOfTheMatch',
+  'playerOfTheTournament',
+  'topBatters',
+  'topBowlers',
+];
+
 export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
   teamA: loadedState.teamA,
   teamB: loadedState.teamB,
@@ -429,10 +450,19 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
 
   toggleOverlay: (type, forceState) => {
     set((state) => {
-      const updated = {
-        ...state.activeOverlays,
-        [type]: forceState !== undefined ? forceState : !state.activeOverlays[type],
-      };
+      const willBeActive = forceState !== undefined ? forceState : !state.activeOverlays[type];
+      const updated = { ...state.activeOverlays };
+
+      // Exclusive Full-Card Mode: Auto-close other full cards so overlays never stack on top of each other!
+      if (willBeActive && FULL_CARD_OVERLAYS.includes(type)) {
+        FULL_CARD_OVERLAYS.forEach((cardKey) => {
+          if (cardKey !== type) {
+            updated[cardKey] = false;
+          }
+        });
+      }
+
+      updated[type] = willBeActive;
       const nextState = { ...state, activeOverlays: updated };
       postStateSync(nextState);
       return { activeOverlays: updated };
@@ -451,7 +481,7 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
     });
   },
 
-  triggerAnimation: (type, durationMs = 4000) => {
+  triggerAnimation: (type, durationMs = 3500) => {
     const { animationTimeoutId, activeAnimation } = get();
     if (animationTimeoutId) clearTimeout(animationTimeoutId);
 
@@ -464,7 +494,8 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
 
     const newTimeout = setTimeout(() => {
       set({ activeAnimation: null, animationTimeoutId: null });
-      postStateSync({ ...get(), activeAnimation: null });
+      const currentState = get();
+      postStateSync({ ...currentState, activeAnimation: null });
     }, durationMs);
 
     set({ activeAnimation: type, animationTimeoutId: newTimeout });
@@ -1248,17 +1279,6 @@ if (typeof window !== 'undefined') {
         const parsed = JSON.parse(e.newValue);
         useBroadcastStore.getState().applyExternalState(parsed);
       } catch {}
-    }
-  });
-
-  window.addEventListener('ar_sports_local_update', (e: any) => {
-    if (e.detail) {
-      useBroadcastStore.getState().applyExternalState(e.detail);
-    }
-  });
-  window.addEventListener('cricscorer_local_update', (e: any) => {
-    if (e.detail) {
-      useBroadcastStore.getState().applyExternalState(e.detail);
     }
   });
 }
