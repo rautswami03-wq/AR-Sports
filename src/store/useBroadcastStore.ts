@@ -537,7 +537,11 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
         const striker = { ...batters[strikerIndex] };
         striker.runs += runs;
         striker.balls += 1;
-        if (boundaryType === 4) striker.fours += 1;
+      if (runs === 4) {
+        setTimeout(() => get().triggerAnimation('FOUR'), 50);
+      } else if (runs === 6) {
+        setTimeout(() => get().triggerAnimation('SIX'), 50);
+      }
         if (boundaryType === 6) striker.sixes += 1;
 
         if (runs % 2 !== 0) {

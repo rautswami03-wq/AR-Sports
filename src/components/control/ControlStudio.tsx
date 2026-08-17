@@ -42,6 +42,7 @@ export const ControlStudio: React.FC = () => {
   const [selectedTab, setSelectedTab] = useState<'scorer' | 'overlays' | 'animations' | 'theme' | 'tourStats'>('scorer');
   const [showEditModal, setShowEditModal] = useState(false);
   const [showTossModal, setShowTossModal] = useState(false);
+  const [showObsGuideModal, setShowObsGuideModal] = useState(false);
 
 
   const [bowlerInput, setBowlerInput] = useState('');
@@ -264,6 +265,13 @@ export const ControlStudio: React.FC = () => {
             >
               {copiedUrl ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
               {copiedUrl ? 'Copied!' : 'Copy OBS Source'}
+            </button>
+            <button
+              onClick={() => setShowObsGuideModal(true)}
+              className="bg-slate-800 hover:bg-slate-700 text-sky-400 border border-slate-700 px-2.5 py-1 rounded font-bold flex items-center gap-1 transition-all"
+              title="6-Step OBS Setup Guide"
+            >
+              <Tv className="w-3.5 h-3.5" /> Setup Guide
             </button>
           </div>
           <button
@@ -925,6 +933,57 @@ export const ControlStudio: React.FC = () => {
 
       <EditMatchModal isOpen={showEditModal} onClose={() => setShowEditModal(false)} />
       <TossMatchModal isOpen={showTossModal} onClose={() => setShowTossModal(false)} />
+
+      {/* OBS Setup Guide Modal */}
+      {showObsGuideModal && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-[#0b101b] border border-slate-800 rounded-2xl max-w-2xl w-full p-6 shadow-2xl relative">
+            <button
+              onClick={() => setShowObsGuideModal(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-white text-lg font-bold"
+            >
+              ✕
+            </button>
+            <h2 className="text-xl font-black text-white uppercase tracking-tight mb-2 flex items-center gap-2">
+              <Tv className="w-5 h-5 text-sky-400" /> OBS & Streamlabs Setup Steps
+            </h2>
+            <p className="text-xs text-slate-400 mb-6">
+              Follow these 6 simple steps to link your live score overlay to OBS Studio, Streamlabs, or vMix.
+            </p>
+
+            <div className="space-y-4">
+              {[
+                { num: '1', title: 'Get Your Overlay URL', desc: 'Copy your unique live browser source URL from the header button above.' },
+                { num: '2', title: 'Add Browser Source in OBS', desc: 'In OBS Studio, click the + button under Sources and select "Browser". Name it "AR Sports Overlay".' },
+                { num: '3', title: 'Paste the URL', desc: 'Paste the copied URL into the URL field. Set width to 1920 and height to 1080 for 1080p Full HD (or 2560x1440 for QHD).' },
+                { num: '4', title: 'Configure Browser Settings', desc: 'Check "Shutdown source when not visible" and "Refresh browser when scene becomes active".' },
+                { num: '5', title: 'Verify Live Connection', desc: 'Score a test ball in the studio — your OBS overlay will update in under 50ms.' },
+                { num: '6', title: 'Position the Source', desc: 'The overlay renders with a transparent background. Position it above your camera feed.' },
+              ].map((step) => (
+                <div key={step.num} className="flex gap-4 items-start bg-slate-900/80 border border-slate-800 p-3 rounded-xl">
+                  <span className="w-7 h-7 rounded-full bg-sky-500/20 text-sky-400 border border-sky-500/30 flex items-center justify-center font-black text-xs shrink-0">
+                    {step.num}
+                  </span>
+                  <div>
+                    <h3 className="text-xs font-black text-white uppercase">{step.title}</h3>
+                    <p className="text-[11px] text-slate-400 mt-0.5">{step.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-6 flex justify-between items-center pt-4 border-t border-slate-800">
+              <span className="text-xs font-mono text-slate-400 truncate max-w-[320px]">{obsUrl}</span>
+              <button
+                onClick={copyObsUrl}
+                className="bg-sky-500 hover:bg-sky-400 text-slate-950 px-4 py-2 rounded-xl text-xs font-black uppercase transition-all"
+              >
+                {copiedUrl ? 'Copied URL!' : 'Copy Overlay URL'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
