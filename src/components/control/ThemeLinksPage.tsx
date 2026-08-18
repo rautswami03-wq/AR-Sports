@@ -36,6 +36,7 @@ export const THEME_LINKS_DATA: ThemeLinkItem[] = [
   { id: '19', themeKey: 'cwc_t20_2020', name: 'ICC T20 World Cup 2020', server1Url: '/#/theme/19/69d9cec52b632413dd8d7d48', server2Url: '/#/overlay?theme=cwc_t20_2020', mobileUrl: '/#/overlay?theme=cwc_t20_2020&mobile=true' },
   { id: '20', themeKey: 'icc_wc_vibrant', name: 'ICC World Cup (Vibrant Edition)', server1Url: '/#/theme/20/69d9cec52b632413dd8d7d48', server2Url: '/#/overlay?theme=icc_wc_vibrant', mobileUrl: '/#/overlay?theme=icc_wc_vibrant&mobile=true', badge: 'NEW' },
   { id: '21', themeKey: 'super_fission', name: 'Super Fission (Neon Green)', server1Url: '/#/theme/21/69d9cec52b632413dd8d7d48', server2Url: '/#/overlay?theme=super_fission', mobileUrl: '/#/overlay?theme=super_fission&mobile=true', badge: 'NEW' },
+  { id: '22', themeKey: 'local_match_pro', name: 'Local Match Stream Pro', server1Url: '/#/theme/22/69d9cec52b632413dd8d7d48', server2Url: '/#/overlay?theme=local_match_pro', mobileUrl: '/#/overlay?theme=local_match_pro&mobile=true', badge: '1-to-1 MATCH' },
 ];
 
 export const ThemeLinksPage: React.FC = () => {
