@@ -16,6 +16,73 @@ export const PlayerStatisticsOverlay: React.FC = () => {
 
   const sr = striker.balls > 0 ? ((striker.runs / striker.balls) * 100).toFixed(2) : '0.00';
 
+  if (layoutStyle === 'local-match-pro') {
+    return (
+      <motion.div
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.8, opacity: 0 }}
+        transition={{ type: 'spring', damping: 25, stiffness: 240 }}
+        className="absolute left-8 top-16 z-40 w-[380px] bg-[#00b4d8] rounded-xl shadow-2xl border-4 border-[#ff5500] overflow-hidden font-sans text-slate-950"
+      >
+        {/* Header Title */}
+        <div className="bg-[#0b0c26] text-white p-3 text-center border-b-2 border-slate-950">
+          <span className="text-[11px] font-black tracking-widest text-amber-400 uppercase block">THIS TOURNAMENT</span>
+          <h2 className="text-2xl font-black uppercase tracking-tight flex items-center justify-center gap-2">
+            <span>🏏</span> {striker.name}
+          </h2>
+          <span className="text-xs font-bold text-cyan-400 uppercase block mt-0.5">
+            ({battingTeam.fullName || battingTeam.shortName})
+          </span>
+        </div>
+
+        {/* Stats Table Tiles Matching Screenshot 2 */}
+        <div className="p-3 space-y-1.5 text-center font-black">
+          <div className="bg-[#00d2ff] p-2 rounded border border-slate-900 shadow-sm">
+            <span className="text-[11px] text-slate-900 uppercase block">MATCHES</span>
+            <span className="text-xl text-slate-950 font-black">4</span>
+          </div>
+          <div className="bg-[#00d2ff] p-2 rounded border border-slate-900 shadow-sm">
+            <span className="text-[11px] text-slate-900 uppercase block">RUNS</span>
+            <span className="text-2xl text-slate-950 font-black">{striker.runs}</span>
+          </div>
+          <div className="grid grid-cols-2 gap-1.5">
+            <div className="bg-[#00d2ff] p-2 rounded border border-slate-900 shadow-sm">
+              <span className="text-[11px] text-slate-900 uppercase block">FOURS {striker.fours}</span>
+            </div>
+            <div className="bg-[#00d2ff] p-2 rounded border border-slate-900 shadow-sm">
+              <span className="text-[11px] text-slate-900 uppercase block">SIXES {striker.sixes}</span>
+            </div>
+          </div>
+          <div className="bg-[#00d2ff] p-2 rounded border border-slate-900 shadow-sm">
+            <span className="text-[11px] text-slate-900 uppercase block">STRIKE RATE</span>
+            <span className="text-2xl text-slate-950 font-black">{sr}</span>
+          </div>
+          <div className="bg-[#00d2ff] p-2 rounded border border-slate-900 shadow-sm">
+            <span className="text-[11px] text-slate-900 uppercase block">BATTING BEST</span>
+            <span className="text-xl text-slate-950 font-black">{striker.runs} ({striker.balls})</span>
+          </div>
+          <div className="bg-[#00d2ff] p-2 rounded border border-slate-900 shadow-sm">
+            <span className="text-[11px] text-slate-900 uppercase block">WICKETS</span>
+            <span className="text-xl text-slate-950 font-black">2</span>
+          </div>
+          <div className="grid grid-cols-2 gap-1.5">
+            <div className="bg-[#00d2ff] p-2 rounded border border-slate-900 shadow-sm">
+              <span className="text-[10px] text-slate-900 uppercase block">OVERS BOWLED 2</span>
+            </div>
+            <div className="bg-[#00d2ff] p-2 rounded border border-slate-900 shadow-sm">
+              <span className="text-[10px] text-slate-900 uppercase block">ECONOMY 14.00</span>
+            </div>
+          </div>
+          <div className="bg-[#00d2ff] p-2 rounded border border-slate-900 shadow-sm">
+            <span className="text-[11px] text-slate-900 uppercase block">BOWLING BEST</span>
+            <span className="text-xl text-slate-950 font-black">1 - 13 (1)</span>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+
   if (layoutStyle === 't20-asia-cup') {
     return (
       <motion.div

@@ -182,9 +182,97 @@ export const LiveScoreBug: React.FC = () => {
       )}
 
       {/* ------------------------------------------------------------------ */}
-      {/* 3A. T20 EMERGING ASIA CUP THEME (Exact Screenshot Replica)         */}
+      {/* 30. LOCAL MATCH STREAM PRO (1-to-1 Exact Screenshot Match)         */}
       {/* ------------------------------------------------------------------ */}
-      {layoutStyle === 't20-asia-cup' ? (
+      {layoutStyle === 'local-match-pro' ? (
+        <motion.div
+          initial={{ opacity: 0, y: 60 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: 'spring', damping: 24, stiffness: 220 }}
+          className="w-full max-w-[1280px] flex flex-col font-sans pointer-events-auto shadow-2xl relative overflow-hidden"
+        >
+          <div className="h-[74px] flex items-stretch border-2 border-slate-900 bg-black">
+            {/* Left Team Cyan Box */}
+            <div className="bg-[#00d2ff] text-slate-950 px-5 flex flex-col justify-center min-w-[170px] shrink-0 relative overflow-hidden">
+              <span className="font-black text-xl uppercase tracking-tighter leading-none">
+                {battingTeam.fullName || battingTeam.shortName}
+              </span>
+              <span className="text-[11px] font-extrabold opacity-80 mt-1 uppercase">
+                v {bowlingTeam.shortName}
+              </span>
+            </div>
+
+            {/* Cyan Score Box */}
+            <div className="bg-[#00b4d8] text-[#000080] px-6 flex flex-col items-center justify-center min-w-[140px] shrink-0 border-r-2 border-slate-950">
+              <span className="font-black text-3xl leading-none tracking-tight">
+                {battingTeam.score}-{battingTeam.wickets}
+              </span>
+              <span className="text-[11px] font-bold text-slate-950 mt-0.5">
+                {matchDetails.targetRuns ? `TARGET - ${matchDetails.targetRuns}` : `${oversFormatted} OVERS`}
+              </span>
+            </div>
+
+            {/* Dark Navy Batters Box */}
+            <div className="bg-[#000080] text-white flex-1 px-6 flex flex-col justify-center border-r-2 border-slate-950">
+              {striker && (
+                <div className="flex items-center justify-between text-base font-black uppercase py-0.5">
+                  <span className="flex items-center gap-2">
+                    <span className="text-cyan-400 font-bold">&gt;</span>
+                    {striker.name}
+                  </span>
+                  <span className="text-cyan-300 font-black text-lg">
+                    {striker.runs} <span className="text-xs text-white/70 font-normal">{striker.balls}</span>
+                  </span>
+                </div>
+              )}
+              {nonStriker && (
+                <div className="flex items-center justify-between text-xs font-bold uppercase opacity-75 py-0.5 pl-4">
+                  <span>{nonStriker.name}</span>
+                  <span>
+                    {nonStriker.runs} <span className="opacity-60">{nonStriker.balls}</span>
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Red Bowler Box */}
+            <div className="bg-[#ff003c] text-white px-6 flex flex-col justify-center min-w-[260px] shrink-0 border-r-2 border-slate-950">
+              {currentBowler && (
+                <div className="flex items-center justify-between text-sm font-black uppercase mb-1">
+                  <span>{currentBowler.name}</span>
+                  <span className="text-yellow-300">
+                    {currentBowler.wickets} - {currentBowler.runsConceded} <span className="text-xs text-white font-normal">({currentBowler.overs}.{currentBowler.ballsInCurrentOver})</span>
+                  </span>
+                </div>
+              )}
+              <div className="flex items-center gap-1">
+                {matchDetails.recentBalls.slice(-6).map((ball, idx) => (
+                  <span key={idx} className="w-5 h-5 rounded bg-white text-slate-950 font-black text-[11px] flex items-center justify-center border border-slate-900 shadow">
+                    {ball}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* Right Team Red Box */}
+            <div className="bg-[#ff003c] text-white px-5 flex flex-col justify-center items-end min-w-[170px] shrink-0">
+              <span className="font-black text-xl uppercase tracking-tighter leading-none text-right">
+                {bowlingTeam.fullName || bowlingTeam.shortName}
+              </span>
+              <span className="text-[10px] font-extrabold text-yellow-300 uppercase mt-1">
+                BOWLING
+              </span>
+            </div>
+          </div>
+
+          {/* Bottom Ticker */}
+          <div className="h-6 bg-[#000080] text-white text-xs font-black uppercase tracking-widest flex items-center justify-between px-6 border-t border-cyan-400">
+            <span>{battingTeam.fullName} INNINGS</span>
+            <span>{matchDetails.winnerMargin || matchDetails.customInputText || `1st Innings • Target Set`}</span>
+            <span>OVERS: {oversFormatted}</span>
+          </div>
+        </motion.div>
+      ) : layoutStyle === 't20-asia-cup' ? (
         <motion.div
           initial={{ opacity: 0, y: 60 }}
           animate={{ opacity: 1, y: 0 }}

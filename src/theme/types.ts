@@ -1,5 +1,6 @@
 export type LayoutStyle =
   | 'broadcast-full'   // NEW: full-width flat bar with team flanks (most themes)
+  | 'local-match-pro'  // NEW: 1-to-1 match for local stream scorebug & player stat cards from screenshots
   | 'centered-pill'    // NEW: compact centered pill (CT2025)
   | 'minimal-center'   // NEW: minimal center-only box (BBL Star)
   | 't20-asia-cup'     // two-row white bar (T20 Emerging Asia Cup)

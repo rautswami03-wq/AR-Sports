@@ -94,6 +94,27 @@ export const PRESET_TEAMS: Record<string, TeamPreset> = {
 };
 
 export const PRESET_TOURNAMENTS: Record<string, TournamentTheme> = {
+  local_match_pro: {
+    id: 'local_match_pro',
+    name: 'LOCAL MATCH STREAM PRO',
+    headerGradient: 'linear-gradient(90deg, #00d2ff 0%, #00529b 50%, #ff003c 100%)',
+    primaryAccent: '#00d2ff',
+    badgeBg: '#00d2ff',
+    teamLabelBg: '#00d2ff',
+    teamLabelColor: '#000000',
+    scoreColor: '#000080',
+    scoreBoxBg: '#00d2ff',
+    battersBg: '#000080',
+    centerBoxBg: '#ff003c',
+    bowlerBg: '#ff003c',
+    scoreBugMainBg: 'bg-[#00d2ff]',
+    scoreBugAccentBg: 'bg-[#ff003c]',
+    scoreBugTextColor: 'text-white',
+    layoutStyle: 'local-match-pro',
+    animationVariant: 'explosive-gold',
+    showOverDots: true,
+    showTargetBar: true,
+  },
   IPL: {
     id: 'IPL',
     name: 'TATA IPL 2025 OFFICIAL',
