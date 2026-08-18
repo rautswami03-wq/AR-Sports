@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1920, height=1080, initial-scale=1.0" />
+  <title>AR Sports Pro — Free Open Source Cricket Overlay</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,800;0,900;1,800;1,900&family=Inter:wght@400;600;800;900&family=Rajdhani:wght@700;800;900&display=swap" rel="stylesheet">
+  <style>
+    /* ==========================================================================
+       GLOBAL OBS OVERLAY CANVAS — 1920x1080 TRANSPARENT CANVAS
+       ========================================================================== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+    html, body {
+      width: 1920px;
+      height: 1080px;
+      background: transparent !important;
+      overflow: hidden;
+      font-family: 'Inter', sans-serif;
+      color: #ffffff;
+    }
+
+    #overlay-root {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 0 40px 40px 40px;
+      pointer-events: none;
+    }
+
+    /* ==========================================================================
+       THEME STYLES (5 DISTINCT VARIATIONS)
+       ========================================================================== */
+
+    /* 1. DARK STUDIO THEME */
+    .theme-dark {
+      --bug-bg: #090d16;
+      --team-bg: #0f172a;
+      --score-bg: #1e293b;
+      --accent: #38bdf8;
+      --text-main: #f8fafc;
+      --border: rgba(255, 255, 255, 0.12);
+    }
+
+    /* 2. LIGHT CLEAN THEME */
+    .theme-light {
+      --bug-bg: #ffffff;
+      --team-bg: #f1f5f9;
+      --score-bg: #e2e8f0;
+      --accent: #0284c7;
+      --text-main: #0f172a;
+      --border: rgba(0, 0, 0, 0.1);
+      color: #0f172a !important;
+    }
+
+    /* 3. IPL T20 GOLD & CYAN THEME */
+    .theme-ipl {
+      --bug-bg: #080e24;
+      --team-bg: #0b1536;
+      --score-bg: #05102e;
+      --accent: #00f2fe;
+      --text-main: #ffffff;
+      --border: #00f2fe;
+    }
+
+    /* 4. NEON CYBERPUNK THEME */
+    .theme-neon {
+      --bug-bg: #090938;
+      --team-bg: #121254;
+      --score-bg: #1a1a70;
+      --accent: #22c55e;
+      --text-main: #ffffff;
+      --border: #22c55e;
+    }
+
+    /* 5. FROSTED GLASSMORPHISM THEME */
+    .theme-glass {
+      --bug-bg: rgba(15, 23, 42, 0.85);
+      --team-bg: rgba(30, 41, 59, 0.7);
+      --score-bg: rgba(51, 65, 85, 0.8);
+      --accent: #f43f5e;
+      --text-main: #ffffff;
+      --border: rgba(255, 255, 255, 0.2);
+    }
+
+    /* ==========================================================================
+       SCOREBUG LAYOUT ENGINE
+       ========================================================================== */
+    .scorebug-container {
+      background: var(--bug-bg);
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: stretch;
+      height: 76px;
+      width: 100%;
+      max-width: 1240px;
+      margin: 0 auto;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .team-badge {
+      background: var(--team-bg);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      min-width: 160px;
+    }
+    .team-color-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.4);
+    }
+    .team-name {
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 26px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .score-block {
+      background: var(--score-bg);
+      padding: 0 28px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      border-left: 2px solid var(--border);
+      border-right: 2px solid var(--border);
+      min-width: 220px;
+    }
+    .score-numbers {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 42px;
+      font-weight: 900;
+      line-height: 1;
+      color: var(--accent);
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+    .overs-text {
+      font-size: 16px;
+      font-weight: 700;
+      opacity: 0.85;
+      color: var(--text-main);
+    }
+    .crr-badge {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      opacity: 0.8;
+      margin-top: 2px;
+    }
+
+    .stats-block {
+      flex: 1;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .batter-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .striker-dot {
+      color: var(--accent);
+      font-size: 12px;
+    }
+    .stat-runs {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 22px;
+      font-weight: 900;
+      color: var(--accent);
+    }
+    .stat-balls {
+      font-size: 13px;
+      opacity: 0.7;
+    }
+
+    .bowler-block {
+      background: rgba(0,0,0,0.15);
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border-left: 1px solid var(--border);
+      min-width: 240px;
+    }
+    .bowler-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .ball-dots {
+      display: flex;
+      gap: 4px;
+    }
+    .ball-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 9px;
+      font-weight: 900;
+    }
+    .dot-six { background: #16a34a; color: #fff; }
+    .dot-four { background: #ca8a04; color: #fff; }
+    .dot-wicket { background: #dc2626; color: #fff; }
+    .dot-wide { background: #7c3aed; color: #fff; }
+
+    /* ==========================================================================
+       CELEBRATION STING ANIMATIONS (FLASH EFFECTS)
+       ========================================================================== */
+    .animation-popup {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      opacity: 0;
+      transform: scale(0.4) rotateX(45deg);
+      transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .animation-popup.active {
+      opacity: 1;
+      transform: scale(1.05) rotateX(0deg);
+    }
+
+    .popup-card {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      border: 4px solid var(--accent);
+      box-shadow: 0 0 60px var(--accent), 0 20px 40px rgba(0,0,0,0.8);
+      border-radius: 24px;
+      padding: 32px 64px;
+      text-align: center;
+      transform: skewX(-10deg);
+    }
+    .popup-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 72px;
+      font-weight: 900;
+      font-style: italic;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      text-shadow: 0 4px 12px rgba(0,0,0,0.9);
+    }
+    .popup-subtitle {
+      font-size: 20px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="overlay-root">
+    <!-- EVENT STING POPUP -->
+    <div id="anim-popup" class="animation-popup">
+      <div class="popup-card">
+        <div id="popup-title" class="popup-title">MAXIMUM SIX!</div>
+        <div id="popup-subtitle" class="popup-subtitle">OVER THE ROPES • 6 RUNS</div>
+      </div>
+    </div>
+
+    <!-- MAIN SCOREBUG CONTAINER -->
+    <div id="scorebug" class="scorebug-container theme-ipl">
+      <!-- BATTING TEAM BADGE -->
+      <div class="team-badge">
+        <div id="team-color" class="team-color-dot" style="background: #00529b;"></div>
+        <div id="team-name" class="team-name">INDIA</div>
+      </div>
+
+      <!-- SCORE BLOCK -->
+      <div class="score-block">
+        <div class="score-numbers">
+          <span id="score-val">184-3</span>
+          <span id="overs-val" class="overs-text">(18.4)</span>
+        </div>
+        <div id="crr-val" class="crr-badge">CRR: 9.85 • REQ: 6.00</div>
+      </div>
+
+      <!-- BATTERS STATS -->
+      <div class="stats-block">
+        <div>
+          <div class="batter-row">
+            <span class="striker-dot">●</span>
+            <span id="striker-name">V. KOHLI</span>
+            <span id="striker-runs" class="stat-runs">84</span>
+            <span id="striker-balls" class="stat-balls">(48)</span>
+          </div>
+          <div class="batter-row" style="opacity: 0.8; margin-top: 4px;">
+            <span style="visibility: hidden;">●</span>
+            <span id="nonstriker-name">R. SHARMA</span>
+            <span id="nonstriker-runs" class="stat-runs" style="color: inherit;">42</span>
+            <span id="nonstriker-balls" class="stat-balls">(26)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOWLER STATS & RECENT BALLS -->
+      <div class="bowler-block">
+        <div class="bowler-info">
+          <span id="bowler-name">M. STARCK</span>
+          <span id="bowler-stats">2-34 (3.4)</span>
+        </div>
+        <div id="recent-balls" class="ball-dots">
+          <div class="ball-dot dot-four">4</div>
+          <div class="ball-dot">1</div>
+          <div class="ball-dot dot-six">6</div>
+          <div class="ball-dot dot-wicket">W</div>
+          <div class="ball-dot">0</div>
+          <div class="ball-dot dot-wide">WD</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       JAVASCRIPT REST API & WEBSOCKET BROADCAST BRIDGE
+       ========================================================================== -->
+  <script>
+    // State storage
+    const state = {
+      theme: 'ipl',
+      teamName: 'INDIA',
+      teamColor: '#00529b',
+      score: 184,
+      wickets: 3,
+      overs: '18.4',
+      crr: '9.85',
+      striker: { name: 'V. KOHLI', runs: 84, balls: 48 },
+      nonStriker: { name: 'R. SHARMA', runs: 42, balls: 26 },
+      bowler: { name: 'M. STARCK', wickets: 2, runs: 34, overs: '3.4' },
+      recentBalls: ['4', '1', '6', 'W', '0', 'WD']
+    };
+
+    // DOM References
+    const bug = document.getElementById('scorebug');
+    const animPopup = document.getElementById('anim-popup');
+
+    // Render Function
+    function render() {
+      bug.className = `scorebug-container theme-${state.theme}`;
+      document.getElementById('team-name').innerText = state.teamName;
+      document.getElementById('team-color').style.background = state.teamColor;
+      document.getElementById('score-val').innerText = `${state.score}-${state.wickets}`;
+      document.getElementById('overs-val').innerText = `(${state.overs})`;
+      document.getElementById('crr-val').innerText = `CRR: ${state.crr}`;
+
+      document.getElementById('striker-name').innerText = state.striker.name;
+      document.getElementById('striker-runs').innerText = state.striker.runs;
+      document.getElementById('striker-balls').innerText = `(${state.striker.balls})`;
+
+      document.getElementById('nonstriker-name').innerText = state.nonStriker.name;
+      document.getElementById('nonstriker-runs').innerText = state.nonStriker.runs;
+      document.getElementById('nonstriker-balls').innerText = `(${state.nonStriker.balls})`;
+
+      document.getElementById('bowler-name').innerText = state.bowler.name;
+      document.getElementById('bowler-stats').innerText = `${state.bowler.wickets}-${state.bowler.runs} (${state.bowler.overs})`;
+
+      // Render recent ball dots
+      const ballContainer = document.getElementById('recent-balls');
+      ballContainer.innerHTML = state.recentBalls.slice(-6).map(b => {
+        let cls = 'ball-dot';
+        if (b === '6') cls += ' dot-six';
+        else if (b === '4') cls += ' dot-four';
+        else if (b === 'W') cls += ' dot-wicket';
+        else if (b.includes('WD') || b.includes('NB')) cls += ' dot-wide';
+        return `<div class="${cls}">${b}</div>`;
+      }).join('');
+    }
+
+    // Trigger Boundary & Wicket Sting Animations
+    function triggerAnimation(type, title, subtitle) {
+      document.getElementById('popup-title').innerText = title || type;
+      document.getElementById('popup-subtitle').innerText = subtitle || 'MATCH EVENT';
+      animPopup.classList.add('active');
+      setTimeout(() => animPopup.classList.remove('active'), 3500);
+    }
+
+    // 1. WebSocket Live Data Bridge (Port 8088 / custom WS)
+    function connectWebSocket(wsUrl = 'ws://localhost:8088') {
+      try {
+        const ws = new WebSocket(wsUrl);
+        ws.onmessage = (event) => {
+          const data = JSON.parse(event.data);
+          if (data.type === 'SCORE_UPDATE') {
+            Object.assign(state, data.payload);
+            render();
+          } else if (data.type === 'TRIGGER_ANIMATION') {
+            triggerAnimation(data.animation, data.title, data.subtitle);
+          }
+        };
+        ws.onclose = () => setTimeout(() => connectWebSocket(wsUrl), 3000);
+      } catch (e) {}
+    }
+
+    // 2. Window Message Bridge (PostMessage / BroadcastChannel / Query Param Theme)
+    window.addEventListener('message', (e) => {
+      if (e.data && e.data.type === 'UPDATE_OVERLAY') {
+        Object.assign(state, e.data.payload);
+        render();
+      }
+    });
+
+    // Theme Selector via URL param (?theme=dark | light | ipl | neon | glass)
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('theme')) {
+      state.theme = params.get('theme');
+    }
+
+    // Initial Render
+    render();
+    connectWebSocket();
+  </script>
+</body>
+</html>
