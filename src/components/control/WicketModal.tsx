@@ -118,15 +118,21 @@ export const WicketModal: React.FC<WicketModalProps> = ({ isOpen, onClose }) => 
 
         {/* Fielder / Catcher Input */}
         {(dismissalType === 'Caught' || dismissalType === 'Run Out' || dismissalType === 'Stumped') && (
-          <div className="space-y-1.5">
+          <div className="space-y-1.5 font-sans">
             <label className="text-xs font-bold text-slate-400 uppercase">Fielder / Catcher / Keeper Name</label>
             <input
               type="text"
-              placeholder="e.g. Jadeja"
+              list="fielder-list"
+              placeholder="Select fielder or type name..."
               value={fielderName}
               onChange={(e) => setFielderName(e.target.value)}
               className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white font-semibold focus:outline-none focus:border-cyan-500"
             />
+            <datalist id="fielder-list">
+              {bowlingTeam.batters.map((b) => (
+                <option key={b.id} value={b.name} />
+              ))}
+            </datalist>
           </div>
         )}
 

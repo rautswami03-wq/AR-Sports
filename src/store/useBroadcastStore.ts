@@ -24,7 +24,6 @@ export interface BroadcastStoreState {
   tournamentId: string;
   isWsConnected: boolean;
   historyStack: HistorySnapshot[];
-
   // Actions
   toggleOverlay: (type: OverlayType, forceState?: boolean) => void;
   hideAllOverlays: () => void;
@@ -39,6 +38,7 @@ export interface BroadcastStoreState {
   setBattingTeam: (teamId: string) => void;
   updateMatchSettings: (settings: Partial<MatchDetails>) => void;
   updateTeamDetails: (teamId: 'teamA' | 'teamB', details: { fullName?: string; shortName?: string; logoUrl?: string }) => void;
+  setActivePairs: (strikerId: string, nonStrikerId: string) => void;
   setDecision: (decision: 'PENDING' | 'OUT' | 'NOT OUT' | null) => void;
   setGraphType: (type: 'BAR' | 'LINE' | 'DOUBLE_BAR' | null) => void;
   retireBatter: () => void;
@@ -825,6 +825,41 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
       });
       team.batters = batters;
       const nextState = { [isTeamA ? 'teamA' : 'teamB']: team };
+      postStateSync({ ...state, ...nextState });
+      return nextState;
+    });
+  },
+
+  setActivePairs: (strikerId, nonStrikerId) => {
+    set((state) => {
+      const isTeamA = isBattingTeamA(state);
+      const teamKey = isTeamA ? 'teamA' : 'teamB';
+      const team = { ...state[teamKey] };
+      
+      let updatedBatters = team.batters.map((b) => {
+        if (b.id === strikerId) {
+          return { ...b, isStriker: true, isOut: false };
+        }
+        if (b.id === nonStrikerId) {
+          return { ...b, isStriker: false, isOut: false };
+        }
+        return { ...b, isStriker: false };
+      });
+
+      const strikerObj = updatedBatters.find(b => b.id === strikerId);
+      const nonStrikerObj = updatedBatters.find(b => b.id === nonStrikerId);
+
+      if (strikerObj && nonStrikerObj) {
+        const otherBatters = updatedBatters.filter(b => b.id !== strikerId && b.id !== nonStrikerId);
+        team.batters = [strikerObj, nonStrikerObj, ...otherBatters];
+      } else if (strikerObj) {
+        const otherBatters = updatedBatters.filter(b => b.id !== strikerId);
+        team.batters = [strikerObj, ...otherBatters];
+      } else {
+        team.batters = updatedBatters;
+      }
+
+      const nextState = { [teamKey]: team };
       postStateSync({ ...state, ...nextState });
       return nextState;
     });

@@ -32,6 +32,7 @@ export const ControlStudio: React.FC = () => {
     retireBatter,
     changeBowler,
     bulkAddPlayers,
+    setActivePairs,
     setDecision,
     setGraphType,
     updateTeamColors,
@@ -454,6 +455,77 @@ export const ControlStudio: React.FC = () => {
                     onChange={(e) => setBowlerInput(e.target.value)}
                     className="px-2.5 py-1 text-xs bg-slate-950 text-white border border-slate-700 rounded w-28 focus:outline-none"
                   />
+
+                  {/* Active Player Selectors */}
+                  <div className="w-full bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3 mt-4">
+                    <span className="text-xs font-black uppercase text-cyan-400 block">
+                      ACTIVE PLAYERS SELECTION
+                    </span>
+                    <div className="grid grid-cols-3 gap-3">
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Striker</label>
+                        <select
+                          value={striker?.id || ''}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            if (val) {
+                              setActivePairs(val, nonStriker?.id || '');
+                            }
+                          }}
+                          className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-400 font-semibold"
+                        >
+                          <option value="">Select Striker...</option>
+                          {battingTeam.batters.map((b) => (
+                            <option key={b.id} value={b.id}>
+                              {b.name} {b.isOut ? '(OUT)' : ''}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Non-Striker</label>
+                        <select
+                          value={nonStriker?.id || ''}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            if (val) {
+                              setActivePairs(striker?.id || '', val);
+                            }
+                          }}
+                          className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-400 font-semibold"
+                        >
+                          <option value="">Select Non-Striker...</option>
+                          {battingTeam.batters.map((b) => (
+                            <option key={b.id} value={b.id}>
+                              {b.name} {b.isOut ? '(OUT)' : ''}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Active Bowler</label>
+                        <select
+                          value={currentBowler?.name || ''}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            if (val) {
+                              changeBowler(val);
+                            }
+                          }}
+                          className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-400 font-semibold"
+                        >
+                          <option value="">Select Bowler...</option>
+                          {bowlingTeam.batters.map((b) => (
+                            <option key={b.id} value={b.name}>
+                              {b.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  </div>
                   <button
                     onClick={() => toggleOverlay('scoreBug', true)}
                     className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded shadow"

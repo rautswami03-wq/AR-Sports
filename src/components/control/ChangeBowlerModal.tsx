@@ -22,9 +22,9 @@ export const ChangeBowlerModal: React.FC<ChangeBowlerModalProps> = ({ isOpen, on
     if (newBowlerName.trim()) {
       changeBowler(newBowlerName.trim());
     } else if (selectedBowlerId) {
-      const targetBowler = bowlingTeam.bowlers.find((bw) => bw.id === selectedBowlerId);
-      if (targetBowler) {
-        changeBowler(targetBowler.name);
+      const targetBatter = bowlingTeam.batters.find((b) => b.id === selectedBowlerId);
+      if (targetBatter) {
+        changeBowler(targetBatter.name);
       }
     }
     setNewBowlerName('');
@@ -65,11 +65,14 @@ export const ChangeBowlerModal: React.FC<ChangeBowlerModalProps> = ({ isOpen, on
               className="w-full px-4 py-2.5 text-slate-950 font-bold bg-white rounded-xl focus:outline-none text-sm"
             >
               <option value="">Choose Bowler</option>
-              {bowlingTeam.bowlers.map((bw) => (
-                <option key={bw.id} value={bw.id}>
-                  {bw.name} — {bw.wickets}-{bw.runsConceded} ({bw.overs}.{bw.ballsInCurrentOver})
-                </option>
-              ))}
+              {bowlingTeam.batters.map((b) => {
+                const bw = bowlingTeam.bowlers.find((x) => x.name.toLowerCase() === b.name.toLowerCase());
+                return (
+                  <option key={b.id} value={b.id}>
+                    {b.name} {bw ? `— ${bw.wickets}-${bw.runsConceded} (${bw.overs}.${bw.ballsInCurrentOver})` : '— (Not bowled yet)'}
+                  </option>
+                );
+              })}
             </select>
           </div>
 
