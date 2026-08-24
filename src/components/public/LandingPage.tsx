@@ -114,67 +114,6 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Live Interactive Preview & Theme Switcher Stage */}
-      <section className="px-6 max-w-7xl mx-auto mb-20">
-        <div className="bg-gradient-to-b from-slate-900/90 via-[#0d162a] to-[#070b15] border border-cyan-500/30 rounded-3xl p-6 sm:p-8 shadow-2xl shadow-cyan-500/10">
-          <div className="flex flex-wrap items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-800">
-            <div>
-              <div className="flex items-center gap-2 text-cyan-400 text-xs font-mono font-bold uppercase">
-                <Sparkles className="w-4 h-4 text-amber-400" /> INTERACTIVE LIVE MATCH PREVIEW
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-black text-white uppercase mt-1">
-                Real-Time Overlay Renderer
-              </h2>
-            </div>
-
-            {/* Quick Theme Switcher Pills */}
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-bold text-slate-400 uppercase mr-1">Switch Theme:</span>
-              {['ipl25', 'asia_cup', 'cwc23', 'bbl_black', 'jiocinema', 'sa20'].map((tId) => {
-                const theme = PRESET_TOURNAMENTS[tId];
-                if (!theme) return null;
-                const isSelected = tournamentId === tId;
-                return (
-                  <button
-                    key={tId}
-                    onClick={() => setTournamentId(tId)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all border ${
-                      isSelected
-                        ? 'bg-cyan-500 text-slate-950 border-cyan-400 shadow-md shadow-cyan-500/30 font-extrabold'
-                        : 'bg-slate-800/80 text-slate-300 border-slate-700 hover:border-slate-500'
-                    }`}
-                  >
-                    {theme.name.split(' ')[0]}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Embedded Broadcast Overlay Stage Window */}
-          <div className="relative w-full aspect-video max-h-[500px] bg-[#001100] rounded-2xl border border-slate-700/80 overflow-hidden shadow-2xl flex items-center justify-center group">
-            {/* Cricket Field Preview Background */}
-            <div
-              className="absolute inset-0 bg-cover bg-center opacity-40 group-hover:opacity-50 transition-opacity"
-              style={{
-                backgroundImage: `url('https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?q=80&w=1600&auto=format&fit=crop')`,
-              }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/40" />
-
-            {/* Live Overlay Canvas Stage */}
-            <div className="relative z-10 w-full h-full transform scale-90 sm:scale-100 flex items-center justify-center">
-              <OverlayStage scale={0.85} />
-            </div>
-
-            {/* Top Indicator */}
-            <div className="absolute top-4 left-4 z-20 bg-black/70 backdrop-blur-md px-3 py-1 rounded-md text-[11px] font-mono font-bold text-emerald-400 flex items-center gap-2 border border-emerald-500/40">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              LIVE PREVIEW &bull; {PRESET_TOURNAMENTS[tournamentId]?.name || 'IPL 2025'}
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Navigation Tabs (Themes / Features / OBS Guide) */}
       <section id="themes-gallery" className="px-6 max-w-7xl mx-auto mb-16">
