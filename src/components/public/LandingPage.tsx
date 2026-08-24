@@ -15,7 +15,13 @@ import {
   ExternalLink,
   Play,
   Cloud,
-  Sliders
+  Sliders,
+  Video,
+  RotateCcw,
+  Camera,
+  Mic,
+  HardDrive,
+  Activity
 } from 'lucide-react';
 import { CricNavbar } from '../common/CricNavbar';
 import { PRESET_TOURNAMENTS } from '../../theme/presetThemes';
@@ -235,55 +241,115 @@ export const LandingPage: React.FC = () => {
 
       {/* Tab 2: Feature Highlights */}
       {activeTab === 'features' && (
-        <section className="px-6 max-w-7xl mx-auto mb-20">
+        <section className="px-6 max-w-7xl mx-auto mb-20 animate-fade-in">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
               <div className="w-12 h-12 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-cyan-400 mb-4">
-                <Zap className="w-6 h-6" />
+                <Radio className="w-6 h-6" />
               </div>
-              <h4 className="text-lg font-black text-white uppercase">100ms Ultra-Low Latency</h4>
+              <h4 className="text-lg font-black text-white uppercase">Live Streaming</h4>
               <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                Dual-redundant sync engine combining LocalStorage polling, BroadcastChannel, and custom window event dispatchers for instant scorebug updates.
+                Stream to YouTube, Facebook, and custom RTMP destinations simultaneously. Broadcast to up to 3 platforms at once with ultra-low delay.
               </p>
             </div>
 
             <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
               <div className="w-12 h-12 rounded-xl bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center text-indigo-400 mb-4">
-                <Cloud className="w-6 h-6" />
+                <RotateCcw className="w-6 h-6" />
               </div>
-              <h4 className="text-lg font-black text-white uppercase">Firebase Cloud Firestore Sync</h4>
+              <h4 className="text-lg font-black text-white uppercase">Instant Replay</h4>
               <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                Operate from any computer or smartphone while your stream overlay runs remotely anywhere in the world over cloud Firestore real-time listeners.
+                Integrated 60-second instant replay buffer with support for slow motion, ball-event bookmarks, and live DRS review overlays.
               </p>
             </div>
 
             <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
               <div className="w-12 h-12 rounded-xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-purple-400 mb-4">
-                <Sparkles className="w-6 h-6" />
+                <Video className="w-6 h-6" />
               </div>
-              <h4 className="text-lg font-black text-white uppercase">Animated Sting Banners</h4>
+              <h4 className="text-lg font-black text-white uppercase">Auto Highlights</h4>
               <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                Full-width animated tickers for **SIX**, **FOUR**, **WICKET**, **FREE HIT**, **NO BALL**, **WIDE**, and **POWERPLAY** with audio visual effects.
+                Automatically generated match highlights reels filtered dynamically by wickets, sixes, fours, innings, or specific players.
               </p>
             </div>
 
             <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
               <div className="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400 mb-4">
-                <Flame className="w-6 h-6" />
+                <Camera className="w-6 h-6" />
               </div>
-              <h4 className="text-lg font-black text-white uppercase">Decision Banners</h4>
+              <h4 className="text-lg font-black text-white uppercase">Camera Support</h4>
               <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                Top-third decision popups (`OUT`, `NOT OUT`, `DECISION PENDING`) matching international broadcast television networks.
+                Seamless switching between local cameras, external USB capture cards, manual zoom levels, and live display frame capture.
               </p>
             </div>
 
             <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
               <div className="w-12 h-12 rounded-xl bg-red-500/20 border border-red-400/40 flex items-center justify-center text-red-400 mb-4">
+                <Sliders className="w-6 h-6" />
+              </div>
+              <h4 className="text-lg font-black text-white uppercase">Video Quality</h4>
+              <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
+                Broadcast-grade hardware encoding scaling from 720p up to 4K UHD resolutions at 30/60fps with adaptive streaming bitrates.
+              </p>
+            </div>
+
+            <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
+              <div className="w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400 mb-4">
+                <Mic className="w-6 h-6" />
+              </div>
+              <h4 className="text-lg font-black text-white uppercase">48kHz Audio Capture</h4>
+              <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
+                Professional stereo capture featuring noise cancellation filters, separate volume sliders, and live VU metering.
+              </p>
+            </div>
+
+            <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
+              <div className="w-12 h-12 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-cyan-400 mb-4">
+                <HardDrive className="w-6 h-6" />
+              </div>
+              <h4 className="text-lg font-black text-white uppercase">Local Recording</h4>
+              <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
+                High-definition local MP4 recording with timeline bookmark tracking, segmented files, and pause/resume actions.
+              </p>
+            </div>
+
+            <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
+              <div className="w-12 h-12 rounded-xl bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center text-indigo-400 mb-4">
                 <Layers className="w-6 h-6" />
               </div>
-              <h4 className="text-lg font-black text-white uppercase">Spotlight Side Cards</h4>
+              <h4 className="text-lg font-black text-white uppercase">Overlay Integration</h4>
               <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                Player and bowler career spotlight cards (`THIS TOURNAMENT - ROHIT SHARMA / M STARC`) with headshot photos and statistical breakdowns.
+                Native overlay compositing engines rendering scoreboard layouts in real-time with automated data APIs.
+              </p>
+            </div>
+
+            <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
+              <div className="w-12 h-12 rounded-xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-purple-400 mb-4">
+                <Activity className="w-6 h-6" />
+              </div>
+              <h4 className="text-lg font-black text-white uppercase">Real-Time Diagnostics</h4>
+              <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
+                Detailed streaming statistics dashboard displaying connection strength, dropped frames, device logs, and diagnostics.
+              </p>
+            </div>
+
+            <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
+              <div className="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400 mb-4">
+                <Zap className="w-6 h-6" />
+              </div>
+              <h4 className="text-lg font-black text-white uppercase">100ms Ultra-Low Latency</h4>
+              <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
+                Redundant synchronization system combining LocalStorage polling and custom window dispatchers for instant scorebug updates.
+              </p>
+            </div>
+
+            <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
+              <div className="w-12 h-12 rounded-xl bg-red-500/20 border border-red-400/40 flex items-center justify-center text-red-400 mb-4">
+                <Cloud className="w-6 h-6" />
+              </div>
+              <h4 className="text-lg font-black text-white uppercase">Firebase Cloud Sync</h4>
+              <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
+                Score matches from any smartphone while your overlay runs remotely anywhere in the world via cloud databases.
               </p>
             </div>
 
@@ -293,7 +359,7 @@ export const LandingPage: React.FC = () => {
               </div>
               <h4 className="text-lg font-black text-white uppercase">100% Unlocked PRO Edition</h4>
               <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                No paywalls, no limits, no watermarks. Complete control over tournament settings, team rosters, and overlay link exports.
+                No subscription plans, watermark overlays, or limitations. Complete access to all presets, templates, and links.
               </p>
             </div>
           </div>
