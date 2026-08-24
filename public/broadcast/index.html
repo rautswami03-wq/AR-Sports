@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CricScorer PRO Broadcast Overlay Studio</title>
+  
+  <!-- Tailwind CSS & Lucide Icons -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- GSAP Core & Text Plugin -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  
+  <!-- Font assets -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Courier+Prime:wght@700&family=Fira+Sans:ital,wght@0,700;0,900;1,900&family=Inter:wght@400;700;900&family=Montserrat:wght@800;900&family=Playfair+Display:ital,wght@0,700;1,700&family=VT323&display=swap" rel="stylesheet">
+  
+  <!-- Theme styles link -->
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body class="relative w-[1920px] h-[1080px] overflow-hidden select-none bg-transparent">
+
+  <!-- ==========================================
+       OBS VIEWPORT CANVAS
+       ========================================== -->
+  <main id="obs-viewport" class="relative w-1920 h-1080 bg-transparent">
+    
+    <!-- 1. DRS Review System Screen (Third-Umpire Overlay) -->
+    <div id="drs-overlay" class="absolute inset-0 bg-slate-950/95 flex flex-col items-center justify-center hidden opacity-0 z-40">
+      <div class="w-[800px] h-[400px] border-4 border-slate-800 bg-slate-900 rounded-3xl flex flex-col items-center justify-center p-8 relative shadow-2xl overflow-hidden">
+        <!-- Grid pattern overlay -->
+        <div class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:20px_20px] pointer-events-none"></div>
+        <div class="text-xs font-black text-cyan-400 uppercase tracking-widest mb-6 bg-cyan-950/50 border border-cyan-800/40 px-4 py-1.5 rounded-full z-10">
+          DRS DECISION SYSTEM
+        </div>
+        <div id="drs-signal-text" class="text-amber-400 text-3xl font-black tracking-widest uppercase z-10">
+          DRS REVIEW PENDING...
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Ad Break screen -->
+    <div id="adbreak-scene" class="absolute inset-0 bg-slate-950 flex flex-col items-center justify-center hidden z-30 animate-fade-in">
+      <div class="text-center space-y-6">
+        <span class="w-16 h-16 rounded-full bg-slate-900 border border-slate-800 flex items-center justify-center text-3xl mx-auto shadow-lg">
+          📺
+        </span>
+        <h2 class="text-3xl font-black text-white uppercase tracking-wider">Commercial Break</h2>
+        <p class="text-slate-400 text-sm max-w-sm mx-auto font-medium">
+          Broadcast will resume shortly. Stay tuned for live coverage updates.
+        </p>
+        <div class="inline-block bg-slate-900 border border-slate-800/60 text-cyan-400 font-mono text-xl font-bold px-6 py-2.5 rounded-xl shadow-inner">
+          RESUMING IN: <span id="adbreak-timer">45s</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Full Scorecard Card Scene -->
+    <div id="fullcard-scene" class="absolute inset-0 bg-slate-950/80 flex items-center justify-center hidden z-30 animate-fade-in">
+      <div class="w-[1200px] bg-slate-900/90 border border-slate-800 rounded-3xl p-8 shadow-2xl backdrop-blur-md">
+        
+        <!-- Header -->
+        <div class="flex items-center justify-between border-b border-slate-800 pb-6 mb-6">
+          <div>
+            <h2 class="text-3xl font-black text-white uppercase tracking-wider">Innings Scorecard</h2>
+            <p class="text-slate-400 text-xs font-bold uppercase mt-1 tracking-widest">AR Sports Broadcast Live</p>
+          </div>
+          <div class="text-right">
+            <span class="text-xs text-slate-500 font-bold uppercase tracking-widest block">Sponsor</span>
+            <span id="sponsor-overlay-name" class="text-cyan-400 font-black text-sm uppercase tracking-wide">CricScorer Pro</span>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <table class="w-full text-left">
+          <thead>
+            <tr class="text-slate-500 text-xs font-bold uppercase tracking-widest border-b border-slate-800">
+              <th class="py-3 px-4">Batter</th>
+              <th class="py-3 px-4">Dismissal</th>
+              <th class="py-3 px-4 text-right">Runs</th>
+              <th class="py-3 px-4 text-right">Balls</th>
+              <th class="py-3 px-4 text-right">4s</th>
+              <th class="py-3 px-4 text-right">6s</th>
+              <th class="py-3 px-4 text-right">SR</th>
+            </tr>
+          </thead>
+          <tbody id="fullcard-tbody" class="divide-y divide-slate-800/40">
+            <!-- Dynamic entries loaded via App.js -->
+          </tbody>
+        </table>
+
+      </div>
+    </div>
+
+    <!-- 4. Scorebug Overlay Container -->
+    <div id="scoreboard-root" class="theme-classic absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col w-[1120px] transition-all duration-500 transform scale-100 z-10">
+      
+      <!-- Main Horizontal Panel -->
+      <div class="sb-bar h-16 rounded-lg flex items-stretch overflow-hidden shadow-2xl transition-all duration-300 relative">
+        
+        <!-- Left Team Initials & Badge -->
+        <div class="px-6 flex items-center justify-center font-black text-xl tracking-wider uppercase border-r border-white/10 shrink-0">
+          <span id="team-batting-name">IND</span>
+        </div>
+
+        <!-- Main Run Scorebug Block (Digit Scroll) -->
+        <div class="px-6 flex items-center justify-center gap-1.5 border-r border-white/10 min-w-[190px] shrink-0">
+          <div class="flex items-center text-4xl font-black tracking-tighter">
+            <!-- Hundreds Digit -->
+            <div class="digit-container" id="digit-100">
+              <div class="digit-strip">
+                <div class="digit-val">0</div><div class="digit-val">1</div><div class="digit-val">2</div><div class="digit-val">3</div><div class="digit-val">4</div><div class="digit-val">5</div><div class="digit-val">6</div><div class="digit-val">7</div><div class="digit-val">8</div><div class="digit-val">9</div>
+              </div>
+            </div>
+            <!-- Tens Digit -->
+            <div class="digit-container" id="digit-10">
+              <div class="digit-strip">
+                <div class="digit-val">0</div><div class="digit-val">1</div><div class="digit-val">2</div><div class="digit-val">3</div><div class="digit-val">4</div><div class="digit-val">5</div><div class="digit-val">6</div><div class="digit-val">7</div><div class="digit-val">8</div><div class="digit-val">9</div>
+              </div>
+            </div>
+            <!-- Ones Digit -->
+            <div class="digit-container" id="digit-1">
+              <div class="digit-strip">
+                <div class="digit-val">0</div><div class="digit-val">1</div><div class="digit-val">2</div><div class="digit-val">3</div><div class="digit-val">4</div><div class="digit-val">5</div><div class="digit-val">6</div><div class="digit-val">7</div><div class="digit-val">8</div><div class="digit-val">9</div>
+              </div>
+            </div>
+
+            <!-- Separator / Wickets -->
+            <span class="mx-1.5 text-3xl font-bold opacity-80">/</span>
+            
+            <div class="digit-container" id="digit-w">
+              <div class="digit-strip">
+                <div class="digit-val">0</div><div class="digit-val">1</div><div class="digit-val">2</div><div class="digit-val">3</div><div class="digit-val">4</div><div class="digit-val">5</div><div class="digit-val">6</div><div class="digit-val">7</div><div class="digit-val">8</div><div class="digit-val">9</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Overs Tracker -->
+        <div class="px-6 flex flex-col justify-center border-r border-white/10 min-w-[120px] shrink-0">
+          <span class="text-[10px] font-bold opacity-60 uppercase tracking-widest leading-none mb-1">Overs</span>
+          <span class="text-lg font-black leading-none" id="match-overs">14.3</span>
+        </div>
+
+        <!-- Batting Stats Panel (Compact/Expanded toggled inside state) -->
+        <div id="panel-batting" class="flex-1 px-6 flex items-center justify-between gap-6 border-r border-white/10 min-w-0">
+          <!-- Batter 1 -->
+          <div id="bat1-card" class="flex items-center gap-2 flex-1 min-w-0 transition-all duration-300">
+            <span class="w-1.5 h-1.5 rounded-full active-striker-dot shrink-0" id="bat1-strike"></span>
+            <span class="text-sm font-black truncate uppercase" id="bat1-name">R. Sharma</span>
+            <span class="text-sm font-black ml-auto shrink-0" id="bat1-stats">45 <span class="text-[11px] font-bold opacity-60">32</span></span>
+          </div>
+
+          <!-- Divider -->
+          <div class="w-px h-6 bg-white/10"></div>
+
+          <!-- Batter 2 -->
+          <div id="bat2-card" class="flex items-center gap-2 flex-1 min-w-0 transition-all duration-300 opacity-60">
+            <span class="w-1.5 h-1.5 rounded-full bg-slate-500/20 shrink-0" id="bat2-strike"></span>
+            <span class="text-sm font-black truncate uppercase" id="bat2-name">V. Kohli</span>
+            <span class="text-sm font-black ml-auto shrink-0" id="bat2-stats">12 <span class="text-[11px] font-bold opacity-60">10</span></span>
+          </div>
+        </div>
+
+        <!-- Bowling Stats Panel -->
+        <div id="panel-bowling" class="px-6 flex items-center justify-between gap-4 min-w-[240px] border-r border-white/10 shrink-0">
+          <div class="flex flex-col justify-center min-w-0">
+            <span class="text-[9px] font-bold opacity-50 uppercase tracking-widest mb-0.5 leading-none">Bowler</span>
+            <span class="text-sm font-black truncate uppercase" id="bowl-name">M. Starc</span>
+          </div>
+          <span class="text-sm font-black shrink-0" id="bowl-stats">2-34 <span class="text-[11px] font-bold opacity-60">(3.3)</span></span>
+        </div>
+
+        <!-- Right Action Ticker/Sponsor Block -->
+        <div class="sb-accent px-6 flex items-center justify-center font-black text-xs uppercase tracking-wider min-w-[150px] relative overflow-hidden shrink-0">
+          <span id="ticker-text">CRR: 10.32</span>
+        </div>
+
+      </div>
+
+      <!-- Bottom Mini Ticker (Target/Required Runs) -->
+      <div id="bottom-ticker" class="h-6 bg-slate-900/90 text-white flex items-center justify-center text-[10px] font-bold uppercase tracking-widest rounded-b-md border-t border-white/5 shadow-md">
+        <span id="bottom-ticker-text">IND NEED 84 RUNS IN 33 BALLS (REQ: 15.27)</span>
+      </div>
+
+    </div>
+
+    <!-- 5. Advanced Toggle Data Panels Overlay (Wagon Wheel, Pitch Map, Manhattan Chart Side-By-Side) -->
+    <div id="graphics-panel-grid" class="absolute bottom-36 left-1/2 -translate-x-1/2 w-[1120px] grid grid-cols-3 gap-6 z-10 pointer-events-none">
+      
+      <!-- Panel 1: Wagon Wheel -->
+      <div id="panel-wagonwheel" class="canvas-card p-4 flex flex-col items-center justify-center hidden">
+        <h5 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Wagon Wheel Shot Chart</h5>
+        <canvas id="canvas-wagonwheel" width="220" height="220" class="bg-slate-900/40 rounded-xl"></canvas>
+      </div>
+
+      <!-- Panel 2: Pitch Map -->
+      <div id="panel-pitchmap" class="canvas-card p-4 flex flex-col items-center justify-center hidden">
+        <h5 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Pitch Map Bounce Lengths</h5>
+        <canvas id="canvas-pitchmap" width="220" height="220" class="bg-slate-900/40 rounded-xl"></canvas>
+      </div>
+
+      <!-- Panel 3: Last-10 Manhattan -->
+      <div id="panel-manhattan" class="canvas-card p-4 flex flex-col items-center justify-center hidden">
+        <h5 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3">Manhattan Runs Per Over</h5>
+        <canvas id="canvas-manhattan" width="220" height="220" class="bg-slate-900/40 rounded-xl"></canvas>
+      </div>
+
+    </div>
+
+    <!-- 6. Bottom Commentary Ticker -->
+    <div id="ticker-wrapper" class="absolute bottom-4 left-1/2 -translate-x-1/2 w-[1120px] h-8 bg-black/95 text-white flex items-center border border-slate-800 rounded-md px-6 shadow-2xl z-10 gap-3 hidden">
+      <span class="text-[9px] font-black uppercase text-cyan-400 bg-cyan-950 border border-cyan-800/40 px-2 py-0.5 rounded tracking-widest shrink-0">Commentary</span>
+      <span id="ticker-log" class="text-xs font-semibold truncate text-slate-300">Smith to Kohli, 1 run</span>
+    </div>
+
+    <!-- Event Boundary/Wicket Flashes -->
+    <div id="event-flash" class="absolute inset-0 bg-transparent pointer-events-none z-20 flex items-center justify-center opacity-0 scale-95">
+      <div class="px-16 py-8 bg-black/95 border-y-4 border-cyan-400 text-white font-black text-7xl uppercase tracking-widest shadow-2xl relative overflow-hidden rounded-xl">
+        <div id="flash-banner-glow" class="absolute inset-0 bg-cyan-500/10 mix-blend-screen animate-pulse"></div>
+        <span id="event-text" class="relative z-10 drop-shadow-md">SIX!</span>
+      </div>
+    </div>
+
+    <!-- Particle Overlay System Container -->
+    <div id="particle-container" class="absolute inset-0 pointer-events-none z-30 overflow-hidden"></div>
+
+    <!-- Vignette / Redout Vignette -->
+    <div id="vignette-effect"></div>
+
+  </main>
+
+  <!-- ==========================================
+       CONTROL HUD DRAWER (COLLAPSIBLE)
+       ========================================== -->
+  <aside id="control-panel" class="absolute top-0 bottom-0 left-0 bg-slate-950/98 border-r border-slate-900 text-white w-96 p-6 transition-all duration-300 z-50 transform -translate-x-full shadow-2xl max-h-[1080px] overflow-y-auto">
+    
+    <div class="flex items-center justify-between mb-6">
+      <div class="flex items-center gap-2">
+        <div class="w-2.5 h-2.5 rounded-full bg-cyan-500 animate-pulse"></div>
+        <h2 class="text-sm font-black uppercase tracking-wider text-slate-100">Broadcast Control Center</h2>
+      </div>
+      <button id="toggle-drawer-btn" class="text-xs font-black text-slate-500 hover:text-white uppercase tracking-widest">Hide [H]</button>
+    </div>
+
+    <div class="space-y-6">
+      
+      <!-- Theme Selection -->
+      <div>
+        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Overlay Theme</label>
+        <select id="theme-select" class="w-full bg-slate-900 border border-slate-800 rounded px-3 py-2 text-xs font-bold uppercase text-slate-300 focus:outline-none focus:border-cyan-400">
+          <option value="classic">Classic</option>
+          <option value="ipl-style">IPL Style</option>
+          <option value="icc-modern">ICC Modern</option>
+          <option value="t20-blast">T20 Blast</option>
+          <option value="test-match">Test Match</option>
+          <option value="big-bash">Big Bash</option>
+          <option value="the-hundred">The Hundred</option>
+          <option value="champions">Champions</option>
+          <option value="minimal-dark">Minimal Dark</option>
+          <option value="minimal-light">Minimal Light</option>
+          <option value="retro-cricket">Retro Cricket</option>
+          <option value="neon-glow">Neon Glow</option>
+          <option value="glass">Glassmorphism</option>
+          <option value="gradient-wave">Gradient Wave</option>
+          <option value="corporate">Corporate</option>
+          <option value="street-cricket">Street Cricket</option>
+          <option value="custom">Custom Editable</option>
+        </select>
+      </div>
+
+      <!-- Variant & Layout Toggles -->
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Color Variant</label>
+          <select id="variant-select" class="w-full bg-slate-900 border border-slate-800 rounded px-3 py-2 text-xs font-bold uppercase text-slate-300 focus:outline-none focus:border-cyan-400">
+            <option value="dark">Dark Theme</option>
+            <option value="light">Light Theme</option>
+            <option value="adaptive">Team Adaptive</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Layout style</label>
+          <select id="layout-select" class="w-full bg-slate-900 border border-slate-800 rounded px-3 py-2 text-xs font-bold uppercase text-slate-300 focus:outline-none focus:border-cyan-400">
+            <option value="expanded">Expanded View</option>
+            <option value="compact">Compact Bar</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Scene Views Selector -->
+      <div>
+        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Active Broadcast Scene</label>
+        <select id="scene-select" class="w-full bg-slate-900 border border-slate-800 rounded px-3 py-2 text-xs font-bold uppercase text-slate-300 focus:outline-none focus:border-cyan-400">
+          <option value="scorebug">Persistent Scorebug</option>
+          <option value="fullcard">Innings Full Scorecard</option>
+          <option value="adbreak">Commercial Break Screen</option>
+        </select>
+      </div>
+
+      <!-- Toggleable Data Panels -->
+      <div class="border-t border-slate-900 pt-4 space-y-3">
+        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Toggle Data Panels</label>
+        
+        <div class="grid grid-cols-2 gap-2 text-xs">
+          <label class="flex items-center gap-2 p-2 bg-slate-900 border border-slate-800/60 rounded cursor-pointer">
+            <input type="checkbox" id="toggle-batting" checked class="accent-cyan-400"> Batting info
+          </label>
+          <label class="flex items-center gap-2 p-2 bg-slate-900 border border-slate-800/60 rounded cursor-pointer">
+            <input type="checkbox" id="toggle-bowling" checked class="accent-cyan-400"> Bowling info
+          </label>
+          <label class="flex items-center gap-2 p-2 bg-slate-900 border border-slate-800/60 rounded cursor-pointer">
+            <input type="checkbox" id="toggle-partnership" checked class="accent-cyan-400"> Partnership
+          </label>
+          <label class="flex items-center gap-2 p-2 bg-slate-900 border border-slate-800/60 rounded cursor-pointer">
+            <input type="checkbox" id="toggle-wagon" class="accent-cyan-400"> Wagon Wheel
+          </label>
+          <label class="flex items-center gap-2 p-2 bg-slate-900 border border-slate-800/60 rounded cursor-pointer">
+            <input type="checkbox" id="toggle-pitch" class="accent-cyan-400"> Pitch Map
+          </label>
+          <label class="flex items-center gap-2 p-2 bg-slate-900 border border-slate-800/60 rounded cursor-pointer">
+            <input type="checkbox" id="toggle-manhattan" class="accent-cyan-400"> Manhattan
+          </label>
+        </div>
+        
+        <label class="flex items-center gap-2 p-2 bg-slate-900 border border-slate-800/60 rounded cursor-pointer text-xs">
+          <input type="checkbox" id="toggle-commentary" class="accent-cyan-400"> Commentary Ticker
+        </label>
+      </div>
+
+      <!-- Live Action Test Flash Triggers -->
+      <div class="border-t border-slate-900 pt-4 space-y-2">
+        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Broadcast Event Triggers</label>
+        <div class="grid grid-cols-3 gap-2">
+          <button onclick="triggerEventFlash('SIX!', '#fbbf24')" class="px-3 py-2 bg-emerald-950 border border-emerald-800 hover:border-emerald-400 rounded text-xs font-black uppercase text-emerald-400">SIX</button>
+          <button onclick="triggerEventFlash('FOUR!', '#38bdf8')" class="px-3 py-2 bg-emerald-950 border border-emerald-800 hover:border-emerald-400 rounded text-xs font-black uppercase text-emerald-400">FOUR</button>
+          <button onclick="triggerEventFlash('WICKET!', '#ef4444')" class="px-3 py-2 bg-red-950 border border-red-800 hover:border-red-400 rounded text-xs font-black uppercase text-red-400">WICKET</button>
+        </div>
+      </div>
+
+      <!-- Autoplay Settings -->
+      <div class="border-t border-slate-900 pt-4">
+        <label class="flex items-center justify-between text-xs font-bold text-slate-300 cursor-pointer">
+          Autoplay Live Match Sim
+          <input type="checkbox" id="autoplay-chk" checked class="w-4 h-4 accent-cyan-400">
+        </label>
+      </div>
+
+      <!-- Sponsor controls -->
+      <div class="border-t border-slate-900 pt-4">
+        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Current Sponsor Logo</label>
+        <div class="flex items-center gap-3">
+          <div id="sponsor-logo-box" class="w-10 h-10 bg-slate-900 border border-slate-800 flex items-center justify-center text-xl rounded-xl">🏆</div>
+          <div class="text-xs">
+            <div class="text-slate-500 font-bold uppercase text-[9px]">Active Sponsor</div>
+            <div class="text-white font-black uppercase" id="sponsor-overlay-name">CricScorer Pro</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </aside>
+
+  <!-- ==========================================
+       MAIN APP SCRIPT LOADING
+       ========================================== -->
+  <script type="module" src="./app.js"></script>
+
+</body>
+</html>

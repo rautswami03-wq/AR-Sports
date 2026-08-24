@@ -1,0 +1,144 @@
+/* ==========================================
+   CricScorer PRO Broadcasting Overlay Styles
+   ========================================== */
+
+:root {
+  --sb-bg: #111827;
+  --sb-text: #ffffff;
+  --sb-accent: #fbbf24;
+  --sb-secondary: #1e3a8a;
+  --sb-font-family: 'Inter', sans-serif;
+  --sb-glow: rgba(59, 130, 246, 0.4);
+  --sb-skew: 0deg;
+  --sb-border-radius: 8px;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  background-color: transparent;
+  font-family: var(--sb-font-family);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* GPU Hardware Acceleration optimization flags */
+.accelerated-layer {
+  transform: translate3d(0, 0, 0);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+/* Base Scoreboard Overlay style wrapper */
+#scoreboard-root {
+  width: 1120px;
+  font-family: var(--sb-font-family);
+}
+
+.sb-bar {
+  background: var(--sb-bg);
+  color: var(--sb-text);
+  border-radius: var(--sb-border-radius);
+  transform: skewX(var(--sb-skew));
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px var(--sb-glow);
+  border-bottom: 3px solid var(--sb-accent);
+}
+
+.sb-accent {
+  background: var(--sb-accent);
+  color: #000000;
+}
+
+/* Skew Counter-Correction for inner items */
+.sb-bar > * {
+  transform: skewX(calc(-1 * var(--sb-skew)));
+}
+
+/* Slot Machine Digit Roll styling */
+.digit-container {
+  height: 40px;
+  overflow: hidden;
+  position: relative;
+  display: inline-block;
+  width: 22px;
+}
+
+.digit-strip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 40px;
+  height: 400px; /* 10 digits */
+  text-align: center;
+  will-change: transform;
+}
+
+.digit-val {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Active Striker pulse breathing keyframes */
+@keyframes strikePulse {
+  0%, 100% { opacity: 0.8; transform: scale(1); filter: drop-shadow(0 0 2px var(--sb-accent)); }
+  50% { opacity: 1; transform: scale(1.2); filter: drop-shadow(0 0 8px var(--sb-accent)); }
+}
+
+.active-striker-dot {
+  background-color: var(--sb-accent);
+  animation: strikePulse 1.8s infinite ease-in-out;
+}
+
+/* Tab/Views transitions */
+.animate-fade-in {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Wagon Wheel & Pitch Map Canvas layouts */
+.canvas-card {
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+/* Vignette stress shader */
+#vignette-effect {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle, transparent 60%, rgba(239, 68, 68, 0.25) 100%);
+  opacity: 0;
+  z-index: 15;
+  transition: opacity 0.3s ease;
+}
+
+#vignette-effect.active {
+  opacity: 1;
+}
+
+/* Custom Scrollbar for Drawer Controls */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.2);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
