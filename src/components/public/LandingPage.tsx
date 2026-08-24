@@ -596,14 +596,65 @@ export const LandingPage: React.FC = () => {
       )}
 
       {/* Footer */}
-      <footer className="border-t border-slate-800 py-10 px-6 text-center text-xs text-slate-500">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-2 font-black text-slate-300">
-            <Radio className="w-4 h-4 text-cyan-400" /> CricScorer PRO &bull; AR Sports Broadcast System
+      <footer className="border-t border-slate-900 bg-slate-950/60 backdrop-blur-md py-16 px-6 text-slate-400 mt-20">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12 text-left">
+          {/* Col 1: About */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 font-black text-slate-100 uppercase tracking-wider text-base">
+              <Radio className="w-5 h-5 text-cyan-400" /> AR Sports Broadcast System
+            </div>
+            <p className="text-slate-400 text-sm leading-relaxed font-medium">
+              Television-grade broadcast overlays and tournament management dashboard. 100% unlocked, ultra-low latency, and fully compatible with OBS Studio, vMix, and PRISM Live.
+            </p>
           </div>
+
+          {/* Col 2: Products List */}
           <div>
-            Built with React, Vite, Framer Motion & Tailwind &bull; 100% Unlocked PRO Version
+            <h5 className="font-black text-slate-100 uppercase tracking-widest text-sm mb-4 border-b border-slate-800 pb-1.5">
+              CrickPro Suite Products
+            </h5>
+            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5 text-xs font-bold">
+              {[
+                { name: 'Cricket Scoring App', desc: 'Ball-by-ball scoring with all formats.' },
+                { name: 'CrickPro Lite', desc: 'Casual, offline, local-first scoring + overlay.' },
+                { name: 'Cricket Streaming App', desc: 'Live stream, replay, and highlights.' },
+                { name: 'Cricket Highlight Generator', desc: 'Auto-generate clips, tag players.' },
+                { name: 'Cricket Score Overlay', desc: '50 panels, 17+ broadcast themes.' },
+                { name: 'Cricket League Website', desc: 'Build a professional league site.' },
+                { name: 'Cricket Web Dashboard', desc: 'Tournament + overlay management.' },
+                { name: 'TV Broadcast Solution', desc: 'Television-grade cricket production.' },
+                { name: 'CrickPro Broadcast', desc: 'Standalone TV-grade cricket production — no OBS.' },
+                { name: 'CrickPro TV', desc: 'Premium cricket streaming & tournament hosting.' }
+              ].map((prod) => (
+                <li key={prod.name} className="group">
+                  <span className="text-slate-300 group-hover:text-cyan-400 transition-colors block font-black">
+                    {prod.name}
+                  </span>
+                  <span className="text-[10px] text-slate-500 font-medium block">
+                    {prod.desc}
+                  </span>
+                </li>
+              ))}
+            </ul>
           </div>
+
+          {/* Col 3: Platform */}
+          <div className="space-y-4">
+            <h5 className="font-black text-slate-100 uppercase tracking-widest text-sm mb-4 border-b border-slate-800 pb-1.5">
+              Platform & Tech Stack
+            </h5>
+            <p className="text-slate-400 text-xs leading-relaxed font-semibold">
+              Engineered with React, Vite, Framer Motion, and Tailwind CSS. Integrated real-time synchronization pipelines over WebSockets and LocalStorage.
+            </p>
+            <div className="bg-slate-900/60 border border-slate-800/80 p-3.5 rounded-xl text-[10px] font-bold text-slate-400">
+              ⚡ Compatible with OBS Studio, vMix, Wirecast, PRISM Live Studio, and Blackmagic Design hardware.
+            </div>
+          </div>
+        </div>
+
+        <div className="max-w-7xl mx-auto border-t border-slate-900 mt-12 pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs font-semibold text-slate-500">
+          <span>&copy; 2026 AR Sports. All rights reserved.</span>
+          <span>100% Unlocked Enterprise Edition</span>
         </div>
       </footer>
     </div>
