@@ -1,17 +1,23 @@
 export type LayoutStyle =
-  | 'broadcast-full'   // NEW: full-width flat bar with team flanks (most themes)
-  | 'local-match-pro'  // NEW: 1-to-1 match for local stream scorebug & player stat cards from screenshots
-  | 'centered-pill'    // NEW: compact centered pill (CT2025)
-  | 'minimal-center'   // NEW: minimal center-only box (BBL Star)
-  | 't20-asia-cup'     // two-row white bar (T20 Emerging Asia Cup)
-  | 'icc-navarasa'     // Navarasa CWC23 India layout
-  | 'super-fission'    // Neon green pill layout
-  | 'pill'             // legacy (falls to broadcast-full)
-  | 'dual-capsule'     // legacy (falls to broadcast-full)
-  | 'chevron'          // legacy (falls to broadcast-full)
-  | 'flat-bar'         // legacy (falls to broadcast-full)
-  | 'glass-box'        // legacy (falls to broadcast-full)
-  | 'cricscorer-broadcast'; // legacy
+  | 'broadcast-full'     // TATA IPL 2025 official scorebug
+  | 'local-match-pro'    // 1-to-1 match for local stream scorebug & player stat cards from screenshots
+  | 'jiocinema-magenta'  // JioCinema Magenta & Gold broadcast bar
+  | 'sa20-gold'          // SA20 Green & Gold diagonal slash bar
+  | 'bbl-black-carbon'   // BBL Carbon Fiber Black & Neon Yellow bar
+  | 'fancode-orange'     // WCL FanCode Orange & White bar
+  | 'cricfusion-glass'   // CricFusion Glassmorphism frosted card
+  | 'centered-pill'      // CT2025 compact centered pill
+  | 'minimal-center'     // BBL Star Sports minimal center box
+  | 't20-asia-cup'       // T20 Emerging Asia Cup white bar with cyan/yellow wings
+  | 'icc-navarasa'       // Navarasa CWC23 India layout
+  | 'super-fission'      // Neon green pill layout
+  | 'pill'               // legacy
+  | 'dual-capsule'       // legacy
+  | 'chevron'            // legacy
+  | 'flat-bar'           // legacy
+  | 'glass-box'          // legacy
+  | 'cricscorer-broadcast'
+  | 'crickpro-elite';
 
 export type AnimationVariant = 'explosive-gold' | 'neon-pulse' | 'smooth-slide' | 'glass-fade' | 'minimal-pop';
 

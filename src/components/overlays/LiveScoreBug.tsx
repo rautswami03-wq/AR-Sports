@@ -76,6 +76,11 @@ export const LiveScoreBug: React.FC = () => {
     ? Math.max(0, (matchDetails.targetRuns - battingTeam.score) / Math.max(1, (120 - totalBalls) / 6)).toFixed(2)
     : '0.00';
 
+  const strikerContrib   = striker?.runs   ?? 0;
+  const nonStrikerContrib = nonStriker?.runs ?? 0;
+  const partnershipRuns  = strikerContrib + nonStrikerContrib;
+  const partnershipBalls = (striker?.balls ?? 0) + (nonStriker?.balls ?? 0);
+
   // ── TIMED FLASH BANNER — auto-dismisses after 3 seconds ──────────────────
   const [flashType, setFlashType] = useState<'four' | 'six' | 'wicket' | null>(null);
   const prevLastBall   = useRef('');
@@ -270,6 +275,383 @@ export const LiveScoreBug: React.FC = () => {
             <span>{battingTeam.fullName} INNINGS</span>
             <span>{matchDetails.winnerMargin || matchDetails.customInputText || `1st Innings • Target Set`}</span>
             <span>OVERS: {oversFormatted}</span>
+          </div>
+        </motion.div>
+      ) : layoutStyle === 'crickpro-elite' ? (
+        /* ------------------------------------------------------------------ */
+        /* 3. CRICKPRO ELITE OFFICIAL LAYOUT                                  */
+        /* ------------------------------------------------------------------ */
+        <motion.div
+          initial={{ opacity: 0, y: 60 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: 'spring', damping: 24, stiffness: 220 }}
+          className="w-full max-w-[1340px] flex flex-col font-sans pointer-events-auto relative select-none"
+        >
+          {/* Target top tab overlay (centered over center section) */}
+          {matchDetails.targetRuns && (
+            <div className="absolute left-[38%] top-[-26px] z-20">
+              <div 
+                className="bg-[#0a041f] text-white text-[11px] font-black px-6 py-1 rounded-t-lg tracking-widest uppercase border-t border-x border-white/20 shadow-md flex items-center justify-center gap-1.5"
+                style={{ clipPath: 'polygon(10px 0, calc(100% - 10px) 0, 100% 100%, 0 100%)' }}
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping shrink-0" />
+                TARGET - {matchDetails.targetRuns}
+              </div>
+            </div>
+          )}
+
+          {/* Main Ticker Block */}
+          <div className="h-[76px] flex items-stretch border-2 border-slate-950 bg-[#160c30] shadow-2xl relative overflow-visible">
+            
+            {/* ── A. LEFT TEAM BADGE Flank ── */}
+            <div 
+              className="px-6 flex items-center justify-center shrink-0 min-w-[180px] text-slate-950 relative overflow-hidden"
+              style={{
+                background: battingTeam.primaryColor || '#ffd700',
+                clipPath: 'polygon(0% 0%, 90% 0%, 100% 50%, 90% 100%, 0% 100%)',
+              }}
+            >
+              <span className="font-black text-xl uppercase tracking-tighter text-center line-clamp-1">
+                {battingTeam.shortName || battingTeam.fullName}
+              </span>
+              
+              {/* Chevron chevron effect border */}
+              <div className="absolute right-1 top-0 bottom-0 flex flex-col justify-center items-center gap-1.5 opacity-60">
+                <span className="text-[8px] font-black">&gt;</span>
+                <span className="text-[8px] font-black">&gt;</span>
+                <span className="text-[8px] font-black">&gt;</span>
+              </div>
+            </div>
+
+            {/* ── B. BATTERS BOX (White ground) ── */}
+            <div className="bg-white text-[#160c30] flex-[1.2] px-6 flex flex-col justify-center border-r-2 border-slate-950 shadow-inner relative">
+              {striker && (
+                <div className="flex items-center justify-between text-[15px] font-black uppercase py-0.5">
+                  <span className="flex items-center gap-1.5 text-[#160c30]">
+                    <span className="text-rose-500 font-black text-xs shrink-0">▶</span>
+                    <span className="truncate max-w-[150px]">{striker.name}</span>
+                  </span>
+                  <span className="font-black text-[16px] text-rose-600">
+                    {striker.runs} <span className="text-[11px] font-normal text-slate-600 align-baseline">({striker.balls})</span>
+                  </span>
+                </div>
+              )}
+              {nonStriker && (
+                <div className="flex items-center justify-between text-[13px] font-extrabold uppercase opacity-85 py-0.5 pl-4">
+                  <span className="truncate max-w-[150px] text-slate-700">{nonStriker.name}</span>
+                  <span className="font-bold text-[13px] text-slate-700">
+                    {nonStriker.runs} <span className="text-[10px] font-normal text-slate-500 align-baseline">({nonStriker.balls})</span>
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* ── C. CENTER BRAND & SCORE BOX (Deep purple ground) ── */}
+            <div 
+              className="flex-[1.5] px-4 flex items-center justify-between relative"
+              style={{
+                background: '#160c30',
+                clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)',
+              }}
+            >
+              {/* Left text: Match summary / Title */}
+              <div className="flex flex-col justify-center text-left pl-2">
+                <span className="text-[11px] text-slate-400 font-extrabold tracking-wider uppercase leading-none">
+                  {battingTeam.shortName} V {bowlingTeam.shortName}
+                </span>
+                <span className="text-xs text-white font-black uppercase tracking-tight mt-1 line-clamp-1 max-w-[180px]">
+                  {matchDetails.winnerMargin || matchDetails.customInputText || 'LIVE MATCH COVERAGE'}
+                </span>
+              </div>
+
+              {/* Center: Angle Pink Score Box */}
+              <div className="flex items-center gap-2">
+                <div 
+                  className="bg-gradient-to-r from-pink-600 to-rose-500 text-white font-black px-6 py-2 shadow-lg border border-pink-400/20 flex items-center justify-center min-w-[110px]"
+                  style={{
+                    clipPath: 'polygon(15% 0%, 100% 0%, 85% 100%, 0% 100%)',
+                  }}
+                >
+                  <span className="text-[26px] font-black tracking-tight leading-none">
+                    {battingTeam.score}-{battingTeam.wickets}
+                  </span>
+                </div>
+
+                {/* Powerplay / Free hit badge */}
+                <div 
+                  className="w-8 h-8 flex items-center justify-center font-black text-slate-950 text-xs shadow-md shrink-0"
+                  style={{
+                    background: '#ffd700',
+                    clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
+                  }}
+                >
+                  {battingTeam.overs < 6 ? 'P' : 'R'}
+                </div>
+              </div>
+
+              {/* Right: Partnership Capsule */}
+              <div 
+                className="bg-[#241747] text-white px-4 py-1.5 flex flex-col items-center justify-center min-w-[70px] border border-white/5"
+                style={{
+                  clipPath: 'polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%)',
+                }}
+              >
+                <span className="text-[9px] font-extrabold opacity-60 uppercase tracking-widest leading-none">PART</span>
+                <span className="text-[12px] font-black text-yellow-300 mt-0.5 leading-none">
+                  {partnershipRuns}({partnershipBalls})
+                </span>
+              </div>
+            </div>
+
+            {/* ── D. BOWLER BOX (White ground) ── */}
+            <div className="bg-white text-[#160c30] flex-[1.4] px-6 flex flex-col justify-center border-l-2 border-r-2 border-slate-950">
+              {currentBowler && (
+                <div className="flex items-center justify-between text-[13px] font-black uppercase mb-1">
+                  <span className="truncate max-w-[150px]">{currentBowler.name}</span>
+                  <span className="text-rose-600 font-black">
+                    {currentBowler.wickets}-{currentBowler.runsConceded} 
+                    <span className="text-[10px] font-normal text-slate-600 align-baseline"> ({currentBowler.overs}.{currentBowler.ballsInCurrentOver})</span>
+                  </span>
+                </div>
+              )}
+              
+              {/* Ball Dots */}
+              <div className="flex items-center gap-1.5 overflow-hidden">
+                {matchDetails.recentBalls.slice(-6).map((ball, idx) => {
+                  let dotColor = 'bg-slate-800 text-white';
+                  let label = ball;
+                  if (ball === '6') { dotColor = 'bg-[#16a34a] text-white'; }
+                  else if (ball === '4') { dotColor = 'bg-[#ca8a04] text-white'; }
+                  else if (ball === 'W') { dotColor = 'bg-[#dc2626] text-white'; }
+                  else if (ball === 'WD') { dotColor = 'bg-[#7c3aed] text-white'; label = 'Wd'; }
+                  else if (ball === 'NB') { dotColor = 'bg-[#ea580c] text-white'; label = 'Nb'; }
+                  else if (ball === '0') { dotColor = 'bg-slate-900 text-slate-400'; label = '●'; }
+
+                  return (
+                    <span 
+                      key={idx} 
+                      className={`w-[22px] h-[22px] rounded-full font-black text-[10px] flex items-center justify-center shadow-sm shrink-0 ${dotColor}`}
+                    >
+                      {label}
+                    </span>
+                  );
+                })}
+                {/* Pad empty balls */}
+                {Array.from({ length: Math.max(0, 6 - matchDetails.recentBalls.length) }).map((_, idx) => (
+                  <span 
+                    key={`e-${idx}`} 
+                    className="w-[22px] h-[22px] rounded-full border border-slate-300 shrink-0 bg-slate-50"
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* ── E. RIGHT TEAM BADGE Flank ── */}
+            <div 
+              className="px-6 flex items-center justify-center shrink-0 min-w-[180px] text-slate-950 relative overflow-hidden"
+              style={{
+                background: bowlingTeam.primaryColor || '#00d2ff',
+                clipPath: 'polygon(10% 0%, 100% 0%, 100% 100%, 10% 100%, 0% 50%)',
+              }}
+            >
+              {/* Chevron pattern separator on the left */}
+              <div className="absolute left-1 top-0 bottom-0 flex flex-col justify-center items-center gap-1.5 opacity-60">
+                <span className="text-[8px] font-black">&lt;</span>
+                <span className="text-[8px] font-black">&lt;</span>
+                <span className="text-[8px] font-black">&lt;</span>
+              </div>
+
+              <span className="font-black text-xl uppercase tracking-tighter text-center line-clamp-1 pl-2">
+                {bowlingTeam.shortName || bowlingTeam.fullName}
+              </span>
+            </div>
+
+          </div>
+
+          {/* Bottom Running ticker strip */}
+          <div className="h-6 bg-[#0a041f] text-white text-[11px] font-black uppercase tracking-wider flex items-center justify-between px-6 border-t-2 border-pink-500 shadow-md">
+            <span className="text-yellow-400">CRR: {crr} {rrr ? ` | RRR: ${rrr}` : ''}</span>
+            <span className="text-white/80">{matchDetails.customInputText || `${battingTeam.fullName} INNINGS OVER ${oversFormatted}`}</span>
+            <span className="text-cyan-400">OVERS: {oversFormatted}</span>
+          </div>
+
+        </motion.div>
+      ) : layoutStyle === 'jiocinema-magenta' ? (
+        /* ------------------------------------------------------------------ */
+        /* 3B. JIOCINEMA MAGENTA & GOLD BROADCAST BAR                         */
+        /* ------------------------------------------------------------------ */
+        <motion.div
+          initial={{ opacity: 0, y: 60 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: 'spring', damping: 24, stiffness: 220 }}
+          className="w-full max-w-[1260px] flex flex-col font-sans pointer-events-auto shadow-2xl relative rounded-2xl overflow-hidden border-2 border-rose-400"
+        >
+          <div className="h-[72px] flex items-stretch bg-[#4c0519]">
+            <div className="bg-gradient-to-r from-rose-700 to-pink-600 text-white px-6 flex items-center justify-center font-black text-xl uppercase tracking-wider shrink-0 min-w-[170px] shadow-lg">
+              {battingTeam.fullName || battingTeam.shortName}
+            </div>
+            <div className="bg-white text-rose-950 px-6 flex flex-col items-center justify-center min-w-[160px] shrink-0 border-r-2 border-rose-300">
+              <span className="font-black text-3xl leading-none text-rose-700">{battingTeam.score}-{battingTeam.wickets}</span>
+              <span className="text-xs font-bold text-slate-700 mt-0.5">{oversFormatted} OVERS</span>
+            </div>
+            <div className="bg-[#881337] text-white flex-1 px-6 flex flex-col justify-center">
+              {striker && (
+                <div className="flex items-center justify-between text-base font-black uppercase">
+                  <span>★ {striker.name}</span>
+                  <span className="text-amber-300 font-black text-xl">{striker.runs} <span className="text-xs text-white/80">({striker.balls})</span></span>
+                </div>
+              )}
+              {nonStriker && (
+                <div className="flex items-center justify-between text-xs font-bold uppercase opacity-80 mt-0.5">
+                  <span>{nonStriker.name}</span>
+                  <span>{nonStriker.runs} ({nonStriker.balls})</span>
+                </div>
+              )}
+            </div>
+            <div className="bg-[#4c0519] text-white px-6 flex flex-col justify-center min-w-[240px] shrink-0 border-l-2 border-rose-900">
+              {currentBowler && (
+                <div className="flex items-center justify-between text-sm font-black uppercase mb-1">
+                  <span>{currentBowler.name}</span>
+                  <span className="text-pink-400">{currentBowler.wickets}-{currentBowler.runsConceded} ({currentBowler.overs}.{currentBowler.ballsInCurrentOver})</span>
+                </div>
+              )}
+              <ColoredBallDots balls={matchDetails.recentBalls} />
+            </div>
+            <div className="bg-gradient-to-l from-rose-700 to-pink-600 text-white px-6 flex items-center justify-center font-black text-xl uppercase tracking-wider shrink-0 min-w-[170px] shadow-lg">
+              {bowlingTeam.fullName || bowlingTeam.shortName}
+            </div>
+          </div>
+        </motion.div>
+      ) : layoutStyle === 'sa20-gold' ? (
+        /* ------------------------------------------------------------------ */
+        /* 3C. SA20 GREEN & GOLD DIAGONAL SLASH BAR                          */
+        /* ------------------------------------------------------------------ */
+        <motion.div
+          initial={{ opacity: 0, y: 60 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: 'spring', damping: 24, stiffness: 220 }}
+          className="w-full max-w-[1260px] flex items-stretch h-[76px] font-sans pointer-events-auto shadow-2xl rounded-xl overflow-hidden border-2 border-yellow-400 bg-[#052e16]"
+        >
+          <div className="bg-green-700 text-white px-6 flex items-center justify-center font-black text-xl uppercase tracking-wider shrink-0 -skew-x-12 min-w-[170px]">
+            <span className="skew-x-12">{battingTeam.shortName}</span>
+          </div>
+          <div className="bg-slate-900 text-yellow-400 px-6 flex flex-col items-center justify-center min-w-[150px] shrink-0 border-x-2 border-yellow-400">
+            <span className="font-black text-3xl leading-none">{battingTeam.score}-{battingTeam.wickets}</span>
+            <span className="text-xs font-bold text-white mt-0.5">{oversFormatted} OVS</span>
+          </div>
+          <div className="bg-[#14532d] text-white flex-1 px-6 flex flex-col justify-center">
+            {striker && (
+              <div className="flex items-center justify-between text-base font-black uppercase">
+                <span>&gt; {striker.name}</span>
+                <span className="text-yellow-300 text-xl font-black">{striker.runs} <span className="text-xs text-white">({striker.balls})</span></span>
+              </div>
+            )}
+            {nonStriker && (
+              <div className="flex items-center justify-between text-xs font-bold uppercase opacity-80">
+                <span>{nonStriker.name}</span>
+                <span>{nonStriker.runs} ({nonStriker.balls})</span>
+              </div>
+            )}
+          </div>
+          <div className="bg-[#052e16] text-white px-6 flex flex-col justify-center min-w-[240px] shrink-0 border-l border-green-800">
+            {currentBowler && (
+              <div className="flex items-center justify-between text-sm font-black uppercase mb-1">
+                <span>{currentBowler.name}</span>
+                <span className="text-yellow-400">{currentBowler.wickets}-{currentBowler.runsConceded} ({currentBowler.overs}.{currentBowler.ballsInCurrentOver})</span>
+              </div>
+            )}
+            <ColoredBallDots balls={matchDetails.recentBalls} />
+          </div>
+          <div className="bg-green-700 text-white px-6 flex items-center justify-center font-black text-xl uppercase tracking-wider shrink-0 -skew-x-12 min-w-[170px]">
+            <span className="skew-x-12">{bowlingTeam.shortName}</span>
+          </div>
+        </motion.div>
+      ) : layoutStyle === 'bbl-black-carbon' ? (
+        /* ------------------------------------------------------------------ */
+        /* 3D. BBL CARBON FIBER BLACK & NEON LIME BAR                         */
+        /* ------------------------------------------------------------------ */
+        <motion.div
+          initial={{ opacity: 0, y: 60 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: 'spring', damping: 24, stiffness: 220 }}
+          className="w-full max-w-[1260px] flex items-stretch h-[76px] font-mono pointer-events-auto shadow-2xl rounded-none border-2 border-lime-400 bg-black"
+        >
+          <div className="bg-lime-400 text-black px-6 flex items-center justify-center font-black text-2xl uppercase tracking-tighter shrink-0 min-w-[170px]">
+            {battingTeam.shortName}
+          </div>
+          <div className="bg-neutral-900 text-lime-400 px-6 flex flex-col items-center justify-center min-w-[160px] shrink-0 border-r-2 border-lime-400">
+            <span className="font-black text-3xl leading-none">{battingTeam.score}-{battingTeam.wickets}</span>
+            <span className="text-xs font-bold text-white mt-0.5">{oversFormatted} OVERS</span>
+          </div>
+          <div className="bg-neutral-950 text-white flex-1 px-6 flex flex-col justify-center border-r-2 border-neutral-800">
+            {striker && (
+              <div className="flex items-center justify-between text-base font-black uppercase">
+                <span className="text-lime-400">&gt; {striker.name}</span>
+                <span className="text-lime-400 font-black text-xl">{striker.runs} ({striker.balls})</span>
+              </div>
+            )}
+            {nonStriker && (
+              <div className="flex items-center justify-between text-xs font-bold uppercase text-neutral-400">
+                <span>{nonStriker.name}</span>
+                <span>{nonStriker.runs} ({nonStriker.balls})</span>
+              </div>
+            )}
+          </div>
+          <div className="bg-black text-white px-6 flex flex-col justify-center min-w-[240px] shrink-0 border-r-2 border-neutral-800">
+            {currentBowler && (
+              <div className="flex items-center justify-between text-sm font-black uppercase mb-1">
+                <span className="text-lime-400">{currentBowler.name}</span>
+                <span className="text-white">{currentBowler.wickets}-{currentBowler.runsConceded} ({currentBowler.overs}.{currentBowler.ballsInCurrentOver})</span>
+              </div>
+            )}
+            <ColoredBallDots balls={matchDetails.recentBalls} />
+          </div>
+          <div className="bg-lime-400 text-black px-6 flex items-center justify-center font-black text-2xl uppercase tracking-tighter shrink-0 min-w-[170px]">
+            {bowlingTeam.shortName}
+          </div>
+        </motion.div>
+      ) : layoutStyle === 'cricfusion-glass' ? (
+        /* ------------------------------------------------------------------ */
+        /* 3E. CRICFUSION FROSTED GLASSMORPHISM BOX                           */
+        /* ------------------------------------------------------------------ */
+        <motion.div
+          initial={{ opacity: 0, y: 60, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ type: 'spring', damping: 24, stiffness: 220 }}
+          className="w-full max-w-[1260px] flex items-stretch h-[76px] font-sans pointer-events-auto backdrop-blur-xl bg-slate-950/80 rounded-2xl shadow-2xl border-2 border-pink-500 overflow-hidden"
+        >
+          <div className="bg-pink-600/40 text-white px-6 flex items-center justify-center font-black text-xl uppercase tracking-wider shrink-0 min-w-[170px] backdrop-blur-md">
+            {battingTeam.fullName || battingTeam.shortName}
+          </div>
+          <div className="bg-white/90 text-pink-950 px-6 flex flex-col items-center justify-center min-w-[160px] shrink-0 border-r border-white/20">
+            <span className="font-black text-3xl leading-none text-pink-600">{battingTeam.score}-{battingTeam.wickets}</span>
+            <span className="text-xs font-bold text-slate-800 mt-0.5">{oversFormatted} OVERS</span>
+          </div>
+          <div className="bg-slate-900/60 text-white flex-1 px-6 flex flex-col justify-center border-r border-white/10">
+            {striker && (
+              <div className="flex items-center justify-between text-base font-black uppercase">
+                <span className="text-pink-400">✦ {striker.name}</span>
+                <span className="text-pink-300 text-xl font-black">{striker.runs} <span className="text-xs text-white">({striker.balls})</span></span>
+              </div>
+            )}
+            {nonStriker && (
+              <div className="flex items-center justify-between text-xs font-bold uppercase text-slate-300">
+                <span>{nonStriker.name}</span>
+                <span>{nonStriker.runs} ({nonStriker.balls})</span>
+              </div>
+            )}
+          </div>
+          <div className="bg-slate-950/70 text-white px-6 flex flex-col justify-center min-w-[240px] shrink-0">
+            {currentBowler && (
+              <div className="flex items-center justify-between text-sm font-black uppercase mb-1">
+                <span>{currentBowler.name}</span>
+                <span className="text-pink-400">{currentBowler.wickets}-{currentBowler.runsConceded} ({currentBowler.overs}.{currentBowler.ballsInCurrentOver})</span>
+              </div>
+            )}
+            <ColoredBallDots balls={matchDetails.recentBalls} />
+          </div>
+          <div className="bg-pink-600/40 text-white px-6 flex items-center justify-center font-black text-xl uppercase tracking-wider shrink-0 min-w-[170px] backdrop-blur-md">
+            {bowlingTeam.fullName || bowlingTeam.shortName}
           </div>
         </motion.div>
       ) : layoutStyle === 't20-asia-cup' ? (

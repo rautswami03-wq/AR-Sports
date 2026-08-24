@@ -37,6 +37,7 @@ export const THEME_LINKS_DATA: ThemeLinkItem[] = [
   { id: '20', themeKey: 'icc_wc_vibrant', name: 'ICC World Cup (Vibrant Edition)', server1Url: '/#/theme/20/69d9cec52b632413dd8d7d48', server2Url: '/#/overlay?theme=icc_wc_vibrant', mobileUrl: '/#/overlay?theme=icc_wc_vibrant&mobile=true', badge: 'NEW' },
   { id: '21', themeKey: 'super_fission', name: 'Super Fission (Neon Green)', server1Url: '/#/theme/21/69d9cec52b632413dd8d7d48', server2Url: '/#/overlay?theme=super_fission', mobileUrl: '/#/overlay?theme=super_fission&mobile=true', badge: 'NEW' },
   { id: '22', themeKey: 'local_match_pro', name: 'Local Match Stream Pro', server1Url: '/#/theme/22/69d9cec52b632413dd8d7d48', server2Url: '/#/overlay?theme=local_match_pro', mobileUrl: '/#/overlay?theme=local_match_pro&mobile=true', badge: '1-to-1 MATCH' },
+  { id: '23', themeKey: 'crickpro_elite', name: 'CrickPro Elite Official', server1Url: '/#/theme/23/69d9cec52b632413dd8d7d48', server2Url: '/#/overlay?theme=crickpro_elite', mobileUrl: '/#/overlay?theme=crickpro_elite&mobile=true', badge: 'OFFICIAL' },
 ];
 
 export const ThemeLinksPage: React.FC = () => {
