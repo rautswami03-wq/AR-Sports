@@ -38,6 +38,21 @@ export const THEME_LINKS_DATA: ThemeLinkItem[] = [
   { id: '21', themeKey: 'super_fission', name: 'Super Fission (Neon Green)', server1Url: '/#/theme/21/69d9cec52b632413dd8d7d48', server2Url: '/#/overlay?theme=super_fission', mobileUrl: '/#/overlay?theme=super_fission&mobile=true', badge: 'NEW' },
   { id: '22', themeKey: 'local_match_pro', name: 'Local Match Stream Pro', server1Url: '/#/theme/22/69d9cec52b632413dd8d7d48', server2Url: '/#/overlay?theme=local_match_pro', mobileUrl: '/#/overlay?theme=local_match_pro&mobile=true', badge: '1-to-1 MATCH' },
   { id: '23', themeKey: 'crickpro_elite', name: 'CrickPro Elite Official', server1Url: '/#/theme/23/69d9cec52b632413dd8d7d48', server2Url: '/#/overlay?theme=crickpro_elite', mobileUrl: '/#/overlay?theme=crickpro_elite&mobile=true', badge: 'OFFICIAL' },
+  { id: '24', themeKey: 'thunder', name: 'Thunder (CrickPro)', server1Url: '/#/theme/24/69d9cec52b632413dd8d7d48', server2Url: '/#/overlay?theme=thunder', mobileUrl: '/#/overlay?theme=thunder&mobile=true', badge: 'CRICKPRO' },
+  { id: '25', themeKey: 'apex', name: 'Apex (CrickPro)', server1Url: '/#/theme/25/69d9cec52b632413dd8d7d48', server2Url: '/#/overlay?theme=apex', mobileUrl: '/#/overlay?theme=apex&mobile=true', badge: 'CRICKPRO' },
+  { id: '26', themeKey: 'volt', name: 'Volt (CrickPro)', server1Url: '/#/theme/26/69d9cec52b632413dd8d7d48', server2Url: '/#/overlay?theme=volt', mobileUrl: '/#/overlay?theme=volt&mobile=true', badge: 'CRICKPRO' },
+  { id: '27', themeKey: 'blitz', name: 'Blitz (CrickPro)', server1Url: '/#/theme/27/69d9cec52b632413dd8d7d48', server2Url: '/#/overlay?theme=blitz', mobileUrl: '/#/overlay?theme=blitz&mobile=true', badge: 'CRICKPRO' },
+  { id: '28', themeKey: 'africa', name: 'Africa (CrickPro)', server1Url: '/#/theme/28/69d9cec52b632413dd8d7d48', server2Url: '/#/overlay?theme=africa', mobileUrl: '/#/overlay?theme=africa&mobile=true', badge: 'CRICKPRO' },
+  { id: '29', themeKey: 'franchise', name: 'Franchise (CrickPro)', server1Url: '/#/theme/29/69d9cec52b632413dd8d7d48', server2Url: '/#/overlay?theme=franchise', mobileUrl: '/#/overlay?theme=franchise&mobile=true', badge: 'CRICKPRO' },
+  { id: '30', themeKey: 'elite', name: 'Elite (CrickPro)', server1Url: '/#/theme/30/69d9cec52b632413dd8d7d48', server2Url: '/#/overlay?theme=elite', mobileUrl: '/#/overlay?theme=elite&mobile=true', badge: 'CRICKPRO' },
+  { id: '31', themeKey: 'aranyaka', name: 'Aranyaka (CrickPro)', server1Url: '/#/theme/31/69d9cec52b632413dd8d7d48', server2Url: '/#/overlay?theme=aranyaka', mobileUrl: '/#/overlay?theme=aranyaka&mobile=true', badge: 'CRICKPRO' },
+  { id: '32', themeKey: 'shakti', name: 'Shakti (CrickPro)', server1Url: '/#/theme/32/69d9cec52b632413dd8d7d48', server2Url: '/#/overlay?theme=shakti', mobileUrl: '/#/overlay?theme=shakti&mobile=true', badge: 'CRICKPRO' },
+  { id: '33', themeKey: 'agni', name: 'Agni (CrickPro)', server1Url: '/#/theme/33/69d9cec52b632413dd8d7d48', server2Url: '/#/overlay?theme=agni', mobileUrl: '/#/overlay?theme=agni&mobile=true', badge: 'CRICKPRO' },
+  { id: '34', themeKey: 'dharma', name: 'Dharma (CrickPro)', server1Url: '/#/theme/34/69d9cec52b632413dd8d7d48', server2Url: '/#/overlay?theme=dharma', mobileUrl: '/#/overlay?theme=dharma&mobile=true', badge: 'CRICKPRO' },
+  { id: '35', themeKey: 'diamond', name: 'Diamond (CrickPro)', server1Url: '/#/theme/35/69d9cec52b632413dd8d7d48', server2Url: '/#/overlay?theme=diamond', mobileUrl: '/#/overlay?theme=diamond&mobile=true', badge: 'CRICKPRO' },
+  { id: '36', themeKey: 'championship_2022', name: 'Championship 2022 (CrickPro)', server1Url: '/#/theme/36/69d9cec52b632413dd8d7d48', server2Url: '/#/overlay?theme=championship_2022', mobileUrl: '/#/overlay?theme=championship_2022&mobile=true', badge: 'CRICKPRO' },
+  { id: '37', themeKey: 'championship_2019', name: 'Championship 2019 (CrickPro)', server1Url: '/#/theme/37/69d9cec52b632413dd8d7d48', server2Url: '/#/overlay?theme=championship_2019', mobileUrl: '/#/overlay?theme=championship_2019&mobile=true', badge: 'CRICKPRO' },
+  { id: '38', themeKey: 'asia_2022', name: 'Asia 2022 (CrickPro)', server1Url: '/#/theme/38/69d9cec52b632413dd8d7d48', server2Url: '/#/overlay?theme=asia_2022', mobileUrl: '/#/overlay?theme=asia_2022&mobile=true', badge: 'CRICKPRO' },
 ];
 
 export const ThemeLinksPage: React.FC = () => {
