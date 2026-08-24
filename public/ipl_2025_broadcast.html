@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>IPL 2025 Star Sports Broadcast Overlay</title>
+  <title>IPL 2025 Disney+ Hotstar Broadcast Overlay</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --primary: #0A1E3D;
-      --secondary: #0D2B4B;
+      --primary: #051429;
+      --secondary: #0A2240;
       --accent: #00D4FF;
       --highlight: #FFD700;
       --text: #FFFFFF;
       --text-sec: #89CFF0;
-      --panel-grad: linear-gradient(135deg, #0A1E3D 0%, #0D2B4B 70%, #00D4FF 100%);
+      --border-glowing: 0 0 20px rgba(0, 212, 255, 0.6), inset 0 0 15px rgba(0, 212, 255, 0.2);
     }
     body {
       font-family: 'Montserrat', sans-serif;
@@ -26,31 +26,75 @@
       margin: 0;
       padding: 0;
     }
-    .ipl-panel {
-      background: var(--panel-grad);
-      border: 1.5px solid var(--accent);
-      box-shadow: 0 0 15px rgba(0, 212, 255, 0.4), inset 0 0 20px rgba(0, 212, 255, 0.1);
-      border-radius: 6px;
-      transform: skewX(-6deg);
+    /* Premium Star Sports / Disney+ Hotstar design language */
+    .ipl-card {
+      background: linear-gradient(135deg, #051429 0%, #0c2b4d 75%, #00d4ff 100%);
+      border: 2px solid var(--accent);
+      box-shadow: var(--border-glowing);
+      border-radius: 2px;
+      transform: skewX(-12deg);
+      position: relative;
+      overflow: hidden;
     }
-    .ipl-skew-correction {
-      transform: skewX(6deg);
+    .ipl-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.15), transparent);
+      transform: skewX(25deg);
+      animation: shine 4s infinite linear;
+    }
+    @keyframes shine {
+      0% { left: -100%; }
+      50% { left: 150%; }
+      100% { left: 150%; }
+    }
+    .ipl-unskew {
+      transform: skewX(12deg);
     }
     .neon-text-cyan {
       color: var(--accent);
-      text-shadow: 0 0 8px rgba(0, 212, 255, 0.6);
+      text-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
     }
     .neon-text-gold {
       color: var(--highlight);
-      text-shadow: 0 0 8px rgba(255, 215, 0, 0.6);
+      text-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
     }
     .screen-container {
-      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
     }
     .hidden-screen {
       opacity: 0 !important;
       transform: translateY(40px) scale(0.95) !important;
       pointer-events: none !important;
+    }
+    .skew-tag {
+      background: var(--accent);
+      color: #000;
+      transform: skewX(-20deg);
+      font-weight: 900;
+    }
+    .skew-tag-text {
+      transform: skewX(20deg);
+    }
+    /* Wicket strobe keyframes */
+    @keyframes redStrobe {
+      0%, 100% { background-color: rgba(127, 29, 29, 0.95); }
+      50% { background-color: rgba(220, 38, 38, 0.95); }
+    }
+    .wicket-strobe {
+      animation: redStrobe 0.8s infinite ease-in-out;
+    }
+    /* Free Hit strobe keyframes */
+    @keyframes yellowStrobe {
+      0%, 100% { background-color: rgba(113, 63, 18, 0.95); }
+      50% { background-color: rgba(234, 179, 8, 0.95); }
+    }
+    .freehit-strobe {
+      animation: yellowStrobe 0.8s infinite ease-in-out;
     }
   </style>
 </head>
@@ -62,70 +106,87 @@
   <div id="viewport" class="relative w-[1920px] h-[1080px] bg-transparent">
 
     <!-- 1. MAIN SCOREBOARD -->
-    <div id="screen-1" class="screen-container absolute bottom-12 left-1/2 -translate-x-1/2 w-[1140px] ipl-panel p-4 flex flex-col gap-2 z-10 hidden-screen">
-      <div class="ipl-skew-correction flex items-center justify-between">
-        <div class="flex items-center gap-4">
-          <div class="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center text-2xl border border-cyan-400">⚡</div>
+    <div id="screen-1" class="screen-container absolute bottom-12 left-1/2 -translate-x-1/2 w-[1180px] ipl-card p-4 flex flex-col gap-2 z-10 hidden-screen">
+      <div class="ipl-unskew flex items-center justify-between">
+        <!-- Team badges with diagonal design -->
+        <div class="flex items-center gap-6">
+          <div class="flex items-center gap-3">
+            <span class="px-3.5 py-1 bg-cyan-500 text-slate-950 font-black text-xs uppercase rounded transform -skew-x-12">MI</span>
+            <span class="text-xs font-bold text-slate-400 uppercase">VS</span>
+            <span class="px-3.5 py-1 bg-yellow-500 text-slate-950 font-black text-xs uppercase rounded transform -skew-x-12">CSK</span>
+          </div>
           <div>
-            <h4 class="text-xs font-black text-cyan-400 uppercase tracking-widest leading-none mb-1">IPL 2025 MATCH 1</h4>
-            <span class="text-2xl font-black tracking-wide">MI vs CSK</span>
+            <h4 class="text-[10px] font-black text-[#89CFF0] uppercase tracking-widest leading-none mb-1">IPL 2025 LEAGUE MATCH</h4>
+            <span class="text-xl font-black tracking-wide text-white">MUMBAI INDIANS BATTING</span>
           </div>
         </div>
+
+        <!-- Real-time metrics -->
         <div class="flex items-center gap-6">
           <div class="text-right">
-            <span class="text-xs font-bold text-cyan-300 block uppercase tracking-wider">OVERS</span>
-            <span class="text-xl font-black">12.4 <span class="opacity-40 text-xs">/ 20</span></span>
+            <span class="text-[10px] font-black text-cyan-400 block uppercase tracking-wider">OVERS</span>
+            <span class="text-xl font-black text-white">14.3 <span class="opacity-40 text-xs">/ 20</span></span>
           </div>
           <div class="text-right">
-            <span class="text-xs font-bold text-[#89CFF0] block uppercase tracking-wider">REQ RATE</span>
-            <span class="text-xl font-black text-amber-300">9.45</span>
+            <span class="text-[10px] font-black text-[#89CFF0] block uppercase tracking-wider">CRR</span>
+            <span class="text-xl font-black text-white">10.32</span>
           </div>
-          <div class="px-6 py-2.5 bg-slate-950/80 rounded-lg border border-cyan-500/30 text-center min-w-[160px] shadow-[0_0_15px_rgba(0,212,255,0.1)]">
+          <div class="text-right">
+            <span class="text-[10px] font-black text-amber-400 block uppercase tracking-wider">TARGET</span>
+            <span class="text-xl font-black text-amber-400">208</span>
+          </div>
+          
+          <!-- Large Scoreboard Badge -->
+          <div class="px-6 py-2.5 bg-slate-950/85 rounded border border-cyan-400/40 text-center min-w-[170px] shadow-[0_0_20px_rgba(0,212,255,0.25)]">
             <span class="text-[9px] font-black text-cyan-400 uppercase block tracking-wider leading-none mb-1">SCORE</span>
-            <span class="text-3xl font-black text-white">124 <span class="text-xl text-rose-500">/ 3</span></span>
+            <span class="text-3xl font-black text-white">154 <span class="text-xl text-rose-500 font-extrabold">/ 3</span></span>
           </div>
         </div>
       </div>
     </div>
 
     <!-- 2. BATTER CARD -->
-    <div id="screen-2" class="screen-container absolute bottom-12 left-1/2 -translate-x-1/2 w-[800px] ipl-panel p-4 flex items-center justify-between z-10 hidden-screen">
-      <div class="ipl-skew-correction">
-        <span class="text-xs font-black text-cyan-400 uppercase tracking-widest block mb-0.5">BATSMAN IN CREASE</span>
+    <div id="screen-2" class="screen-container absolute bottom-12 left-1/2 -translate-x-1/2 w-[820px] ipl-card p-4 flex items-center justify-between z-10 hidden-screen">
+      <div class="ipl-unskew">
+        <span class="text-xs font-black text-cyan-400 uppercase tracking-widest block mb-0.5">CURRENT BATTER</span>
         <h3 class="text-2xl font-black uppercase text-white tracking-wide">Rohit Sharma</h3>
-        <p class="text-[11px] font-bold text-amber-400 uppercase">Mumbai Indians</p>
+        <p class="text-[11px] font-bold text-amber-400 uppercase tracking-widest">Mumbai Indians</p>
       </div>
-      <div class="ipl-skew-correction flex items-center gap-6 text-center">
+      <div class="ipl-unskew flex items-center gap-8 text-center">
         <div>
           <span class="text-[9px] font-bold text-[#89CFF0] uppercase block">RUNS</span>
-          <span class="text-2xl font-black text-white">58</span>
+          <span class="text-2xl font-black text-white">74</span>
         </div>
         <div>
           <span class="text-[9px] font-bold text-[#89CFF0] uppercase block">BALLS</span>
-          <span class="text-2xl font-black text-white">32</span>
+          <span class="text-2xl font-black text-white">42</span>
         </div>
         <div>
           <span class="text-[9px] font-bold text-[#89CFF0] uppercase block">4s / 6s</span>
-          <span class="text-lg font-black text-white">5 / 3</span>
+          <span class="text-lg font-black text-white">6 / 4</span>
         </div>
         <div>
           <span class="text-[9px] font-bold text-[#89CFF0] uppercase block">S/R</span>
-          <span class="text-2xl font-black text-cyan-400">181.2</span>
+          <span class="text-2xl font-black text-cyan-400">176.2</span>
+        </div>
+        <div>
+          <span class="text-[9px] font-bold text-[#89CFF0] uppercase block">DOTS</span>
+          <span class="text-xl font-black text-slate-400">12</span>
         </div>
       </div>
     </div>
 
     <!-- 3. BOWLER CARD -->
-    <div id="screen-3" class="screen-container absolute bottom-12 left-1/2 -translate-x-1/2 w-[800px] ipl-panel p-4 flex items-center justify-between z-10 hidden-screen">
-      <div class="ipl-skew-correction">
-        <span class="text-xs font-black text-cyan-400 uppercase tracking-widest block mb-0.5">CURRENT BOWLER</span>
-        <h3 class="text-2xl font-black uppercase text-white tracking-wide">Ravindra Jadeja</h3>
-        <p class="text-[11px] font-bold text-amber-400 uppercase">Chennai Super Kings</p>
+    <div id="screen-3" class="screen-container absolute bottom-12 left-1/2 -translate-x-1/2 w-[820px] ipl-card p-4 flex items-center justify-between z-10 hidden-screen">
+      <div class="ipl-unskew">
+        <span class="text-xs font-black text-cyan-400 uppercase tracking-widest block mb-0.5">ACTIVE BOWLER</span>
+        <h3 class="text-2xl font-black uppercase text-white tracking-wide">Jasprit Bumrah</h3>
+        <p class="text-[11px] font-bold text-amber-400 uppercase tracking-widest">Mumbai Indians</p>
       </div>
-      <div class="ipl-skew-correction flex items-center gap-6 text-center">
+      <div class="ipl-unskew flex items-center gap-8 text-center">
         <div>
           <span class="text-[9px] font-bold text-[#89CFF0] uppercase block">OVERS</span>
-          <span class="text-2xl font-black text-white">2.4</span>
+          <span class="text-2xl font-black text-white">3.3</span>
         </div>
         <div>
           <span class="text-[9px] font-bold text-[#89CFF0] uppercase block">RUNS</span>
@@ -133,21 +194,25 @@
         </div>
         <div>
           <span class="text-[9px] font-bold text-[#89CFF0] uppercase block">WICKETS</span>
-          <span class="text-2xl font-black text-cyan-400">2</span>
+          <span class="text-2xl font-black text-cyan-400">3</span>
         </div>
         <div>
           <span class="text-[9px] font-bold text-[#89CFF0] uppercase block">ECON</span>
-          <span class="text-2xl font-black text-amber-300">6.75</span>
+          <span class="text-2xl font-black text-amber-300">5.14</span>
+        </div>
+        <div>
+          <span class="text-[9px] font-bold text-[#89CFF0] uppercase block">DOTS</span>
+          <span class="text-xl font-black text-slate-400">14</span>
         </div>
       </div>
     </div>
 
     <!-- 4. BATTING SUMMARY -->
-    <div id="screen-4" class="screen-container absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[980px] ipl-panel p-6 z-10 hidden-screen">
-      <div class="ipl-skew-correction">
+    <div id="screen-4" class="screen-container absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] ipl-card p-6 z-10 hidden-screen">
+      <div class="ipl-unskew">
         <div class="flex items-center justify-between border-b border-cyan-400/40 pb-3 mb-4">
           <h2 class="text-2xl font-black uppercase tracking-wide text-white">Mumbai Indians <span class="text-cyan-400">Batting</span></h2>
-          <span class="text-lg font-black text-white">154/4 (16.2 overs)</span>
+          <span class="text-lg font-black text-white">174/3 (15.3 overs)</span>
         </div>
         <div class="space-y-2 text-sm font-semibold" id="batting-summary-container">
           <!-- Dynamic Batters -->
@@ -156,11 +221,11 @@
     </div>
 
     <!-- 5. BOWLING SUMMARY -->
-    <div id="screen-5" class="screen-container absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[980px] ipl-panel p-6 z-10 hidden-screen">
-      <div class="ipl-skew-correction">
+    <div id="screen-5" class="screen-container absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] ipl-card p-6 z-10 hidden-screen">
+      <div class="ipl-unskew">
         <div class="flex items-center justify-between border-b border-cyan-400/40 pb-3 mb-4">
           <h2 class="text-2xl font-black uppercase tracking-wide text-white">Chennai Super Kings <span class="text-cyan-400">Bowling</span></h2>
-          <span class="text-xs font-bold text-[#89CFF0] uppercase tracking-wider">Bowling summary card</span>
+          <span class="text-xs font-black text-[#89CFF0] uppercase tracking-wider">Bowling innings card</span>
         </div>
         <div class="space-y-2 text-sm font-semibold" id="bowling-summary-container">
           <!-- Dynamic Bowlers -->
@@ -169,226 +234,231 @@
     </div>
 
     <!-- 6. FALL OF WICKETS -->
-    <div id="screen-6" class="screen-container absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[850px] ipl-panel p-6 z-10 hidden-screen">
-      <div class="ipl-skew-correction">
-        <h3 class="text-2xl font-black text-center text-cyan-400 uppercase tracking-widest mb-4">FALL OF WICKETS</h3>
-        <div class="space-y-2 font-semibold">
-          <div class="bg-white/5 border border-cyan-400/20 p-3 rounded flex justify-between text-sm">
+    <div id="screen-6" class="screen-container absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[850px] ipl-card p-6 z-10 hidden-screen">
+      <div class="ipl-unskew">
+        <h3 class="text-2xl font-black text-center text-cyan-400 uppercase tracking-widest mb-4">FALL OF WICKETS (CSK)</h3>
+        <div class="space-y-2.5 font-semibold">
+          <div class="bg-slate-950/80 border border-cyan-400/20 p-3.5 rounded flex justify-between text-sm">
             <span>1-34 (Ishan Kishan, 3.2 overs)</span>
-            <span class="text-cyan-400 font-bold">Partnership: 34 runs</span>
+            <span class="text-cyan-400 font-bold">Partnership: 34 (20b)</span>
           </div>
-          <div class="bg-white/5 border border-cyan-400/20 p-3 rounded flex justify-between text-sm">
+          <div class="bg-slate-950/80 border border-cyan-400/20 p-3.5 rounded flex justify-between text-sm">
             <span>2-78 (Suryakumar Yadav, 8.4 overs)</span>
-            <span class="text-cyan-400 font-bold">Partnership: 44 runs</span>
+            <span class="text-cyan-400 font-bold">Partnership: 44 (32b)</span>
+          </div>
+          <div class="bg-slate-950/80 border border-cyan-400/20 p-3.5 rounded flex justify-between text-sm">
+            <span>3-148 (Tilak Varma, 14.3 overs)</span>
+            <span class="text-cyan-400 font-bold">Partnership: 70 (35b)</span>
           </div>
         </div>
       </div>
     </div>
 
     <!-- 7. MATCH SUMMARY -->
-    <div id="screen-7" class="screen-container absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1160px] ipl-panel p-6 z-10 hidden-screen">
-      <div class="ipl-skew-correction">
-        <h2 class="text-2xl font-black uppercase text-center text-cyan-400 tracking-wider mb-6">IPL MATCH SUMMARY</h2>
+    <div id="screen-7" class="screen-container absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1160px] ipl-card p-6 z-10 hidden-screen">
+      <div class="ipl-unskew">
+        <h2 class="text-2xl font-black uppercase text-center text-cyan-400 tracking-wider mb-6">IPL 2025 MATCH SUMMARY</h2>
         <div class="grid grid-cols-2 gap-8">
           <div>
             <div class="flex justify-between border-b border-cyan-400/40 pb-2 mb-3">
               <span class="font-black text-white text-lg">MUMBAI INDIANS</span>
-              <span class="font-black text-cyan-400 text-lg">188/5 (20.0)</span>
+              <span class="font-black text-cyan-400 text-lg">186/6 (20.0)</span>
             </div>
             <div class="space-y-1 text-sm font-semibold text-slate-300">
-              <div class="flex justify-between"><span>Rohit Sharma</span><span>68 (38)</span></div>
-              <div class="flex justify-between"><span>Hardik Pandya</span><span>42 (24)</span></div>
-              <div class="flex justify-between"><span>Matheesha Pathirana</span><span>2/32 (4.0)</span></div>
+              <div class="flex justify-between"><span>Abhishek Sharma</span><span>74 (42)</span></div>
+              <div class="flex justify-between"><span>Tilak Varma</span><span>44 (30)</span></div>
+              <div class="flex justify-between"><span>Sufiyan Muqeem</span><span>2/34 (4.0)</span></div>
             </div>
           </div>
           <div>
             <div class="flex justify-between border-b border-cyan-400/40 pb-2 mb-3">
               <span class="font-black text-white text-lg">CHENNAI SUPER KINGS</span>
-              <span class="font-black text-cyan-400 text-lg">182/6 (20.0)</span>
+              <span class="font-black text-cyan-400 text-lg">179/7 (20.0)</span>
             </div>
             <div class="space-y-1 text-sm font-semibold text-slate-300">
-              <div class="flex justify-between"><span>Ruturaj Gaikwad</span><span>72 (46)</span></div>
-              <div class="flex justify-between"><span>Shivam Dube</span><span>36 (18)</span></div>
-              <div class="flex justify-between"><span>Jasprit Bumrah</span><span>3/18 (4.0)</span></div>
+              <div class="flex justify-between"><span>Yasir Khan</span><span>58 (36)</span></div>
+              <div class="flex justify-between"><span>Qasim Akram</span><span>32 (18)</span></div>
+              <div class="flex justify-between"><span>Anshul Kamboj</span><span>3/22 (4.0)</span></div>
             </div>
           </div>
         </div>
         <div class="mt-6 text-center">
           <span class="bg-cyan-500/10 border border-cyan-400/40 text-cyan-400 font-black text-base px-6 py-2 rounded">
-            MUMBAI INDIANS WON BY 6 RUNS
+            MUMBAI INDIANS WON BY 7 RUNS
           </span>
         </div>
       </div>
     </div>
 
     <!-- 8. PARTNERSHIP DISPLAY -->
-    <div id="screen-8" class="screen-container absolute bottom-12 left-1/2 -translate-x-1/2 w-[800px] ipl-panel p-4 flex items-center justify-between z-10 hidden-screen">
-      <div class="ipl-skew-correction flex-1 text-left">
+    <div id="screen-8" class="screen-container absolute bottom-12 left-1/2 -translate-x-1/2 w-[820px] ipl-card p-4 flex items-center justify-between z-10 hidden-screen">
+      <div class="ipl-unskew flex-1 text-left">
         <span class="text-[10px] font-black text-cyan-400 uppercase tracking-widest block mb-1">PARTNERSHIP</span>
         <div class="flex items-center gap-3">
           <span class="text-sm font-bold uppercase text-white">Rohit Sharma</span>
-          <span class="text-xs text-[#89CFF0]">42 (26)</span>
+          <span class="text-xs text-[#89CFF0]">68% contribution</span>
         </div>
-        <div class="flex items-center gap-3 mt-1">
-          <span class="text-sm font-bold uppercase text-white">H. Pandya</span>
-          <span class="text-xs text-[#89CFF0]">18 (14)</span>
+        <!-- Progress Bar split -->
+        <div class="w-48 h-2 bg-slate-950 rounded-full overflow-hidden mt-1.5 flex">
+          <div class="h-full bg-cyan-400" style="width: 68%"></div>
+          <div class="h-full bg-amber-400" style="width: 32%"></div>
         </div>
       </div>
-      <div class="ipl-skew-correction text-center px-8 border-l border-cyan-400/30 shrink-0">
+      <div class="ipl-unskew text-center px-8 border-l border-cyan-400/30 shrink-0">
         <span class="text-[10px] font-bold text-slate-400 uppercase block">TOTAL</span>
-        <span class="text-3xl font-black text-cyan-400">60</span>
-        <span class="text-[10px] font-bold text-[#89CFF0] uppercase block">runs (40b)</span>
+        <span class="text-3xl font-black text-cyan-400">52</span>
+        <span class="text-[10px] font-bold text-[#89CFF0] uppercase block">runs (34b)</span>
       </div>
     </div>
 
     <!-- 9. RESULT BANNER -->
-    <div id="screen-9" class="screen-container absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] ipl-panel p-8 text-center z-10 hidden-screen">
-      <div class="ipl-skew-correction">
-        <div class="text-amber-400 text-4xl mb-3">🏆</div>
-        <h2 class="text-3xl font-black tracking-wide text-white uppercase mb-2">MATCH OVER</h2>
-        <p class="text-2xl font-black text-cyan-400 uppercase tracking-widest mb-4">MUMBAI INDIANS WON BY 6 RUNS</p>
+    <div id="screen-9" class="screen-container absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] ipl-card p-8 text-center z-10 hidden-screen">
+      <div class="ipl-unskew">
+        <div class="text-amber-400 text-5xl mb-3 animate-bounce">🏆</div>
+        <h2 class="text-3xl font-black tracking-wide text-white uppercase mb-2">IPL MATCH RESULTS</h2>
+        <p class="text-2xl font-black text-cyan-400 uppercase tracking-widest mb-4">MUMBAI INDIANS WON BY 7 RUNS</p>
         <div class="h-px bg-cyan-400/20 w-48 mx-auto my-3"></div>
-        <p class="text-xs font-bold text-[#89CFF0] uppercase tracking-wider">Star Sports Live Broadcast</p>
+        <p class="text-xs font-bold text-[#89CFF0] uppercase tracking-wider">AR Sports Broadcast Live</p>
       </div>
     </div>
 
     <!-- 10. DISMISSAL CARD -->
-    <div id="screen-10" class="screen-container absolute bottom-12 left-1/2 -translate-x-1/2 w-[800px] ipl-panel p-4 flex items-center justify-between z-10 hidden-screen">
-      <div class="ipl-skew-correction">
-        <span class="text-xs font-black text-rose-500 uppercase block mb-1">OUT / DISMISSAL</span>
-        <h3 class="text-2xl font-black uppercase text-white tracking-wide">Hardik Pandya</h3>
-        <p class="text-sm font-bold text-amber-400 uppercase mt-0.5">c MS Dhoni b Pathirana</p>
+    <div id="screen-10" class="screen-container absolute bottom-12 left-1/2 -translate-x-1/2 w-[820px] ipl-card p-4 flex items-center justify-between z-10 hidden-screen border-l-4 border-l-rose-500">
+      <div class="ipl-unskew">
+        <span class="text-xs font-black text-rose-500 uppercase block mb-1">OUT / WICKET FALLS</span>
+        <h3 class="text-2xl font-black uppercase text-white tracking-wide">Tilak Varma</h3>
+        <p class="text-sm font-bold text-amber-400 uppercase mt-0.5">c Qasim Akram b Sufiyan Muqeem</p>
       </div>
-      <div class="ipl-skew-correction flex items-center gap-6 text-center">
+      <div class="ipl-unskew flex items-center gap-6 text-center">
         <div>
           <span class="text-[9px] font-bold text-[#89CFF0] uppercase block">RUNS</span>
-          <span class="text-2xl font-black text-white">42</span>
+          <span class="text-2xl font-black text-white">44</span>
         </div>
         <div>
           <span class="text-[9px] font-bold text-[#89CFF0] uppercase block">BALLS</span>
-          <span class="text-2xl font-black text-white">24</span>
+          <span class="text-2xl font-black text-white">30</span>
         </div>
-        <div class="bg-rose-950/40 border border-rose-950/60 rounded px-4 py-2">
+        <div class="bg-rose-950/40 border border-rose-900/60 rounded px-4 py-2">
           <span class="text-[9px] font-bold text-slate-400 uppercase block">FOW</span>
-          <span class="text-lg font-black text-rose-500">178-5</span>
+          <span class="text-lg font-black text-rose-500">148-3</span>
         </div>
       </div>
     </div>
 
     <!-- 11. GRAPH VIEW -->
-    <div id="screen-11" class="screen-container absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] ipl-panel p-6 z-10 hidden-screen">
-      <div class="ipl-skew-correction flex flex-col items-center">
-        <h3 class="text-xl font-black text-cyan-400 uppercase tracking-widest mb-4">RUNS PER OVER (LAST 10 OVERS)</h3>
-        <canvas id="runs-graph" width="500" height="220" class="bg-slate-950/60 rounded border border-cyan-400/20"></canvas>
+    <div id="screen-11" class="screen-container absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[850px] ipl-card p-6 z-10 hidden-screen">
+      <div class="ipl-unskew flex flex-col items-center">
+        <h3 class="text-xl font-black text-cyan-400 uppercase tracking-widest mb-4">RUN PROGRESSION (CUMULATIVE)</h3>
+        <canvas id="runs-graph" width="550" height="240" class="bg-slate-950/70 rounded border border-cyan-400/30"></canvas>
       </div>
     </div>
 
     <!-- 12. MAN OF THE MATCH -->
-    <div id="screen-12" class="screen-container absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] ipl-panel p-6 z-10 hidden-screen">
-      <div class="ipl-skew-correction flex items-center gap-6">
-        <div class="w-32 h-32 bg-white/5 border border-cyan-400 rounded-full flex items-center justify-center text-5xl">👤</div>
+    <div id="screen-12" class="screen-container absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] ipl-card p-6 z-10 hidden-screen">
+      <div class="ipl-unskew flex items-center gap-6">
+        <div class="w-32 h-32 bg-white/5 border border-cyan-400 rounded-full flex items-center justify-center text-6xl shadow-lg">👤</div>
         <div>
-          <span class="text-xs font-black text-amber-400 uppercase tracking-widest block mb-0.5">MAN OF THE MATCH</span>
-          <h2 class="text-3xl font-black uppercase text-white tracking-wide">Jasprit Bumrah</h2>
-          <p class="text-sm font-bold text-cyan-400 uppercase mb-3">Mumbai Indians</p>
+          <span class="text-xs font-black text-amber-400 uppercase tracking-widest block mb-0.5">PLAYER OF THE MATCH</span>
+          <h2 class="text-3xl font-black uppercase text-white tracking-wide">Abhishek Sharma</h2>
+          <p class="text-sm font-bold text-cyan-400 uppercase mb-3">India A</p>
           <div class="flex gap-6 text-sm font-bold text-slate-300">
-            <span>Overs: <span class="text-white">4.0</span></span>
-            <span>Runs: <span class="text-white">18</span></span>
-            <span>Wickets: <span class="text-amber-400">3</span></span>
-            <span>Econ: <span class="text-cyan-400">4.50</span></span>
+            <span>Runs: <span class="text-white">74</span></span>
+            <span>Balls: <span class="text-white">42</span></span>
+            <span>Sixes: <span class="text-amber-400">4</span></span>
+            <span>S/R: <span class="text-cyan-400">176.2</span></span>
           </div>
         </div>
       </div>
     </div>
 
     <!-- 13. TOURNAMENT PLAYER STATS -->
-    <div id="screen-13" class="screen-container absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] ipl-panel p-6 z-10 hidden-screen">
-      <div class="ipl-skew-correction">
+    <div id="screen-13" class="screen-container absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] ipl-card p-6 z-10 hidden-screen">
+      <div class="ipl-unskew">
         <div class="flex items-center gap-4 mb-4 border-b border-cyan-400/30 pb-3">
           <div class="text-3xl">🏏</div>
           <div>
-            <h3 class="text-2xl font-black uppercase text-white">Rohit Sharma</h3>
+            <h3 class="text-2xl font-black uppercase text-white">Abhishek Sharma</h3>
             <p class="text-xs font-bold text-[#89CFF0] uppercase tracking-wider">Tournament Batting Stats</p>
           </div>
         </div>
         <div class="grid grid-cols-4 gap-4 text-center">
           <div class="bg-slate-950/60 p-3 rounded border border-cyan-400/20">
             <span class="text-[9px] font-bold text-[#89CFF0] uppercase block">MATCHES</span>
-            <span class="text-2xl font-black text-white">8</span>
+            <span class="text-2xl font-black text-white">5</span>
           </div>
           <div class="bg-slate-950/60 p-3 rounded border border-cyan-400/20">
             <span class="text-[9px] font-bold text-[#89CFF0] uppercase block">RUNS</span>
-            <span class="text-2xl font-black text-cyan-400">384</span>
+            <span class="text-2xl font-black text-cyan-400">284</span>
           </div>
           <div class="bg-slate-950/60 p-3 rounded border border-cyan-400/20">
             <span class="text-[9px] font-bold text-[#89CFF0] uppercase block">STRIKE RATE</span>
-            <span class="text-2xl font-black text-white">182.5</span>
+            <span class="text-2xl font-black text-white">188.5</span>
           </div>
           <div class="bg-slate-950/60 p-3 rounded border border-cyan-400/20">
             <span class="text-[9px] font-bold text-[#89CFF0] uppercase block">BEST</span>
-            <span class="text-2xl font-black text-white">92*</span>
+            <span class="text-2xl font-black text-white">84*</span>
           </div>
         </div>
       </div>
     </div>
 
     <!-- 14. WICKET BANNER (Full-screen red overlay) -->
-    <div id="screen-14" class="screen-container absolute inset-0 bg-red-950/95 flex flex-col items-center justify-center hidden-screen z-20">
+    <div id="screen-14" class="screen-container absolute inset-0 wicket-strobe flex flex-col items-center justify-center hidden-screen z-20">
       <div class="text-center space-y-4">
-        <div class="text-7xl font-black text-white tracking-widest uppercase border-y-8 border-red-500 py-6 px-16 shadow-[0_0_50px_rgba(239,68,68,0.5)]">
+        <div class="text-8xl font-black text-white tracking-widest uppercase border-y-8 border-white py-6 px-16 shadow-[0_0_50px_rgba(255,255,255,0.4)]">
           WICKET!
         </div>
-        <p class="text-xl font-bold text-red-400 uppercase tracking-widest">A huge blow to the batting side!</p>
+        <p class="text-xl font-bold text-white uppercase tracking-widest">CSK STRIKES AGAIN!</p>
       </div>
     </div>
 
     <!-- 15. FREE HIT BANNER -->
-    <div id="screen-15" class="screen-container absolute inset-0 bg-yellow-950/95 flex flex-col items-center justify-center hidden-screen z-20">
+    <div id="screen-15" class="screen-container absolute inset-0 freehit-strobe flex flex-col items-center justify-center hidden-screen z-20">
       <div class="text-center space-y-4">
-        <div class="text-7xl font-black text-slate-950 tracking-widest uppercase bg-yellow-400 py-6 px-16 shadow-[0_0_50px_rgba(250,204,21,0.5)] border-y-8 border-yellow-200">
+        <div class="text-8xl font-black text-slate-950 tracking-widest uppercase bg-yellow-400 py-6 px-16 shadow-[0_0_50px_rgba(250,204,21,0.5)] border-y-8 border-yellow-200">
           FREE HIT!
         </div>
-        <p class="text-xl font-bold text-yellow-300 uppercase tracking-widest">No dismissal except run out!</p>
+        <p class="text-xl font-bold text-white uppercase tracking-widest">FREE SWING FOR THE BATSMAN!</p>
       </div>
     </div>
 
     <!-- 16. TARGET DISPLAY -->
-    <div id="screen-16" class="screen-container absolute bottom-12 left-1/2 -translate-x-1/2 w-[850px] ipl-panel p-4 flex items-center justify-between z-10 hidden-screen">
-      <div class="ipl-skew-correction">
+    <div id="screen-16" class="screen-container absolute bottom-12 left-1/2 -translate-x-1/2 w-[850px] ipl-card p-4 flex items-center justify-between z-10 hidden-screen">
+      <div class="ipl-unskew">
         <span class="text-[9px] font-black text-[#89CFF0] uppercase block mb-1">TARGET CHASE</span>
-        <h4 class="text-xl font-black uppercase text-white tracking-wide">CSK NEED 64 RUNS FROM 44 BALLS</h4>
+        <h4 class="text-xl font-black uppercase text-white tracking-wide">PAKISTAN A NEED 76 RUNS FROM 42 BALLS</h4>
       </div>
-      <div class="ipl-skew-correction text-right">
-        <span class="text-[9px] font-black text-[#89CFF0] uppercase block">REQUIRED RUN RATE</span>
-        <span class="text-3xl font-black text-cyan-400">8.73</span>
+      <div class="ipl-unskew text-right">
+        <span class="text-[9px] font-black text-[#89CFF0] uppercase block">REQUIRED RATE</span>
+        <span class="text-3xl font-black text-cyan-400">10.85</span>
       </div>
     </div>
 
     <!-- 17. TEAM PLAYERS LIST -->
-    <div id="screen-17" class="screen-container absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1160px] ipl-panel p-6 z-10 hidden-screen">
-      <div class="ipl-skew-correction">
-        <h3 class="text-2xl font-black text-center text-cyan-400 uppercase tracking-wider mb-6">TEAM LINEUPS</h3>
+    <div id="screen-17" class="screen-container absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1160px] ipl-card p-6 z-10 hidden-screen">
+      <div class="ipl-unskew">
+        <h3 class="text-2xl font-black text-center text-cyan-400 uppercase tracking-wider mb-6">PLAYING XI ROSTERS</h3>
         <div class="grid grid-cols-2 gap-8">
           <div>
-            <span class="font-black text-white text-lg block border-b border-cyan-400/20 pb-2 mb-3">MUMBAI INDIANS</span>
+            <span class="font-black text-white text-lg block border-b border-cyan-400/20 pb-2 mb-3">INDIA A</span>
             <div class="grid grid-cols-2 gap-2 text-sm font-semibold text-slate-300">
-              <div>1. Rohit Sharma</div>
-              <div>2. Ishan Kishan (wk)</div>
-              <div>3. Suryakumar Yadav</div>
-              <div>4. Hardik Pandya (c)</div>
-              <div>5. Tim David</div>
-              <div>6. Jasprit Bumrah</div>
+              <div>1. Abhishek Sharma</div>
+              <div>2. Prabhsimran Singh</div>
+              <div>3. Tilak Varma (c)</div>
+              <div>4. Ayush Badoni</div>
+              <div>5. Nehal Wadhera</div>
+              <div>6. Ramandeep Singh</div>
             </div>
           </div>
           <div>
-            <span class="font-black text-white text-lg block border-b border-cyan-400/20 pb-2 mb-3">CHENNAI SUPER KINGS</span>
+            <span class="font-black text-white text-lg block border-b border-cyan-400/20 pb-2 mb-3">PAKISTAN A</span>
             <div class="grid grid-cols-2 gap-2 text-sm font-semibold text-slate-300">
-              <div>1. Ruturaj Gaikwad (c)</div>
-              <div>2. Rachin Ravindra</div>
-              <div>3. Shivam Dube</div>
-              <div>4. Daryl Mitchell</div>
-              <div>5. MS Dhoni (wk)</div>
-              <div>6. Ravindra Jadeja</div>
+              <div>1. Yasir Khan</div>
+              <div>2. Arafat Minhas</div>
+              <div>3. Qasim Akram (c)</div>
+              <div>4. Haider Ali</div>
+              <div>5. Mohammad Haris</div>
+              <div>6. Sufiyan Muqeem</div>
             </div>
           </div>
         </div>
@@ -402,11 +472,11 @@
        ========================================== -->
   <div class="fixed bottom-4 right-4 bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-2xl z-50 w-72 text-white font-sans text-xs">
     <div class="flex items-center justify-between mb-3">
-      <span class="font-black uppercase tracking-wider text-cyan-400">IPL Switcher</span>
-      <span class="text-[9px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 px-2 py-0.5 rounded font-black">IPL 2025</span>
+      <span class="font-black uppercase tracking-wider text-cyan-400">IPL 2025 Switcher</span>
+      <span class="text-[9px] bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 px-2 py-0.5 rounded font-black">STAR SPORTS</span>
     </div>
     
-    <div class="space-y-1 max-h-[220px] overflow-y-auto">
+    <div class="space-y-1 max-h-[220px] overflow-y-auto font-semibold">
       <button onclick="switchScreen(1)" class="w-full text-left p-2 hover:bg-slate-800 rounded font-semibold text-slate-300 transition flex items-center justify-between">
         <span>1. Main Scoreboard</span> <span class="opacity-50">Scorebug</span>
       </button>
@@ -472,24 +542,24 @@
        ========================================== -->
   <script>
     const mockBatters = [
-      { name: "Rohit Sharma", status: "c Dhoni b Pathirana", runs: 68, balls: 38, fours: 5, sixes: 3, sr: 178.9 },
-      { name: "Ishan Kishan", status: "c Jadeja b Shardul", runs: 28, balls: 18, fours: 3, sixes: 1, sr: 155.5 },
-      { name: "Suryakumar Yadav", status: "lbw b Jadeja", runs: 16, balls: 12, fours: 1, sixes: 1, sr: 133.3 },
-      { name: "Hardik Pandya", status: "not out", runs: 42, balls: 24, fours: 3, sixes: 2, sr: 175.0 }
+      { name: "Abhishek Sharma", status: "c Qasim Akram b Sufiyan Muqeem", runs: 74, balls: 42, fours: 6, sixes: 4, sr: 176.2 },
+      { name: "Prabhsimran Singh", status: "c & b Arafat Minhas", runs: 36, balls: 24, fours: 4, sixes: 1, sr: 150.0 },
+      { name: "Tilak Varma", status: "not out", runs: 44, balls: 30, fours: 3, sixes: 1, sr: 146.6 },
+      { name: "Ayush Badoni", status: "not out", runs: 12, balls: 6, fours: 1, sixes: 1, sr: 200.0 }
     ];
 
     const mockBowlers = [
-      { name: "Jasprit Bumrah", overs: 4.0, runs: 18, wickets: 3, econ: 4.5 },
-      { name: "Ravindra Jadeja", overs: 4.0, runs: 28, wickets: 2, econ: 7.0 },
-      { name: "Matheesha Pathirana", overs: 3.0, runs: 32, wickets: 2, econ: 10.6 },
-      { name: "Shardul Thakur", overs: 3.0, runs: 36, wickets: 1, econ: 12.0 }
+      { name: "Sufiyan Muqeem", overs: 4.0, runs: 34, wickets: 2, econ: 8.5 },
+      { name: "Arafat Minhas", overs: 3.0, runs: 28, wickets: 1, econ: 9.3 },
+      { name: "Qasim Akram", overs: 2.0, runs: 22, wickets: 0, econ: 11.0 },
+      { name: "Yasir Khan", overs: 1.0, runs: 12, wickets: 0, econ: 12.0 }
     ];
 
     // Populate dynamic tables
     function populateTables() {
       const batWrap = document.getElementById('batting-summary-container');
       batWrap.innerHTML = mockBatters.map(b => `
-        <div class="flex justify-between items-center text-sm font-semibold p-2.5 bg-slate-950/60 rounded border border-cyan-400/20">
+        <div class="flex justify-between items-center text-sm font-semibold p-2.5 bg-slate-950/80 rounded border border-cyan-400/20">
           <span class="w-64 font-black uppercase text-white">${b.name}</span>
           <span class="flex-1 text-[#89CFF0] text-xs">${b.status}</span>
           <div class="flex gap-10 font-black text-slate-100 w-44 justify-end">
@@ -501,7 +571,7 @@
 
       const bowlWrap = document.getElementById('bowling-summary-container');
       bowlWrap.innerHTML = mockBowlers.map(bw => `
-        <div class="flex justify-between items-center text-sm font-semibold p-2.5 bg-slate-950/60 rounded border border-cyan-400/20">
+        <div class="flex justify-between items-center text-sm font-semibold p-2.5 bg-slate-950/80 rounded border border-cyan-400/20">
           <span class="w-64 font-black uppercase text-white">${bw.name}</span>
           <div class="flex-1 flex gap-12 font-black text-slate-100 justify-end">
             <span>Overs: <span class="text-slate-400">${bw.overs}</span></span>
@@ -513,55 +583,67 @@
       `).join('');
     }
 
-    // Render Canvas chart for runs per over
+    // Render Canvas chart for runs vs overs (progression line chart)
     function renderGraph() {
       const canvas = document.getElementById('runs-graph');
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
       const w = canvas.width;
       const h = canvas.height;
-      const data = [6, 12, 8, 14, 18, 9, 11, 15, 7, 12];
+      
+      const teamAProgress = [0, 12, 28, 45, 62, 78, 92, 114, 134, 154];
+      const teamBProgress = [0, 8, 18, 30, 48, 64, 82, 98, 118, 128];
       
       ctx.clearRect(0, 0, w, h);
       
       // Draw grid lines
-      ctx.strokeStyle = 'rgba(0, 212, 255, 0.1)';
+      ctx.strokeStyle = 'rgba(0, 212, 255, 0.15)';
       ctx.lineWidth = 1;
-      for (let i = 1; i <= 5; i++) {
-        const y = h - (i * 35);
+      for (let i = 1; i <= 4; i++) {
+        const y = h - 30 - (i * 45);
         ctx.beginPath();
-        ctx.moveTo(30, y);
+        ctx.moveTo(40, y);
         ctx.lineTo(w - 20, y);
         ctx.stroke();
       }
 
-      // Draw bar chart
-      const barWidth = 30;
-      const gap = 15;
-      data.forEach((val, idx) => {
-        const barH = val * 8;
-        const x = 40 + idx * (barWidth + gap);
-        const y = h - 30 - barH;
+      // X-Axis labels
+      ctx.fillStyle = '#89CFF0';
+      ctx.font = 'bold 9px sans-serif';
+      ctx.textAlign = 'center';
+      for (let i = 0; i < 10; i++) {
+        ctx.fillText(`Over ${i*2}`, 40 + i * 50, h - 10);
+      }
 
-        // Gradient
-        const grad = ctx.createLinearGradient(x, y, x, h - 30);
-        grad.addColorStop(0, '#00D4FF');
-        grad.addColorStop(1, '#0A1E3D');
-
-        ctx.fillStyle = grad;
-        ctx.fillRect(x, y, barWidth, barH);
-        ctx.strokeStyle = '#00D4FF';
-        ctx.lineWidth = 1;
-        ctx.strokeRect(x, y, barWidth, barH);
-
-        // Labels
-        ctx.fillStyle = '#FFFFFF';
-        ctx.font = 'bold 10px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.fillText(val, x + barWidth / 2, y - 6);
-        ctx.fillStyle = '#89CFF0';
-        ctx.fillText(`O${idx+11}`, x + barWidth / 2, h - 12);
+      // Draw Team A line (Cyan)
+      ctx.strokeStyle = '#00D4FF';
+      ctx.lineWidth = 3;
+      ctx.shadowColor = 'rgba(0, 212, 255, 0.4)';
+      ctx.shadowBlur = 10;
+      ctx.beginPath();
+      teamAProgress.forEach((val, idx) => {
+        const x = 40 + idx * 50;
+        const y = h - 30 - (val / 180) * 160;
+        if (idx === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
       });
+      ctx.stroke();
+
+      // Draw Team B line (Gold)
+      ctx.strokeStyle = '#FFD700';
+      ctx.lineWidth = 3;
+      ctx.shadowColor = 'rgba(255, 215, 0, 0.4)';
+      ctx.shadowBlur = 10;
+      ctx.beginPath();
+      teamBProgress.forEach((val, idx) => {
+        const x = 40 + idx * 50;
+        const y = h - 30 - (val / 180) * 160;
+        if (idx === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+      
+      ctx.shadowBlur = 0; // reset shadow
     }
 
     // Switch active display overlay
