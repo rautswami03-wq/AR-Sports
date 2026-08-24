@@ -591,6 +591,96 @@ export const LandingPage: React.FC = () => {
                 </div>
               </div>
             </div>
+
+            {/* Video Tutorials Section */}
+            <div className="mt-12 border-t border-slate-800 pt-10">
+              <h4 className="text-xl font-black text-white uppercase mb-6 flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  <Play className="w-5 h-5 text-red-500 fill-red-500" /> CrickPro Video Tutorials
+                </span>
+                <a
+                  href="https://www.youtube.com/@OfficialCrickPro/videos"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs font-bold text-sky-400 hover:text-sky-300 transition-colors uppercase tracking-widest flex items-center gap-1"
+                >
+                  View All Videos <ExternalLink className="w-3 h-3" />
+                </a>
+              </h4>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                {[
+                  {
+                    title: 'CrickPro Broadcast | Modern Cricket Production',
+                    category: 'Overview',
+                    duration: '5:12',
+                    url: 'https://www.youtube.com/@OfficialCrickPro/videos'
+                  },
+                  {
+                    title: 'Multi-Camera Switcher Setup & Controls',
+                    category: 'Camera Setup',
+                    duration: '8:45',
+                    url: 'https://www.youtube.com/@OfficialCrickPro/videos'
+                  },
+                  {
+                    title: 'Video Ads & L-Shape Ads Integration Guide',
+                    category: 'Monetization',
+                    duration: '6:30',
+                    url: 'https://www.youtube.com/@OfficialCrickPro/videos'
+                  },
+                  {
+                    title: 'Cricket Highlights & Clips Generator Guide',
+                    category: 'Highlights',
+                    duration: '4:20',
+                    url: 'https://www.youtube.com/@OfficialCrickPro/videos'
+                  },
+                  {
+                    title: 'How to Setup Tournament & Roster Import',
+                    category: 'Dashboard',
+                    duration: '10:15',
+                    url: 'https://www.youtube.com/@OfficialCrickPro/videos'
+                  },
+                  {
+                    title: 'Scoring Correction & Scorecard Edits Live',
+                    category: 'Scoring',
+                    duration: '3:55',
+                    url: 'https://www.youtube.com/@OfficialCrickPro/videos'
+                  }
+                ].map((video, idx) => (
+                  <a
+                    key={idx}
+                    href={video.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group bg-slate-900 border border-slate-800/80 hover:border-red-500/50 rounded-2xl overflow-hidden shadow-xl transition-all duration-300 hover:-translate-y-1 block"
+                  >
+                    {/* Simulated Video Thumbnail Box */}
+                    <div className="h-40 bg-slate-950 flex items-center justify-center relative overflow-hidden group-hover:bg-slate-900 transition-colors">
+                      {/* Red glow behind play button on hover */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 to-transparent opacity-60" />
+                      <div className="w-12 h-12 rounded-full bg-red-600 group-hover:bg-red-500 text-white flex items-center justify-center shadow-lg transition-transform group-hover:scale-110 z-10">
+                        <Play className="w-5 h-5 fill-white ml-0.5" />
+                      </div>
+                      <span className="absolute bottom-2 right-2 bg-black/80 px-2 py-0.5 rounded text-[10px] font-bold text-slate-300 z-10 font-mono">
+                        {video.duration}
+                      </span>
+                      <span className="absolute top-2 left-2 bg-slate-800/80 border border-slate-700/50 px-2 py-0.5 rounded text-[9px] font-black text-cyan-400 uppercase tracking-widest z-10">
+                        {video.category}
+                      </span>
+                    </div>
+
+                    <div className="p-4">
+                      <h5 className="text-xs font-black text-slate-100 group-hover:text-red-400 transition-colors line-clamp-2 uppercase tracking-wide leading-relaxed">
+                        {video.title}
+                      </h5>
+                      <span className="text-[10px] font-bold text-slate-500 mt-2 block uppercase tracking-wider">
+                        Official Tutorial &bull; YouTube
+                      </span>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
           </div>
         </section>
       )}
