@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CricScorer OBS Broadcast Overlay Studio</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- GSAP CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Courier+Prime:wght@700&family=Fira+Sans:ital,wght@0,700;0,900;1,900&family=Inter:wght@400;700;900&family=Montserrat:wght@800;900&family=Playfair+Display:ital,wght@0,700;1,700&family=VT323&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      background: transparent;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      width: 1920px;
+      height: 1080px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Standard Reset and Transparency support */
+    #obs-canvas {
+      width: 1920px;
+      height: 1080px;
+      position: relative;
+      background: transparent;
+    }
+
+    /* Digit Roll Styles */
+    .digit-container {
+      height: 40px;
+      overflow: hidden;
+      position: relative;
+      display: inline-block;
+      width: 22px;
+    }
+    .digit-strip {
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      line-height: 40px;
+      height: 400px; /* 10 digits */
+      text-align: center;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .digit-val {
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Breathing effects */
+    @keyframes breathe {
+      0%, 100% { opacity: 0.8; box-shadow: 0 0 10px rgba(14, 165, 233, 0.2); }
+      50% { opacity: 1; box-shadow: 0 0 20px rgba(14, 165, 233, 0.6); }
+    }
+    .active-pulse {
+      animation: breathe 2s infinite ease-in-out;
+    }
+
+    /* ----------------------------------------------------
+       17 THEME CONFIGURATIONS
+       ---------------------------------------------------- */
+
+    /* 1. Classic */
+    .theme-classic .sb-bar {
+      background: linear-gradient(90deg, #1e3a8a 0%, #3b82f6 100%);
+      color: #ffffff;
+      border-bottom: 3px solid #fbbf24;
+      font-family: 'Inter', sans-serif;
+    }
+    .theme-classic .sb-accent { background: #fbbf24; color: #0f172a; }
+
+    /* 2. IPL Style */
+    .theme-ipl-style .sb-bar {
+      background: linear-gradient(135deg, #060c21 0%, #1e1b4b 50%, #311042 100%);
+      color: #ffffff;
+      font-family: 'Montserrat', sans-serif;
+      border-top: 3px solid #f97316;
+      border-bottom: 3px solid #eab308;
+      transform: skewX(-6deg);
+    }
+    .theme-ipl-style .sb-accent { background: #f97316; color: #ffffff; }
+
+    /* 3. ICC Modern */
+    .theme-icc-modern .sb-bar {
+      background: linear-gradient(90deg, #0d002c 0%, #220059 100%);
+      color: #ffffff;
+      font-family: 'Fira Sans', sans-serif;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .theme-icc-modern .sb-accent { background: #00b4d8; color: #0d002c; }
+
+    /* 4. T20 Blast */
+    .theme-t20-blast .sb-bar {
+      background: #000000;
+      color: #ffff00;
+      font-family: 'Montserrat', sans-serif;
+      border: 4px solid #ffff00;
+      font-weight: 900;
+    }
+    .theme-t20-blast .sb-accent { background: #ffff00; color: #000000; }
+
+    /* 5. Test Match */
+    .theme-test-match .sb-bar {
+      background: #ffffff;
+      color: #111827;
+      font-family: 'Playfair Display', serif;
+      border-bottom: 4px solid #064e3b;
+      font-weight: normal;
+    }
+    .theme-test-match .sb-accent { background: #064e3b; color: #ffffff; }
+
+    /* 6. Big Bash */
+    .theme-big-bash .sb-bar {
+      background: #111;
+      color: #ec4899;
+      font-family: 'Fira Sans', sans-serif;
+      border-left: 6px solid #84cc16;
+      border-right: 6px solid #ec4899;
+    }
+    .theme-big-bash .sb-accent { background: #84cc16; color: #000000; }
+
+    /* 7. The Hundred */
+    .theme-the-hundred .sb-bar {
+      background: linear-gradient(90deg, #00f0ff 0%, #ff007f 100%);
+      color: #ffffff;
+      font-family: 'Montserrat', sans-serif;
+      border-radius: 20px;
+    }
+    .theme-the-hundred .sb-accent { background: #000000; color: #00f0ff; }
+
+    /* 8. Champions */
+    .theme-champions .sb-bar {
+      background: #1a1a1a;
+      color: #d4af37;
+      font-family: 'Cinzel', serif;
+      border: 2px solid #d4af37;
+      box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+    }
+    .theme-champions .sb-accent { background: #d4af37; color: #000000; }
+
+    /* 9. Minimal Dark */
+    .theme-minimal-dark .sb-bar {
+      background: #0f172a;
+      color: #f1f5f9;
+      border: 1px solid #334155;
+      font-family: monospace;
+    }
+    .theme-minimal-dark .sb-accent { background: #334155; color: #f1f5f9; }
+
+    /* 10. Minimal Light */
+    .theme-minimal-light .sb-bar {
+      background: #f8fafc;
+      color: #0f172a;
+      border: 1px solid #cbd5e1;
+      font-family: sans-serif;
+    }
+    .theme-minimal-light .sb-accent { background: #e2e8f0; color: #0f172a; }
+
+    /* 11. Retro Cricket */
+    .theme-retro-cricket .sb-bar {
+      background: #fdf6e3;
+      color: #586e75;
+      border: 3px double #586e75;
+      font-family: 'Courier Prime', monospace;
+    }
+    .theme-retro-cricket .sb-accent { background: #586e75; color: #fdf6e3; }
+
+    /* 12. Neon Glow */
+    .theme-neon-glow .sb-bar {
+      background: #020617;
+      color: #00f2fe;
+      border: 2px solid #00f2fe;
+      box-shadow: 0 0 15px #00f2fe, inset 0 0 10px #00f2fe;
+      font-family: 'VT323', monospace;
+      text-shadow: 0 0 5px #00f2fe;
+    }
+    .theme-neon-glow .sb-accent { background: #ff007f; color: #ffffff; box-shadow: 0 0 10px #ff007f; }
+
+    /* 13. Glass */
+    .theme-glass .sb-bar {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+    .theme-glass .sb-accent { background: rgba(255, 255, 255, 0.2); color: #ffffff; }
+
+    /* 14. Gradient Wave */
+    .theme-gradient-wave .sb-bar {
+      background: linear-gradient(270deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+      background-size: 400% 400%;
+      animation: gradientShift 10s ease infinite;
+      color: #ffffff;
+      border-radius: 6px;
+    }
+    .theme-gradient-wave .sb-accent { background: rgba(0,0,0,0.3); color: #ffffff; }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50% }
+      50% { background-position: 100% 50% }
+      100% { background-position: 0% 50% }
+    }
+
+    /* 15. Corporate */
+    .theme-corporate .sb-bar {
+      background: #1e293b;
+      color: #f8fafc;
+      border-top: 4px solid #0f172a;
+      font-family: 'Inter', sans-serif;
+    }
+    .theme-corporate .sb-accent { background: #0284c7; color: #ffffff; }
+
+    /* 16. Street Cricket */
+    .theme-street-cricket .sb-bar {
+      background: #f97316;
+      color: #000000;
+      border: 3px dashed #000000;
+      font-family: 'VT323', monospace;
+    }
+    .theme-street-cricket .sb-accent { background: #000000; color: #f97316; }
+
+    /* 17. Custom (Adjustable dynamically) */
+    .theme-custom .sb-bar {
+      background: var(--custom-bg, #4f46e5);
+      color: var(--custom-text, #ffffff);
+      border-color: var(--custom-accent, #10b981);
+      border-bottom-width: 4px;
+      font-family: 'Inter', sans-serif;
+    }
+    .theme-custom .sb-accent { background: var(--custom-accent, #10b981); color: #ffffff; }
+  </style>
+</head>
+<body class="relative select-none bg-transparent">
+
+  <div id="obs-canvas">
+    
+    <!-- ==========================================
+         LIVE SCOREBUG OVERLAY CONTAINER
+         ========================================== -->
+    <div id="scoreboard-root" class="theme-classic absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col w-[1120px] transition-all duration-500 transform scale-100 z-10">
+      
+      <!-- Main Horizontal Panel -->
+      <div class="sb-bar h-16 rounded-lg flex items-stretch overflow-hidden shadow-2xl transition-all duration-300 relative">
+        
+        <!-- Left Team Initials & Badge -->
+        <div class="px-6 flex items-center justify-center font-black text-xl tracking-wider uppercase border-r border-white/10">
+          <span id="team-batting-name">IND</span>
+        </div>
+
+        <!-- Main Run Scorebug Block (Digit Scroll) -->
+        <div class="px-6 flex items-center justify-center gap-1.5 border-r border-white/10 min-w-[190px]">
+          <div class="flex items-center text-4xl font-black tracking-tighter">
+            <!-- Hundreds Digit -->
+            <div class="digit-container" id="digit-100">
+              <div class="digit-strip" style="transform: translateY(0px);">
+                <div class="digit-val">0</div><div class="digit-val">1</div><div class="digit-val">2</div><div class="digit-val">3</div><div class="digit-val">4</div><div class="digit-val">5</div><div class="digit-val">6</div><div class="digit-val">7</div><div class="digit-val">8</div><div class="digit-val">9</div>
+              </div>
+            </div>
+            <!-- Tens Digit -->
+            <div class="digit-container" id="digit-10">
+              <div class="digit-strip" style="transform: translateY(0px);">
+                <div class="digit-val">0</div><div class="digit-val">1</div><div class="digit-val">2</div><div class="digit-val">3</div><div class="digit-val">4</div><div class="digit-val">5</div><div class="digit-val">6</div><div class="digit-val">7</div><div class="digit-val">8</div><div class="digit-val">9</div>
+              </div>
+            </div>
+            <!-- Ones Digit -->
+            <div class="digit-container" id="digit-1">
+              <div class="digit-strip" style="transform: translateY(0px);">
+                <div class="digit-val">0</div><div class="digit-val">1</div><div class="digit-val">2</div><div class="digit-val">3</div><div class="digit-val">4</div><div class="digit-val">5</div><div class="digit-val">6</div><div class="digit-val">7</div><div class="digit-val">8</div><div class="digit-val">9</div>
+              </div>
+            </div>
+
+            <!-- Separator / Wickets -->
+            <span class="mx-1.5 text-3xl font-bold opacity-80">/</span>
+            
+            <div class="digit-container" id="digit-w">
+              <div class="digit-strip" style="transform: translateY(0px);">
+                <div class="digit-val">0</div><div class="digit-val">1</div><div class="digit-val">2</div><div class="digit-val">3</div><div class="digit-val">4</div><div class="digit-val">5</div><div class="digit-val">6</div><div class="digit-val">7</div><div class="digit-val">8</div><div class="digit-val">9</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Overs Tracker -->
+        <div class="px-6 flex flex-col justify-center border-r border-white/10 min-w-[120px]">
+          <span class="text-[10px] font-bold opacity-60 uppercase tracking-widest leading-none mb-1">Overs</span>
+          <span class="text-lg font-black leading-none" id="match-overs">14.3</span>
+        </div>
+
+        <!-- Batters Segment (Breathing Active State) -->
+        <div class="flex-1 px-6 flex items-center justify-between gap-6 border-r border-white/10">
+          <!-- Batter 1 -->
+          <div id="bat1-card" class="flex items-center gap-2 flex-1 min-w-0 transition-all duration-300">
+            <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 shrink-0" id="bat1-strike"></span>
+            <span class="text-sm font-black truncate uppercase" id="bat1-name">R. Sharma</span>
+            <span class="text-sm font-black ml-auto shrink-0" id="bat1-stats">45 <span class="text-[11px] font-bold opacity-60">32</span></span>
+          </div>
+
+          <!-- Divider -->
+          <div class="w-px h-6 bg-white/10"></div>
+
+          <!-- Batter 2 -->
+          <div id="bat2-card" class="flex items-center gap-2 flex-1 min-w-0 transition-all duration-300 opacity-60">
+            <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 shrink-0 opacity-0" id="bat2-strike"></span>
+            <span class="text-sm font-black truncate uppercase" id="bat2-name">V. Kohli</span>
+            <span class="text-sm font-black ml-auto shrink-0" id="bat2-stats">12 <span class="text-[11px] font-bold opacity-60">10</span></span>
+          </div>
+        </div>
+
+        <!-- Bowler Segment -->
+        <div class="px-6 flex items-center justify-between gap-4 min-w-[240px] border-r border-white/10">
+          <div class="flex flex-col justify-center min-w-0">
+            <span class="text-[9px] font-bold opacity-50 uppercase tracking-widest mb-0.5 leading-none">Bowler</span>
+            <span class="text-sm font-black truncate uppercase" id="bowl-name">M. Starc</span>
+          </div>
+          <span class="text-sm font-black shrink-0" id="bowl-stats">2-34 <span class="text-[11px] font-bold opacity-60">(3.3)</span></span>
+        </div>
+
+        <!-- Right Action Ticker/Sponsor Block -->
+        <div class="sb-accent px-6 flex items-center justify-center font-black text-xs uppercase tracking-wider min-w-[150px] relative overflow-hidden">
+          <span id="ticker-text">CRR: 10.32</span>
+        </div>
+
+      </div>
+
+      <!-- Bottom Mini Ticker (Target/Required Runs) -->
+      <div id="bottom-ticker" class="h-6 bg-slate-900/90 text-white flex items-center justify-center text-[10px] font-bold uppercase tracking-widest rounded-b-md border-t border-white/5 shadow-md">
+        <span id="bottom-ticker-text">IND NEED 84 RUNS IN 33 BALLS (REQ: 15.27)</span>
+      </div>
+
+    </div>
+
+    <!-- Celebration/Sting overlay -->
+    <div id="event-flash" class="absolute inset-0 bg-transparent pointer-events-none z-20 flex items-center justify-center opacity-0 scale-95">
+      <div class="px-16 py-8 bg-black/90 border-y-4 border-cyan-400 text-white font-black text-7xl uppercase tracking-widest shadow-2xl relative overflow-hidden rounded-xl">
+        <div id="flash-banner-glow" class="absolute inset-0 bg-cyan-500/10 mix-blend-screen animate-pulse"></div>
+        <span id="event-text" class="relative z-10 drop-shadow-md">SIX!</span>
+      </div>
+    </div>
+
+    <!-- Particle Celebration Container -->
+    <div id="particle-container" class="absolute inset-0 pointer-events-none z-30 overflow-hidden"></div>
+
+    <!-- ==========================================
+         VISUAL CONTROL DRAWER & THEME SWITCHER
+         ========================================== -->
+    <div id="control-panel" class="absolute top-4 left-4 bg-slate-950/95 border border-slate-800 text-white w-96 rounded-2xl shadow-2xl p-6 transition-all duration-300 z-50 max-h-[960px] overflow-y-auto">
+      
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-2">
+          <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
+          <h2 class="text-base font-black uppercase tracking-wider text-slate-100">OBS Control Studio</h2>
+        </div>
+        <button id="toggle-drawer-btn" class="text-xs font-bold text-slate-400 hover:text-white uppercase tracking-widest">Hide [H]</button>
+      </div>
+
+      <!-- Theme Selection Grid -->
+      <div class="space-y-4">
+        <div>
+          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-2">Select Active Theme (17 Styles)</label>
+          <div class="grid grid-cols-2 gap-2 max-h-48 overflow-y-auto pr-1 border border-slate-900 rounded-lg p-2 bg-slate-900/40">
+            <button onclick="changeTheme('classic')" class="px-3 py-1.5 bg-slate-900 border border-slate-800 hover:border-cyan-400 rounded text-left text-xs font-bold uppercase transition-all">Classic</button>
+            <button onclick="changeTheme('ipl-style')" class="px-3 py-1.5 bg-slate-900 border border-slate-800 hover:border-cyan-400 rounded text-left text-xs font-bold uppercase transition-all">IPL Style</button>
+            <button onclick="changeTheme('icc-modern')" class="px-3 py-1.5 bg-slate-900 border border-slate-800 hover:border-cyan-400 rounded text-left text-xs font-bold uppercase transition-all">ICC Modern</button>
+            <button onclick="changeTheme('t20-blast')" class="px-3 py-1.5 bg-slate-900 border border-slate-800 hover:border-cyan-400 rounded text-left text-xs font-bold uppercase transition-all">T20 Blast</button>
+            <button onclick="changeTheme('test-match')" class="px-3 py-1.5 bg-slate-900 border border-slate-800 hover:border-cyan-400 rounded text-left text-xs font-bold uppercase transition-all">Test Match</button>
+            <button onclick="changeTheme('big-bash')" class="px-3 py-1.5 bg-slate-900 border border-slate-800 hover:border-cyan-400 rounded text-left text-xs font-bold uppercase transition-all">Big Bash</button>
+            <button onclick="changeTheme('the-hundred')" class="px-3 py-1.5 bg-slate-900 border border-slate-800 hover:border-cyan-400 rounded text-left text-xs font-bold uppercase transition-all">The Hundred</button>
+            <button onclick="changeTheme('champions')" class="px-3 py-1.5 bg-slate-900 border border-slate-800 hover:border-cyan-400 rounded text-left text-xs font-bold uppercase transition-all">Champions</button>
+            <button onclick="changeTheme('minimal-dark')" class="px-3 py-1.5 bg-slate-900 border border-slate-800 hover:border-cyan-400 rounded text-left text-xs font-bold uppercase transition-all">Minimal Dark</button>
+            <button onclick="changeTheme('minimal-light')" class="px-3 py-1.5 bg-slate-900 border border-slate-800 hover:border-cyan-400 rounded text-left text-xs font-bold uppercase transition-all">Minimal Light</button>
+            <button onclick="changeTheme('retro-cricket')" class="px-3 py-1.5 bg-slate-900 border border-slate-800 hover:border-cyan-400 rounded text-left text-xs font-bold uppercase transition-all">Retro Cricket</button>
+            <button onclick="changeTheme('neon-glow')" class="px-3 py-1.5 bg-slate-900 border border-slate-800 hover:border-cyan-400 rounded text-left text-xs font-bold uppercase transition-all">Neon Glow</button>
+            <button onclick="changeTheme('glass')" class="px-3 py-1.5 bg-slate-900 border border-slate-800 hover:border-cyan-400 rounded text-left text-xs font-bold uppercase transition-all">Glass</button>
+            <button onclick="changeTheme('gradient-wave')" class="px-3 py-1.5 bg-slate-900 border border-slate-800 hover:border-cyan-400 rounded text-left text-xs font-bold uppercase transition-all">Grad Wave</button>
+            <button onclick="changeTheme('corporate')" class="px-3 py-1.5 bg-slate-900 border border-slate-800 hover:border-cyan-400 rounded text-left text-xs font-bold uppercase transition-all">Corporate</button>
+            <button onclick="changeTheme('street-cricket')" class="px-3 py-1.5 bg-slate-900 border border-slate-800 hover:border-cyan-400 rounded text-left text-xs font-bold uppercase transition-all">Street</button>
+            <button onclick="changeTheme('custom')" class="px-3 py-1.5 bg-slate-900 border border-slate-800 hover:border-cyan-400 rounded text-left text-xs font-bold uppercase transition-all">Custom UI</button>
+          </div>
+        </div>
+
+        <!-- Custom Theme Color Controls -->
+        <div id="custom-theme-controls" class="hidden space-y-3 border-t border-slate-800 pt-3">
+          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Custom Theme Panel</label>
+          <div class="grid grid-cols-3 gap-2">
+            <div>
+              <span class="text-[9px] text-slate-500 block mb-1 font-bold">Background</span>
+              <input type="color" id="color-bg" value="#4f46e5" class="w-full h-8 rounded border border-slate-800 cursor-pointer bg-transparent" onchange="updateCustomColors()">
+            </div>
+            <div>
+              <span class="text-[9px] text-slate-500 block mb-1 font-bold">Text Color</span>
+              <input type="color" id="color-text" value="#ffffff" class="w-full h-8 rounded border border-slate-800 cursor-pointer bg-transparent" onchange="updateCustomColors()">
+            </div>
+            <div>
+              <span class="text-[9px] text-slate-500 block mb-1 font-bold">Accent</span>
+              <input type="color" id="color-accent" value="#10b981" class="w-full h-8 rounded border border-slate-800 cursor-pointer bg-transparent" onchange="updateCustomColors()">
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Event Triggers -->
+        <div class="border-t border-slate-800 pt-4 space-y-2">
+          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Broadcast Event Flashes</label>
+          <div class="grid grid-cols-3 gap-2">
+            <button onclick="triggerFlash('SIX', '#10b981')" class="px-3 py-2 bg-emerald-950 border border-emerald-800 hover:border-emerald-400 rounded text-xs font-black uppercase text-emerald-400">SIX</button>
+            <button onclick="triggerFlash('FOUR', '#10b981')" class="px-3 py-2 bg-emerald-950 border border-emerald-800 hover:border-emerald-400 rounded text-xs font-black uppercase text-emerald-400">FOUR</button>
+            <button onclick="triggerFlash('WICKET', '#ef4444')" class="px-3 py-2 bg-red-950 border border-red-800 hover:border-red-400 rounded text-xs font-black uppercase text-red-400">WICKET</button>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="triggerFlash('NO BALL', '#f59e0b')" class="px-3 py-2 bg-amber-950 border border-amber-800 hover:border-amber-400 rounded text-xs font-black uppercase text-amber-400">NO BALL</button>
+            <button onclick="triggerFlash('FREE HIT', '#3b82f6')" class="px-3 py-2 bg-blue-950 border border-blue-800 hover:border-blue-400 rounded text-xs font-black uppercase text-blue-400">FREE HIT</button>
+          </div>
+        </div>
+
+        <!-- Score Control Adjustments -->
+        <div class="border-t border-slate-800 pt-4 space-y-3">
+          <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Live Score Adjustment (Triggers digit rolls)</label>
+          <div class="flex items-center justify-between gap-4">
+            <div class="flex items-center gap-1.5">
+              <button onclick="adjustScore(-1)" class="w-8 h-8 rounded bg-slate-900 border border-slate-800 hover:bg-slate-800 font-bold text-xs">-1</button>
+              <button onclick="adjustScore(1)" class="w-8 h-8 rounded bg-slate-900 border border-slate-800 hover:bg-slate-800 font-bold text-xs">+1</button>
+              <button onclick="adjustScore(4)" class="w-8 h-8 rounded bg-slate-900 border border-slate-800 hover:bg-slate-800 font-bold text-xs">+4</button>
+              <button onclick="adjustScore(6)" class="w-8 h-8 rounded bg-slate-900 border border-slate-800 hover:bg-slate-800 font-bold text-xs">+6</button>
+            </div>
+            <div class="flex items-center gap-1">
+              <button onclick="adjustWickets(-1)" class="w-8 h-8 rounded bg-slate-900 border border-slate-800 hover:bg-slate-800 font-bold text-xs">-W</button>
+              <button onclick="adjustWickets(1)" class="w-8 h-8 rounded bg-slate-900 border border-slate-800 hover:bg-slate-800 font-bold text-xs">+W</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data Source Switcher -->
+        <div class="border-t border-slate-800 pt-4">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-300">Autoplay Demo Match Data</span>
+            <input type="checkbox" id="autoplay-chk" checked class="w-4 h-4 rounded accent-cyan-400 cursor-pointer">
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- ==========================================
+       JAVASCRIPT LOGIC & ANIMATIONS
+       ========================================== -->
+  <script>
+    // State Variables
+    let matchData = {
+      runs: 184,
+      wickets: 3,
+      overs: 14.3,
+      team: 'IND',
+      bat1Name: 'R. Sharma',
+      bat1Runs: 45,
+      bat1Balls: 32,
+      bat1Strike: true,
+      bat2Name: 'V. Kohli',
+      bat2Runs: 12,
+      bat2Balls: 10,
+      bat2Strike: false,
+      bowlName: 'M. Starc',
+      bowlWickets: 2,
+      bowlConceded: 34,
+      bowlOvers: '3.3',
+      tickerText: 'CRR: 10.32',
+      bottomTicker: 'IND NEED 84 RUNS IN 33 BALLS (REQ: 15.27)'
+    };
+
+    // Keep track of current digit strip translateY offsets
+    let currentDigits = { '100': 0, '10': 0, '1': 0, 'w': 0 };
+
+    // Initialize Page
+    document.addEventListener('DOMContentLoaded', () => {
+      // Toggle control panel
+      document.addEventListener('keydown', (e) => {
+        if (e.key.toLowerCase() === 'h') {
+          const panel = document.getElementById('control-panel');
+          panel.classList.toggle('hidden');
+        }
+      });
+      document.getElementById('toggle-drawer-btn').addEventListener('click', () => {
+        document.getElementById('control-panel').classList.add('hidden');
+      });
+
+      // Populate initial scoreboard UI
+      updateUI(matchData, true);
+
+      // Start Autoplay ticker loops
+      setInterval(() => {
+        if (document.getElementById('autoplay-chk').checked) {
+          simulateNextBall();
+        }
+      }, 5000); // simulation tick
+    });
+
+    // Theme Switcher Logic
+    function changeTheme(themeName) {
+      const root = document.getElementById('scoreboard-root');
+      root.className = `absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col w-[1120px] transition-all duration-500 transform scale-100 z-10 theme-${themeName}`;
+      
+      const customControls = document.getElementById('custom-theme-controls');
+      if (themeName === 'custom') {
+        customControls.classList.remove('hidden');
+        updateCustomColors();
+      } else {
+        customControls.classList.add('hidden');
+      }
+
+      // GSAP Panel transition on theme swap
+      gsap.fromTo("#scoreboard-root", 
+        { scale: 0.95, opacity: 0, y: 15 },
+        { scale: 1, opacity: 1, y: 0, duration: 0.5, ease: "back.out(1.7)" }
+      );
+    }
+
+    function updateCustomColors() {
+      const bg = document.getElementById('color-bg').value;
+      const text = document.getElementById('color-text').value;
+      const accent = document.getElementById('color-accent').value;
+
+      document.documentElement.style.setProperty('--custom-bg', bg);
+      document.documentElement.style.setProperty('--custom-text', text);
+      document.documentElement.style.setProperty('--custom-accent', accent);
+    }
+
+    // Digit Roll Roll Animation (GSAP)
+    function rollDigit(digitKey, targetValue) {
+      const elementId = `digit-${digitKey}`;
+      const container = document.getElementById(elementId);
+      if (!container) return;
+      
+      const strip = container.querySelector('.digit-strip');
+      const offset = targetValue * 40; // 40px per digit
+      
+      if (currentDigits[digitKey] !== targetValue) {
+        currentDigits[digitKey] = targetValue;
+        gsap.to(strip, {
+          y: -offset,
+          duration: 0.6,
+          ease: "back.out(1.2)"
+        });
+      }
+    }
+
+    // Update Scores UI
+    function updateUI(data, isInit = false) {
+      document.getElementById('team-batting-name').innerText = data.team;
+      document.getElementById('match-overs').innerText = data.overs.toFixed(1);
+      
+      // Update batters
+      document.getElementById('bat1-name').innerText = data.bat1Name;
+      document.getElementById('bat1-stats').innerHTML = `${data.bat1Runs} <span class="text-[11px] font-bold opacity-60">${data.bat1Balls}</span>`;
+      document.getElementById('bat2-name').innerText = data.bat2Name;
+      document.getElementById('bat2-stats').innerHTML = `${data.bat2Runs} <span class="text-[11px] font-bold opacity-60">${data.bat2Balls}</span>`;
+
+      // Active Striker Indicator logic
+      if (data.bat1Strike) {
+        document.getElementById('bat1-strike').classList.remove('opacity-0');
+        document.getElementById('bat2-strike').classList.add('opacity-0');
+        document.getElementById('bat1-card').classList.remove('opacity-60');
+        document.getElementById('bat2-card').classList.add('opacity-60');
+      } else {
+        document.getElementById('bat2-strike').classList.remove('opacity-0');
+        document.getElementById('bat1-strike').classList.add('opacity-0');
+        document.getElementById('bat2-card').classList.remove('opacity-60');
+        document.getElementById('bat1-card').classList.add('opacity-60');
+      }
+
+      // Update Bowler
+      document.getElementById('bowl-name').innerText = data.bowlName;
+      document.getElementById('bowl-stats').innerHTML = `${data.bowlWickets}-${data.bowlConceded} <span class="text-[11px] font-bold opacity-60">(${data.bowlOvers})</span>`;
+
+      // Update Tickers
+      document.getElementById('ticker-text').innerText = data.tickerText;
+      document.getElementById('bottom-ticker-text').innerText = data.bottomTicker;
+
+      // Extract Hundreds, Tens, Ones
+      const rVal = data.runs.toString().padStart(3, '0');
+      const digitHundreds = parseInt(rVal[0]);
+      const digitTens = parseInt(rVal[1]);
+      const digitOnes = parseInt(rVal[2]);
+      const digitW = data.wickets;
+
+      if (isInit) {
+        // Instant update
+        gsap.set(`#digit-100 .digit-strip`, { y: -(digitHundreds * 40) });
+        gsap.set(`#digit-10 .digit-strip`, { y: -(digitTens * 40) });
+        gsap.set(`#digit-1 .digit-strip`, { y: -(digitOnes * 40) });
+        gsap.set(`#digit-w .digit-strip`, { y: -(digitW * 40) });
+        currentDigits = { '100': digitHundreds, '10': digitTens, '1': digitOnes, 'w': digitW };
+      } else {
+        // Roll animation
+        rollDigit('100', digitHundreds);
+        rollDigit('10', digitTens);
+        rollDigit('1', digitOnes);
+        rollDigit('w', digitW);
+      }
+    }
+
+    // Manual adjustments
+    function adjustScore(val) {
+      matchData.runs += val;
+      if (val === 4) {
+        triggerFlash('FOUR!', '#10b981');
+      } else if (val === 6) {
+        triggerFlash('SIX!', '#10b981');
+      }
+      updateUI(matchData);
+    }
+
+    // Live Action Event Flash Takeover
+    function triggerFlash(text, color) {
+      const banner = document.getElementById('event-flash');
+      const label = document.getElementById('event-text');
+      label.innerText = text;
+      
+      // Update borders color to reflect event
+      banner.querySelector('div').style.borderColor = color;
+
+      // Reset previous timeline animations
+      gsap.killTweensOf(banner);
+
+      const tl = gsap.timeline();
+      tl.to(banner, {
+        opacity: 1,
+        scale: 1,
+        duration: 0.3,
+        ease: "back.out(1.5)"
+      })
+      .to(banner, {
+        opacity: 0,
+        scale: 0.95,
+        duration: 0.25,
+        delay: 1.5,
+        ease: "power2.in"
+      });
+
+      // Generate particles
+      createParticles(color);
+    }
+
+    // Simple particle system
+    function createParticles(color) {
+      const container = document.getElementById('particle-container');
+      container.innerHTML = '';
+      
+      const count = 40;
+      for (let i = 0; i < count; i++) {
+        const p = document.createElement('div');
+        p.style.position = 'absolute';
+        p.style.width = gsap.utils.random(8, 16) + 'px';
+        p.style.height = p.style.width;
+        p.style.borderRadius = '50%';
+        p.style.backgroundColor = color;
+        p.style.left = '50%';
+        p.style.top = '50%';
+        
+        container.appendChild(p);
+        
+        gsap.to(p, {
+          x: gsap.utils.random(-400, 400),
+          y: gsap.utils.random(-300, 300),
+          scale: 0,
+          opacity: 0,
+          duration: gsap.utils.random(1.2, 2),
+          ease: "power3.out"
+        });
+      }
+    }
+
+    // Autoplay Simulation Data Loop
+    function simulateNextBall() {
+      // Advance overs
+      let nextBalls = Math.round((matchData.overs % 1) * 10) + 1;
+      let wholeOvers = Math.floor(matchData.overs);
+      if (nextBalls >= 6) {
+        nextBalls = 0;
+        wholeOvers += 1;
+      }
+      matchData.overs = wholeOvers + (nextBalls / 10);
+
+      // Random outcome
+      const rng = Math.random();
+      if (rng < 0.1) {
+        // Wicket
+        matchData.wickets = (matchData.wickets + 1) % 10;
+        matchData.bowlWickets += 1;
+        triggerFlash('WICKET!', '#ef4444');
+      } else if (rng < 0.25) {
+        // Four
+        matchData.runs += 4;
+        matchData.bowlConceded += 4;
+        if (matchData.bat1Strike) {
+          matchData.bat1Runs += 4;
+          matchData.bat1Balls += 1;
+        } else {
+          matchData.bat2Runs += 4;
+          matchData.bat2Balls += 1;
+        }
+        triggerFlash('FOUR!', '#10b981');
+      } else if (rng < 0.35) {
+        // Six
+        matchData.runs += 6;
+        matchData.bowlConceded += 6;
+        if (matchData.bat1Strike) {
+          matchData.bat1Runs += 6;
+          matchData.bat1Balls += 1;
+        } else {
+          matchData.bat2Runs += 6;
+          matchData.bat2Balls += 1;
+        }
+        triggerFlash('SIX!', '#10b981');
+      } else if (rng < 0.6) {
+        // Single
+        matchData.runs += 1;
+        matchData.bowlConceded += 1;
+        if (matchData.bat1Strike) {
+          matchData.bat1Runs += 1;
+          matchData.bat1Balls += 1;
+          matchData.bat1Strike = false;
+          matchData.bat2Strike = true;
+        } else {
+          matchData.bat2Runs += 1;
+          matchData.bat2Balls += 1;
+          matchData.bat2Strike = false;
+          matchData.bat1Strike = true;
+        }
+      } else {
+        // Dot ball
+        if (matchData.bat1Strike) {
+          matchData.bat1Balls += 1;
+        } else {
+          matchData.bat2Balls += 1;
+        }
+      }
+
+      // Update bowler overs details
+      let bBalls = Math.round((parseFloat(matchData.bowlOvers) % 1) * 10) + 1;
+      let bOvers = Math.floor(parseFloat(matchData.bowlOvers));
+      if (bBalls >= 6) {
+        bBalls = 0;
+        bOvers += 1;
+      }
+      matchData.bowlOvers = `${bOvers}.${bBalls}`;
+
+      // Update CRR & Target tickers
+      let crrVal = (matchData.runs / matchData.overs).toFixed(2);
+      matchData.tickerText = `CRR: ${crrVal}`;
+      
+      let reqRuns = 268 - matchData.runs;
+      let ballsLeft = 120 - Math.round(wholeOvers * 6 + nextBalls);
+      if (reqRuns > 0 && ballsLeft > 0) {
+        let reqRate = ((reqRuns / ballsLeft) * 6).toFixed(2);
+        matchData.bottomTicker = `${matchData.team} NEED ${reqRuns} RUNS IN ${ballsLeft} BALLS (REQ: ${reqRate})`;
+      } else {
+        matchData.bottomTicker = `FIRST INNINGS MATCH SUMMARY`;
+      }
+
+      updateUI(matchData);
+    }
+  </script>
+</body>
+</html>
