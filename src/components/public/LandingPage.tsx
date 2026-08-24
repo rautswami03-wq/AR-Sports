@@ -21,7 +21,14 @@ import {
   Camera,
   Mic,
   HardDrive,
-  Activity
+  Activity,
+  Globe,
+  Settings,
+  Users,
+  Mail,
+  FileCheck,
+  MapPin,
+  FolderOpen
 } from 'lucide-react';
 import { CricNavbar } from '../common/CricNavbar';
 import { PRESET_TOURNAMENTS } from '../../theme/presetThemes';
@@ -241,126 +248,299 @@ export const LandingPage: React.FC = () => {
 
       {/* Tab 2: Feature Highlights */}
       {activeTab === 'features' && (
-        <section className="px-6 max-w-7xl mx-auto mb-20 animate-fade-in">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-              <div className="w-12 h-12 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-cyan-400 mb-4">
-                <Radio className="w-6 h-6" />
+        <section className="px-6 max-w-7xl mx-auto mb-20 animate-fade-in space-y-16">
+          
+          {/* Subcategory 1: Live Broadcast & Overlays */}
+          <div>
+            <h3 className="text-xl sm:text-2xl font-black text-cyan-400 uppercase tracking-wider mb-6 border-b border-cyan-500/20 pb-2">
+              ⚡ Live Broadcast & Overlay Features
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
+                <div className="w-12 h-12 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-cyan-400 mb-4">
+                  <Radio className="w-6 h-6" />
+                </div>
+                <h4 className="text-lg font-black text-white uppercase">Live Streaming</h4>
+                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
+                  Stream to YouTube, Facebook, and custom RTMP destinations simultaneously. Broadcast to up to 3 platforms at once with ultra-low delay.
+                </p>
               </div>
-              <h4 className="text-lg font-black text-white uppercase">Live Streaming</h4>
-              <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                Stream to YouTube, Facebook, and custom RTMP destinations simultaneously. Broadcast to up to 3 platforms at once with ultra-low delay.
-              </p>
-            </div>
 
-            <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-              <div className="w-12 h-12 rounded-xl bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center text-indigo-400 mb-4">
-                <RotateCcw className="w-6 h-6" />
+              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
+                <div className="w-12 h-12 rounded-xl bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center text-indigo-400 mb-4">
+                  <RotateCcw className="w-6 h-6" />
+                </div>
+                <h4 className="text-lg font-black text-white uppercase">Instant Replay</h4>
+                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
+                  Integrated 60-second instant replay buffer with support for slow motion, ball-event bookmarks, and live DRS review overlays.
+                </p>
               </div>
-              <h4 className="text-lg font-black text-white uppercase">Instant Replay</h4>
-              <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                Integrated 60-second instant replay buffer with support for slow motion, ball-event bookmarks, and live DRS review overlays.
-              </p>
-            </div>
 
-            <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-              <div className="w-12 h-12 rounded-xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-purple-400 mb-4">
-                <Video className="w-6 h-6" />
+              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
+                <div className="w-12 h-12 rounded-xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-purple-400 mb-4">
+                  <Video className="w-6 h-6" />
+                </div>
+                <h4 className="text-lg font-black text-white uppercase">Auto Highlights</h4>
+                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
+                  Automatically generated match highlights reels filtered dynamically by wickets, sixes, fours, innings, or specific players.
+                </p>
               </div>
-              <h4 className="text-lg font-black text-white uppercase">Auto Highlights</h4>
-              <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                Automatically generated match highlights reels filtered dynamically by wickets, sixes, fours, innings, or specific players.
-              </p>
-            </div>
 
-            <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-              <div className="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400 mb-4">
-                <Camera className="w-6 h-6" />
+              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
+                <div className="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400 mb-4">
+                  <Camera className="w-6 h-6" />
+                </div>
+                <h4 className="text-lg font-black text-white uppercase">Camera Support</h4>
+                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
+                  Seamless switching between local cameras, external USB capture cards, manual zoom levels, and live display frame capture.
+                </p>
               </div>
-              <h4 className="text-lg font-black text-white uppercase">Camera Support</h4>
-              <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                Seamless switching between local cameras, external USB capture cards, manual zoom levels, and live display frame capture.
-              </p>
-            </div>
 
-            <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-              <div className="w-12 h-12 rounded-xl bg-red-500/20 border border-red-400/40 flex items-center justify-center text-red-400 mb-4">
-                <Sliders className="w-6 h-6" />
+              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
+                <div className="w-12 h-12 rounded-xl bg-red-500/20 border border-red-400/40 flex items-center justify-center text-red-400 mb-4">
+                  <Sliders className="w-6 h-6" />
+                </div>
+                <h4 className="text-lg font-black text-white uppercase">Video Quality</h4>
+                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
+                  Broadcast-grade hardware encoding scaling from 720p up to 4K UHD resolutions at 30/60fps with adaptive streaming bitrates.
+                </p>
               </div>
-              <h4 className="text-lg font-black text-white uppercase">Video Quality</h4>
-              <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                Broadcast-grade hardware encoding scaling from 720p up to 4K UHD resolutions at 30/60fps with adaptive streaming bitrates.
-              </p>
-            </div>
 
-            <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400 mb-4">
-                <Mic className="w-6 h-6" />
+              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
+                <div className="w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400 mb-4">
+                  <Mic className="w-6 h-6" />
+                </div>
+                <h4 className="text-lg font-black text-white uppercase">48kHz Audio Capture</h4>
+                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
+                  Professional stereo capture featuring noise cancellation filters, separate volume sliders, and live VU metering.
+                </p>
               </div>
-              <h4 className="text-lg font-black text-white uppercase">48kHz Audio Capture</h4>
-              <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                Professional stereo capture featuring noise cancellation filters, separate volume sliders, and live VU metering.
-              </p>
-            </div>
 
-            <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-              <div className="w-12 h-12 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-cyan-400 mb-4">
-                <HardDrive className="w-6 h-6" />
+              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
+                <div className="w-12 h-12 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-cyan-400 mb-4">
+                  <HardDrive className="w-6 h-6" />
+                </div>
+                <h4 className="text-lg font-black text-white uppercase">Local Recording</h4>
+                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
+                  High-definition local MP4 recording with timeline bookmark tracking, segmented files, and pause/resume actions.
+                </p>
               </div>
-              <h4 className="text-lg font-black text-white uppercase">Local Recording</h4>
-              <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                High-definition local MP4 recording with timeline bookmark tracking, segmented files, and pause/resume actions.
-              </p>
-            </div>
 
-            <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-              <div className="w-12 h-12 rounded-xl bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center text-indigo-400 mb-4">
-                <Layers className="w-6 h-6" />
+              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
+                <div className="w-12 h-12 rounded-xl bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center text-indigo-400 mb-4">
+                  <Layers className="w-6 h-6" />
+                </div>
+                <h4 className="text-lg font-black text-white uppercase">Overlay Integration</h4>
+                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
+                  Native overlay compositing engines rendering scoreboard layouts in real-time with automated data APIs.
+                </p>
               </div>
-              <h4 className="text-lg font-black text-white uppercase">Overlay Integration</h4>
-              <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                Native overlay compositing engines rendering scoreboard layouts in real-time with automated data APIs.
-              </p>
-            </div>
 
-            <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-              <div className="w-12 h-12 rounded-xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-purple-400 mb-4">
-                <Activity className="w-6 h-6" />
+              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
+                <div className="w-12 h-12 rounded-xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-purple-400 mb-4">
+                  <Activity className="w-6 h-6" />
+                </div>
+                <h4 className="text-lg font-black text-white uppercase">Real-Time Diagnostics</h4>
+                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
+                  Detailed streaming statistics dashboard displaying connection strength, dropped frames, device logs, and diagnostics.
+                </p>
               </div>
-              <h4 className="text-lg font-black text-white uppercase">Real-Time Diagnostics</h4>
-              <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                Detailed streaming statistics dashboard displaying connection strength, dropped frames, device logs, and diagnostics.
-              </p>
             </div>
+          </div>
 
-            <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-              <div className="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400 mb-4">
-                <Zap className="w-6 h-6" />
+          {/* Subcategory 2: League Website Builder */}
+          <div>
+            <h3 className="text-xl sm:text-2xl font-black text-indigo-400 uppercase tracking-wider mb-6 border-b border-indigo-500/20 pb-2">
+              🌐 League Website Builder Platform
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
+                <div className="w-12 h-12 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-cyan-400 mb-4">
+                  <Palette className="w-6 h-6" />
+                </div>
+                <h4 className="text-lg font-black text-white uppercase">Drag-and-Drop Page Builder</h4>
+                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
+                  Easily build your website using 21 custom content blocks—including stats counters, image sliders, match widgets, and leaderboards.
+                </p>
               </div>
-              <h4 className="text-lg font-black text-white uppercase">100ms Ultra-Low Latency</h4>
-              <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                Redundant synchronization system combining LocalStorage polling and custom window dispatchers for instant scorebug updates.
-              </p>
+
+              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
+                <div className="w-12 h-12 rounded-xl bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center text-indigo-400 mb-4">
+                  <Globe className="w-6 h-6" />
+                </div>
+                <h4 className="text-lg font-black text-white uppercase">Tournament & Standings</h4>
+                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
+                  Auto-generated tournament pages containing standing tables, schedule tables, matches, teams lists, and player squad rosters.
+                </p>
+              </div>
+
+              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
+                <div className="w-12 h-12 rounded-xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-purple-400 mb-4">
+                  <Tv className="w-6 h-6" />
+                </div>
+                <h4 className="text-lg font-black text-white uppercase">Match & Commentary Pages</h4>
+                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
+                  Dynamic match detail pages containing complete scorecards, overs charts, ball-by-ball commentary lines, and player charts.
+                </p>
+              </div>
+
+              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
+                <div className="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400 mb-4">
+                  <Users className="w-6 h-6" />
+                </div>
+                <h4 className="text-lg font-black text-white uppercase">Team & Player Profiles</h4>
+                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
+                  Comprehensive profile pages showcasing batting averages, bowling records, historical matches, and achievement badges.
+                </p>
+              </div>
+
+              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
+                <div className="w-12 h-12 rounded-xl bg-red-500/20 border border-red-400/40 flex items-center justify-center text-red-400 mb-4">
+                  <Sliders className="w-6 h-6" />
+                </div>
+                <h4 className="text-lg font-black text-white uppercase">Theme Customization</h4>
+                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
+                  Choose from 5 premium theme presets. Customize layouts, colors, navigation headers, footer links, and fonts instantly.
+                </p>
+              </div>
+
+              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
+                <div className="w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400 mb-4">
+                  <Sparkles className="w-6 h-6" />
+                </div>
+                <h4 className="text-lg font-black text-white uppercase">Custom Domain & SSL</h4>
+                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
+                  Connect your own league domain. Provison automatic SSL certificates, handle DNS verifications, and www redirection.
+                </p>
+              </div>
+
+              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
+                <div className="w-12 h-12 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-cyan-400 mb-4">
+                  <Cloud className="w-6 h-6" />
+                </div>
+                <h4 className="text-lg font-black text-white uppercase">SEO & AI Optimization</h4>
+                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
+                  Optimized metadata, Open Graph preview tags, and structured JSON-LD schema layouts with 60s ISR caching.
+                </p>
+              </div>
+
+              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
+                <div className="w-12 h-12 rounded-xl bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center text-indigo-400 mb-4">
+                  <Layers className="w-6 h-6" />
+                </div>
+                <h4 className="text-lg font-black text-white uppercase">Multi-Tenant Subdomains</h4>
+                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
+                  Isolated workspaces. Each league gets its own subdomain, unique database table partitions, and administrative settings.
+                </p>
+              </div>
+
+              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
+                <div className="w-12 h-12 rounded-xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-purple-400 mb-4">
+                  <FileCheck className="w-6 h-6" />
+                </div>
+                <h4 className="text-lg font-black text-white uppercase">Waiver & Signatures</h4>
+                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
+                  Digital injury waiver and liability consent forms. Complete with e-signature captures and compliant PDF generation.
+                </p>
+              </div>
             </div>
+          </div>
 
-            <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-              <div className="w-12 h-12 rounded-xl bg-red-500/20 border border-red-400/40 flex items-center justify-center text-red-400 mb-4">
-                <Cloud className="w-6 h-6" />
+          {/* Subcategory 3: Tournament Management Dashboard */}
+          <div>
+            <h3 className="text-xl sm:text-2xl font-black text-purple-400 uppercase tracking-wider mb-6 border-b border-purple-500/20 pb-2">
+              🛠️ Tournament Management Web Dashboard
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
+                <div className="w-12 h-12 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-cyan-400 mb-4">
+                  <Settings className="w-6 h-6" />
+                </div>
+                <h4 className="text-lg font-black text-white uppercase">Tournament Command Center</h4>
+                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
+                  Configure leagues, manage team lists, register squads, publish match schedules, and track outcomes from a single tab.
+                </p>
               </div>
-              <h4 className="text-lg font-black text-white uppercase">Firebase Cloud Sync</h4>
-              <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                Score matches from any smartphone while your overlay runs remotely anywhere in the world via cloud databases.
-              </p>
-            </div>
 
-            <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-              <div className="w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400 mb-4">
-                <Shield className="w-6 h-6" />
+              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
+                <div className="w-12 h-12 rounded-xl bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center text-indigo-400 mb-4">
+                  <Sliders className="w-6 h-6" />
+                </div>
+                <h4 className="text-lg font-black text-white uppercase">Overlay Control Studio</h4>
+                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
+                  Full control panel dashboard to update active overlays. Change scores, customize sponsors, swap layouts, and trigger ads in real-time.
+                </p>
               </div>
-              <h4 className="text-lg font-black text-white uppercase">100% Unlocked PRO Edition</h4>
-              <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                No subscription plans, watermark overlays, or limitations. Complete access to all presets, templates, and links.
-              </p>
+
+              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
+                <div className="w-12 h-12 rounded-xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-purple-400 mb-4">
+                  <Mail className="w-6 h-6" />
+                </div>
+                <h4 className="text-lg font-black text-white uppercase">Email & Notification Campaigns</h4>
+                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
+                  Design rich email newsletters. Target distribution lists by roles, track delivery stats, and manage contact submissions.
+                </p>
+              </div>
+
+              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
+                <div className="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400 mb-4">
+                  <Users className="w-6 h-6" />
+                </div>
+                <h4 className="text-lg font-black text-white uppercase">Role-Based Access Control</h4>
+                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
+                  Set permissions for league administrators, team managers, and scorers. Gate menu actions based on strict authorization rules.
+                </p>
+              </div>
+
+              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
+                <div className="w-12 h-12 rounded-xl bg-red-500/20 border border-red-400/40 flex items-center justify-center text-red-400 mb-4">
+                  <Sparkles className="w-6 h-6" />
+                </div>
+                <h4 className="text-lg font-black text-white uppercase">Sponsor Asset Management</h4>
+                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
+                  Manage league sponsor logos, tier groups, campaigns, and overlay placement details with delivery tracking metrics.
+                </p>
+              </div>
+
+              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
+                <div className="w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400 mb-4">
+                  <MapPin className="w-6 h-6" />
+                </div>
+                <h4 className="text-lg font-black text-white uppercase">Ground & Venue Management</h4>
+                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
+                  Register grounds with maps, coordinate availability timeslots, assign pitches, and track venue booking schedules.
+                </p>
+              </div>
+
+              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
+                <div className="w-12 h-12 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-cyan-400 mb-4">
+                  <FolderOpen className="w-6 h-6" />
+                </div>
+                <h4 className="text-lg font-black text-white uppercase">Document Center</h4>
+                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
+                  Upload and publish league documents—including registration rules, seasonal handbooks, and team schedules.
+                </p>
+              </div>
+
+              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
+                <div className="w-12 h-12 rounded-xl bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center text-indigo-400 mb-4">
+                  <Layers className="w-6 h-6" />
+                </div>
+                <h4 className="text-lg font-black text-white uppercase">CMS & Editor.js integration</h4>
+                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
+                  Write blog articles using Editor.js, build pages with Tiptap, organize media files, and display galleries in lightboxes.
+                </p>
+              </div>
+
+              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
+                <div className="w-12 h-12 rounded-xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-purple-400 mb-4">
+                  <Shield className="w-6 h-6" />
+                </div>
+                <h4 className="text-lg font-black text-white uppercase">Guided Setup Onboarding</h4>
+                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
+                  Interactive setup guide for new organizations. Upload assets, map domains, configure presets, and import rosters easily.
+                </p>
+              </div>
             </div>
           </div>
         </section>
