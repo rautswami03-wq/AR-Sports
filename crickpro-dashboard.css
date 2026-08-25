@@ -1,0 +1,777 @@
+/* style.css - CrickPro Broadcast Overlays Core Styling */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;600;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap');
+
+:root {
+    --dash-bg: #0f172a;
+    --dash-card: #1e293b;
+    --dash-border: #334155;
+    --dash-text: #f8fafc;
+    --dash-text-muted: #94a3b8;
+    --dash-accent: #3b82f6;
+    
+    /* Overlay Default Variables (overridden by themes) */
+    --ol-primary: #121212;
+    --ol-secondary: #242424;
+    --ol-accent: #00ff66;
+    --ol-text: #ffffff;
+    --ol-text-alt: #a0a0a0;
+    --ol-border-radius: 4px;
+    --ol-skew: 0deg;
+    --ol-glow: 0 0 0px rgba(0, 0, 0, 0);
+    --ol-font: 'Outfit', sans-serif;
+    --ol-border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--dash-bg);
+    color: var(--dash-text);
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+}
+
+/* Dashboard Layout */
+.dashboard-container {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+}
+
+/* Sidebar Controls */
+.controls-sidebar {
+    width: 420px;
+    background-color: var(--dash-bg);
+    border-right: 1px solid var(--dash-border);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow-y: auto;
+    padding: 1.5rem;
+}
+
+.controls-sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+.controls-sidebar::-webkit-scrollbar-thumb {
+    background: var(--dash-border);
+    border-radius: 3px;
+}
+
+/* Preview Screen */
+.preview-pane {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #020617;
+    padding: 2rem;
+    position: relative;
+}
+
+.preview-header {
+    width: 100%;
+    max-width: 960px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.preview-header h2 {
+    font-family: 'Outfit', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+/* Virtual 16:9 Broadcast Monitor */
+.monitor-window {
+    width: 100%;
+    max-width: 960px;
+    aspect-ratio: 16/9;
+    background: radial-gradient(circle, #14532d 0%, #052e16 100%);
+    border: 8px solid #0f172a;
+    border-radius: 12px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Fake Match Stream Background Pitch */
+.pitch-bg {
+    position: absolute;
+    inset: 0;
+    background-image: 
+        linear-gradient(rgba(0,0,0,0.1) 50%, transparent 50%),
+        linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 100% 20px, 80px 100%;
+    opacity: 0.6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+}
+
+.pitch-bg::after {
+    content: "LIVE STREAM SIMULATION";
+    font-family: 'Outfit', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.05);
+    letter-spacing: 0.2em;
+}
+
+/* Dynamic Broadcast Components Container */
+.overlays-container {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    font-family: var(--ol-font);
+    color: var(--ol-text);
+}
+
+/* Theme Configuration Classes for 19 Themes */
+
+/* 1. Nakshatra */
+.theme-nakshatra {
+    --ol-primary: #1e0b36;
+    --ol-secondary: #0c0218;
+    --ol-accent: #ffd700;
+    --ol-text: #ffffff;
+    --ol-text-alt: #d1bcf5;
+    --ol-border-radius: 8px;
+    --ol-skew: -4deg;
+    --ol-glow: 0 0 15px rgba(255, 215, 0, 0.35);
+    --ol-font: 'Outfit', sans-serif;
+    --ol-border: 1px solid rgba(255, 215, 0, 0.25);
+}
+
+/* 2. Agni */
+.theme-agni {
+    --ol-primary: #b91c1c;
+    --ol-secondary: #1e1b4b;
+    --ol-accent: #f97316;
+    --ol-text: #ffffff;
+    --ol-text-alt: #fca5a5;
+    --ol-border-radius: 0px;
+    --ol-skew: -10deg;
+    --ol-glow: 0 0 10px rgba(249, 115, 22, 0.5);
+    --ol-font: 'Outfit', sans-serif;
+    --ol-border: 2px solid #f97316;
+}
+
+/* 3. Apex */
+.theme-apex {
+    --ol-primary: #ffffff;
+    --ol-secondary: #000000;
+    --ol-accent: #000000;
+    --ol-text: #000000;
+    --ol-text-alt: #666666;
+    --ol-border-radius: 0px;
+    --ol-skew: 0deg;
+    --ol-glow: none;
+    --ol-font: 'Inter', sans-serif;
+    --ol-border: 1px solid #000000;
+}
+.theme-apex .ol-card-body { color: #ffffff !important; }
+
+/* 4. Aranyaka */
+.theme-aranyaka {
+    --ol-primary: #064e3b;
+    --ol-secondary: #022c22;
+    --ol-accent: #fbbf24;
+    --ol-text: #ffffff;
+    --ol-text-alt: #a7f3d0;
+    --ol-border-radius: 12px;
+    --ol-skew: 0deg;
+    --ol-glow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    --ol-font: 'Outfit', sans-serif;
+    --ol-border: 1px solid rgba(251, 191, 36, 0.3);
+}
+
+/* 5. Volt */
+.theme-volt {
+    --ol-primary: #171717;
+    --ol-secondary: #0a0a0a;
+    --ol-accent: #a3e635;
+    --ol-text: #ffffff;
+    --ol-text-alt: #a3a3a3;
+    --ol-border-radius: 2px;
+    --ol-skew: -6deg;
+    --ol-glow: 0 0 12px rgba(163, 230, 53, 0.4);
+    --ol-font: 'Outfit', sans-serif;
+    --ol-border: 1px solid #a3e635;
+}
+
+/* 6. Thunder */
+.theme-thunder {
+    --ol-primary: #1e293b;
+    --ol-secondary: #0f172a;
+    --ol-accent: #06b6d4;
+    --ol-text: #ffffff;
+    --ol-text-alt: #94a3b8;
+    --ol-border-radius: 6px;
+    --ol-skew: -5deg;
+    --ol-glow: 0 0 14px rgba(6, 182, 212, 0.5);
+    --ol-font: 'Outfit', sans-serif;
+    --ol-border: 1px solid #06b6d4;
+}
+
+/* 7. Africa */
+.theme-africa {
+    --ol-primary: #7c2d12;
+    --ol-secondary: #431407;
+    --ol-accent: #f59e0b;
+    --ol-text: #fffbeb;
+    --ol-text-alt: #fed7aa;
+    --ol-border-radius: 10px;
+    --ol-skew: -2deg;
+    --ol-glow: none;
+    --ol-font: 'Outfit', sans-serif;
+    --ol-border: 2px solid #ea580c;
+}
+
+/* 8. Elite */
+.theme-elite {
+    --ol-primary: #111111;
+    --ol-secondary: #1c1917;
+    --ol-accent: #d97706;
+    --ol-text: #fafaf9;
+    --ol-text-alt: #d6d3d1;
+    --ol-border-radius: 0px;
+    --ol-skew: 0deg;
+    --ol-glow: 0 0 8px rgba(217, 119, 6, 0.25);
+    --ol-font: 'Playfair Display', serif;
+    --ol-border: 1px solid #d97706;
+}
+
+/* 9. Franchise */
+.theme-franchise {
+    --ol-primary: #1e3a8a;
+    --ol-secondary: #172554;
+    --ol-accent: #ec4899;
+    --ol-text: #ffffff;
+    --ol-text-alt: #bfdbfe;
+    --ol-border-radius: 6px;
+    --ol-skew: -8deg;
+    --ol-glow: 0 0 10px rgba(236, 72, 153, 0.4);
+    --ol-font: 'Outfit', sans-serif;
+    --ol-border: 1px solid #ec4899;
+}
+
+/* 10. Blitz */
+.theme-blitz {
+    --ol-primary: #030712;
+    --ol-secondary: #0b0f19;
+    --ol-accent: #ff007f;
+    --ol-text: #ffffff;
+    --ol-text-alt: #00f3ff;
+    --ol-border-radius: 4px;
+    --ol-skew: -12deg;
+    --ol-glow: 0 0 15px rgba(255, 0, 127, 0.6), 0 0 5px rgba(0, 243, 255, 0.4);
+    --ol-font: 'Outfit', sans-serif;
+    --ol-border: 2px solid #00f3ff;
+}
+
+/* 11. Asia 2021 */
+.theme-asia2021 {
+    --ol-primary: #065f46;
+    --ol-secondary: #064e3b;
+    --ol-accent: #fb7185;
+    --ol-text: #ffffff;
+    --ol-text-alt: #fecdd3;
+    --ol-border-radius: 4px;
+    --ol-skew: -3deg;
+    --ol-glow: none;
+    --ol-font: 'Outfit', sans-serif;
+    --ol-border: 1px solid #fb7185;
+}
+
+/* 12. Asia 2022 */
+.theme-asia2022 {
+    --ol-primary: #1d4ed8;
+    --ol-secondary: #1e3a8a;
+    --ol-accent: #eab308;
+    --ol-text: #ffffff;
+    --ol-text-alt: #bfdbfe;
+    --ol-border-radius: 4px;
+    --ol-skew: -5deg;
+    --ol-glow: none;
+    --ol-font: 'Outfit', sans-serif;
+    --ol-border: 1px solid #eab308;
+}
+
+/* 13. Asia */
+.theme-asia {
+    --ol-primary: #0f766e;
+    --ol-secondary: #115e59;
+    --ol-accent: #f59e0b;
+    --ol-text: #ffffff;
+    --ol-text-alt: #ccfbf1;
+    --ol-border-radius: 6px;
+    --ol-skew: 0deg;
+    --ol-glow: none;
+    --ol-font: 'Outfit', sans-serif;
+    --ol-border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* 14. Championship 2019 */
+.theme-championship2019 {
+    --ol-primary: #1c1917;
+    --ol-secondary: #0c0a09;
+    --ol-accent: #ca8a04;
+    --ol-text: #ffffff;
+    --ol-text-alt: #d6d3d1;
+    --ol-border-radius: 2px;
+    --ol-skew: -7deg;
+    --ol-glow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    --ol-font: 'Outfit', sans-serif;
+    --ol-border: 1px solid #ca8a04;
+}
+
+/* 15. Championship 2022 */
+.theme-championship2022 {
+    --ol-primary: #334155;
+    --ol-secondary: #1e293b;
+    --ol-accent: #f1f5f9;
+    --ol-text: #ffffff;
+    --ol-text-alt: #cbd5e1;
+    --ol-border-radius: 4px;
+    --ol-skew: -5deg;
+    --ol-glow: none;
+    --ol-font: 'Outfit', sans-serif;
+    --ol-border: 1px solid #f1f5f9;
+}
+
+/* 16. Dharma */
+.theme-dharma {
+    --ol-primary: #ea580c;
+    --ol-secondary: #9a3412;
+    --ol-accent: #eab308;
+    --ol-text: #ffffff;
+    --ol-text-alt: #ffedd5;
+    --ol-border-radius: 8px;
+    --ol-skew: 0deg;
+    --ol-glow: 0 0 10px rgba(234, 88, 12, 0.3);
+    --ol-font: 'Outfit', sans-serif;
+    --ol-border: 2px solid #eab308;
+}
+
+/* 17. Shakti */
+.theme-shakti {
+    --ol-primary: #991b1b;
+    --ol-secondary: #7f1d1d;
+    --ol-accent: #f59e0b;
+    --ol-text: #ffffff;
+    --ol-text-alt: #fee2e2;
+    --ol-border-radius: 0px;
+    --ol-skew: -6deg;
+    --ol-glow: 0 0 12px rgba(153, 27, 27, 0.4);
+    --ol-font: 'Outfit', sans-serif;
+    --ol-border: 1px solid #f59e0b;
+}
+
+/* 18. Buzz */
+.theme-buzz {
+    --ol-primary: #000000;
+    --ol-secondary: #171717;
+    --ol-accent: #eab308;
+    --ol-text: #ffffff;
+    --ol-text-alt: #a3a3a3;
+    --ol-border-radius: 4px;
+    --ol-skew: -4deg;
+    --ol-glow: 0 0 10px rgba(234, 179, 8, 0.35);
+    --ol-font: 'Outfit', sans-serif;
+    --ol-border: 2px solid #eab308;
+}
+
+/* 19. Diamond */
+.theme-diamond {
+    --ol-primary: #0f766e;
+    --ol-secondary: #134e4a;
+    --ol-accent: #22d3ee;
+    --ol-text: #e0f7fa;
+    --ol-text-alt: #22d3ee;
+    --ol-border-radius: 12px;
+    --ol-skew: -8deg;
+    --ol-glow: 0 0 15px rgba(34, 211, 238, 0.4);
+    --ol-font: 'Outfit', sans-serif;
+    --ol-border: 1px solid #22d3ee;
+}
+
+
+/* Broadcast Elements */
+
+/* 1. Score Ticker (Bottom Bar) */
+.ol-ticker {
+    position: absolute;
+    bottom: 2rem;
+    left: 4%;
+    right: 4%;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    border-radius: var(--ol-border-radius);
+    transform: skew(var(--ol-skew));
+    box-shadow: var(--ol-glow), 0 10px 25px rgba(0,0,0,0.5);
+    border: var(--ol-border);
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ol-ticker-tag {
+    background-color: var(--ol-accent);
+    color: var(--ol-secondary);
+    height: 100%;
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 0.05em;
+}
+
+.ol-ticker-score {
+    background-color: var(--ol-primary);
+    height: 100%;
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    font-weight: 700;
+    font-size: 1.2rem;
+    min-width: 140px;
+}
+
+.ol-ticker-overs {
+    color: var(--ol-text-alt);
+    font-size: 0.9rem;
+    margin-left: 0.5rem;
+    font-weight: 500;
+}
+
+.ol-ticker-batsmen {
+    background-color: var(--ol-secondary);
+    height: 100%;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 0 1.5rem;
+    gap: 2rem;
+    font-size: 0.95rem;
+}
+
+.ol-batsman {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.ol-batsman.active {
+    font-weight: 700;
+}
+
+.ol-batsman.active::after {
+    content: "★";
+    color: var(--ol-accent);
+    font-size: 0.75rem;
+}
+
+.ol-batsman-score {
+    color: var(--ol-accent);
+    font-weight: 700;
+}
+
+.ol-ticker-bowler {
+    background-color: var(--ol-primary);
+    height: 100%;
+    padding: 0 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ol-bowler-figs {
+    color: var(--ol-accent);
+    font-weight: 700;
+}
+
+/* 2. Informational Card Overlay (Left-Side Popup) */
+.ol-card {
+    position: absolute;
+    top: 2rem;
+    left: 4%;
+    width: 320px;
+    border-radius: var(--ol-border-radius);
+    transform: skew(var(--ol-skew));
+    box-shadow: var(--ol-glow), 0 10px 25px rgba(0,0,0,0.5);
+    border: var(--ol-border);
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 0;
+    pointer-events: none;
+    transform: translate(-50px) skew(var(--ol-skew));
+}
+
+.ol-card.visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(0) skew(var(--ol-skew));
+}
+
+.ol-card-header {
+    background-color: var(--ol-accent);
+    color: var(--ol-secondary);
+    padding: 0.75rem 1rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+}
+
+.ol-card-body {
+    background-color: var(--ol-primary);
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.ol-card-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--ol-text);
+}
+
+.ol-card-subtitle {
+    font-size: 0.85rem;
+    color: var(--ol-text-alt);
+    margin-top: -0.5rem;
+}
+
+.ol-card-stat-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    padding-bottom: 0.25rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.ol-card-stat-val {
+    font-weight: 700;
+    color: var(--ol-accent);
+}
+
+/* 3. Pre-Match Team Roster Overlay (Full Screen Center) */
+.ol-roster {
+    position: absolute;
+    inset: 2rem 4% 2rem 4%;
+    border-radius: var(--ol-border-radius);
+    box-shadow: var(--ol-glow), 0 15px 35px rgba(0,0,0,0.6);
+    border: var(--ol-border);
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.95);
+    display: flex;
+    flex-direction: column;
+}
+
+.ol-roster.visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: scale(1);
+}
+
+.ol-roster-header {
+    background-color: var(--ol-accent);
+    color: var(--ol-secondary);
+    padding: 1.25rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ol-roster-title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.ol-roster-subtitle {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    font-weight: 600;
+}
+
+.ol-roster-body {
+    background-color: var(--ol-primary);
+    flex: 1;
+    padding: 2rem;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem 3rem;
+}
+
+.ol-player-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 0.5rem;
+}
+
+.ol-player-num {
+    color: var(--ol-accent);
+    font-weight: 700;
+    width: 30px;
+}
+
+.ol-player-name {
+    flex: 1;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.ol-player-role {
+    font-size: 0.85rem;
+    color: var(--ol-text-alt);
+    background-color: var(--ol-secondary);
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+}
+
+/* Sidebar Dashboard Styling Elements */
+.section-title {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--dash-text-muted);
+    margin: 1.5rem 0 0.75rem 0;
+    font-weight: 700;
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--dash-text-muted);
+    margin-bottom: 0.35rem;
+    font-weight: 500;
+}
+
+.form-control {
+    width: 100%;
+    background-color: var(--dash-card);
+    border: 1px solid var(--dash-border);
+    color: var(--dash-text);
+    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 0.9rem;
+    transition: border-color 0.2s;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--dash-accent);
+}
+
+.row-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+}
+
+.btn {
+    background-color: var(--dash-accent);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: opacity 0.2s;
+}
+
+.btn:hover {
+    opacity: 0.9;
+}
+
+.btn-secondary {
+    background-color: transparent;
+    border: 1px solid var(--dash-border);
+    color: var(--dash-text);
+}
+
+.btn-secondary:hover {
+    background-color: var(--dash-card);
+}
+
+.theme-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+    max-height: 250px;
+    overflow-y: auto;
+    padding-right: 0.25rem;
+}
+
+.theme-grid::-webkit-scrollbar {
+    width: 4px;
+}
+.theme-grid::-webkit-scrollbar-thumb {
+    background: var(--dash-border);
+    border-radius: 2px;
+}
+
+.theme-button {
+    background-color: var(--dash-card);
+    border: 1px solid var(--dash-border);
+    color: var(--dash-text);
+    padding: 0.5rem;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.theme-button.active {
+    background-color: var(--dash-accent);
+    border-color: var(--dash-accent);
+    color: white;
+}
+
+/* Switch & Simulator checkbox */
+.toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.toggle-container input {
+    cursor: pointer;
+}

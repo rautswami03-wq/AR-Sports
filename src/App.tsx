@@ -7,6 +7,8 @@ import { TournamentPage } from './components/control/TournamentPage';
 import { TournamentDetailPage } from './components/control/TournamentDetailPage';
 import { TourMatchPage } from './components/control/TourMatchPage';
 import { LandingPage } from './components/public/LandingPage';
+import { ScoreboardPage } from './components/overlays/scoreboard/ScoreboardOverlay';
+import { AntiGravityPage } from './components/overlays/AntiGravityPage';
 
 export default function App() {
   const location = useLocation();
@@ -17,10 +19,16 @@ export default function App() {
     const isOverlayRoute =
       href.includes('/overlay') ||
       href.includes('/theme/') ||
+      href.includes('/scoreboard') ||
+      href.includes('/anti-gravity') ||
       hash.includes('/overlay') ||
       hash.includes('/theme/') ||
+      hash.includes('/scoreboard') ||
+      hash.includes('/anti-gravity') ||
       location.pathname.startsWith('/overlay') ||
-      location.pathname.startsWith('/theme');
+      location.pathname.startsWith('/theme') ||
+      location.pathname.startsWith('/scoreboard') ||
+      location.pathname.startsWith('/anti-gravity');
 
     if (isOverlayRoute) {
       document.body.style.setProperty('background', 'transparent', 'important');
@@ -46,6 +54,32 @@ export default function App() {
       <Route path="/match/:id" element={<TourMatchPage />} />
       <Route path="/theme_links" element={<ThemeLinksPage />} />
       <Route path="/themes" element={<ThemeLinksPage />} />
+      {/* ── 17-Theme Cricket Scoreboard Overlay (OBS Browser Source) ────── */}
+      <Route
+        path="/scoreboard"
+        element={
+          <div className="w-full h-screen bg-transparent overflow-hidden">
+            <ScoreboardPage />
+          </div>
+        }
+      />
+      <Route
+        path="/scoreboard/:themeId"
+        element={
+          <div className="w-full h-screen bg-transparent overflow-hidden">
+            <ScoreboardPage />
+          </div>
+        }
+      />
+      {/* ── Anti-Gravity WebGL Physics Overlay (OBS Browser Source) ──────── */}
+      <Route
+        path="/anti-gravity"
+        element={
+          <div style={{ width: 1920, height: 1080, background: 'transparent', overflow: 'hidden' }}>
+            <AntiGravityPage />
+          </div>
+        }
+      />
       <Route
         path="/overlay"
         element={
