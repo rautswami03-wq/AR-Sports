@@ -22,7 +22,8 @@ export type ThemeId =
   | 'dharma'
   | 'shakti'
   | 'buzz'
-  | 'diamond';
+  | 'diamond'
+  | 'ipl25';
 
 export type CelebrationStyle = 'ticker-takeover' | 'page-center' | 'batter-bar';
 export type LayoutVariant = 'standard' | 'pill' | 'centered' | 'hundred';
@@ -893,14 +894,57 @@ export const SCOREBOARD_THEMES: Record<ThemeId, ScoreboardTheme> = {
     hasAnimatedBg: false,
     showHundredBalls: false,
   },
+
+  // ── 20. TATA IPL 2025 ────────────────────────────────────────────────────────
+  ipl25: {
+    id: 'ipl25',
+    name: 'TATA IPL 2025',
+    description: 'Tata IPL 2025 style dark navy, neon cyan, and gold',
+    bgPrimary: 'linear-gradient(135deg, #05102e 0%, #080e24 100%)',
+    bgSecondary: '#080e24',
+    bgAccent: '#00f2fe',
+    bgTicker: '#05102e',
+    textPrimary: '#ffffff',
+    textSecondary: '#a0aec0',
+    textAccent: '#00f2fe',
+    textMuted: '#a0aec0',
+    accentPrimary: '#00f2fe',
+    accentSecondary: '#ffd700',
+    borderColor: 'rgba(0, 242, 254, 0.3)',
+    glowColor: 'rgba(0, 242, 254, 0.4)',
+    glowStrength: '0 0 15px',
+    ballDot0: '#080e24',
+    ballDot1: '#1a2035',
+    ballDot4: '#00f2fe',
+    ballDot6: '#ffd700',
+    ballDotW: '#ef4444',
+    ballDotWD: '#a855f7',
+    ballDotNB: '#f97316',
+    flashFour: '#00f2fe',
+    flashSix: '#ffd700',
+    flashWicket: '#ef4444',
+    flashExtra: '#00f2fe',
+    fontPrimary: "'Outfit', 'Inter', sans-serif",
+    fontUrl: 'https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap',
+    layoutVariant: 'standard',
+    animationVariant: 'slot-machine',
+    celebrationStyle: 'ticker-takeover',
+    borderRadius: '4px',
+    stripHeight: '76px',
+    teamBadgeStyle: 'angled',
+    isLight: false,
+    hasAnimatedBg: true,
+    showHundredBalls: false,
+  },
 };
 
 export const DEFAULT_THEME_ID: ThemeId = 'nakshatra';
 
 /** Get a theme by ID, falling back to nakshatra */
 export function getTheme(id: string | null | undefined): ScoreboardTheme {
-  if (id && id in SCOREBOARD_THEMES) {
-    return SCOREBOARD_THEMES[id as ThemeId];
+  const mappedId = id === '15' ? 'ipl25' : id;
+  if (mappedId && mappedId in SCOREBOARD_THEMES) {
+    return SCOREBOARD_THEMES[mappedId as ThemeId];
   }
   return SCOREBOARD_THEMES[DEFAULT_THEME_ID];
 }
