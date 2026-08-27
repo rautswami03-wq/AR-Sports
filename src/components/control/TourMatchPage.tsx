@@ -139,8 +139,8 @@ export const TourMatchPage: React.FC = () => {
   const battingTeam = isTeamA ? teamA : teamB;
   const bowlingTeam = isTeamA ? teamB : teamA;
 
-  const striker = battingTeam.batters.find((b) => b.isStriker) || battingTeam.batters[0];
-  const nonStriker = battingTeam.batters.find((b) => !b.isOut && !b.isStriker) || battingTeam.batters[1];
+  const striker = battingTeam.batters.find((b) => !b.isOut && b.isStriker) || battingTeam.batters.find((b) => !b.isOut) || battingTeam.batters[0];
+  const nonStriker = battingTeam.batters.find((b) => !b.isOut && !b.isStriker) || battingTeam.batters.filter((b) => b.id !== striker?.id && !b.isOut)[0] || battingTeam.batters[1];
   const currentBowler = bowlingTeam.bowlers.find((bw) => bw.isCurrent) || bowlingTeam.bowlers[0];
 
   const handleScoreClick = (runs: number) => {
@@ -812,7 +812,7 @@ export const TourMatchPage: React.FC = () => {
                       value={striker?.name || ''}
                       placeholder="Enter Striker Name"
                       onChange={(e) => striker && updateBatterStats(striker.id, { name: e.target.value })}
-                      className="flex-1 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg text-white font-black text-sm focus:outline-none focus:border-amber-400"
+                      className="flex-1 min-w-0 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg text-white font-black text-sm focus:outline-none focus:border-amber-400"
                     />
                     <select
                       value={striker?.id || ''}
@@ -838,7 +838,7 @@ export const TourMatchPage: React.FC = () => {
                       value={nonStriker?.name || ''}
                       placeholder="Enter Non-Striker Name"
                       onChange={(e) => nonStriker && updateBatterStats(nonStriker.id, { name: e.target.value })}
-                      className="flex-1 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg text-white font-black text-sm focus:outline-none focus:border-cyan-400"
+                      className="flex-1 min-w-0 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg text-white font-black text-sm focus:outline-none focus:border-cyan-400"
                     />
                     <select
                       value={nonStriker?.id || ''}
@@ -864,7 +864,7 @@ export const TourMatchPage: React.FC = () => {
                       value={currentBowler?.name || ''}
                       placeholder="Enter Bowler Name"
                       onChange={(e) => currentBowler && updateBowlerStats(currentBowler.id, { name: e.target.value })}
-                      className="flex-1 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg text-white font-black text-sm focus:outline-none focus:border-emerald-400"
+                      className="flex-1 min-w-0 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg text-white font-black text-sm focus:outline-none focus:border-emerald-400"
                     />
                     <select
                       value={currentBowler?.id || ''}

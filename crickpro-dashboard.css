@@ -406,6 +406,20 @@ body {
     --ol-border: 1px solid #22d3ee;
 }
 
+.theme-customCarbon {
+    --ol-primary: #121212;
+    --ol-secondary: #0d0d0d;
+    --ol-accent: #00f5ff;
+    --ol-text: #ffffff;
+    --ol-text-alt: #3b82f6;
+    --ol-border-radius: 6px;
+    --ol-skew: 0deg;
+    --ol-glow: 0 0 15px rgba(0, 245, 255, 0.4);
+    --ol-font: 'Outfit', sans-serif;
+    --ol-border: 1px solid rgba(0, 245, 255, 0.3);
+}
+
+
 
 /* Broadcast Elements */
 

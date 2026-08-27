@@ -537,12 +537,16 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
         const striker = { ...batters[strikerIndex] };
         striker.runs += runs;
         striker.balls += 1;
-      if (runs === 4) {
-        setTimeout(() => get().triggerAnimation('FOUR'), 50);
-      } else if (runs === 6) {
-        setTimeout(() => get().triggerAnimation('SIX'), 50);
-      }
-        if (boundaryType === 6) striker.sixes += 1;
+        
+        if (runs === 4) {
+          setTimeout(() => get().triggerAnimation('FOUR'), 50);
+          striker.fours = (striker.fours || 0) + 1;
+        } else if (runs === 6) {
+          setTimeout(() => get().triggerAnimation('SIX'), 50);
+          striker.sixes = (striker.sixes || 0) + 1;
+        }
+        if (boundaryType === 6 && runs !== 6) striker.sixes = (striker.sixes || 0) + 1;
+        if (boundaryType === 4 && runs !== 4) striker.fours = (striker.fours || 0) + 1;
 
         if (runs % 2 !== 0) {
           const nonStrikerIndex = batters.findIndex((b) => !b.isOut && !b.isStriker);
@@ -553,6 +557,17 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
         }
         batters[strikerIndex] = striker;
       }
+      
+      // Rotate strike at end of over (if balls === 0 after adding this ball)
+      if (balls === 0) {
+        const activeStrikerIdx = batters.findIndex((b) => b.isStriker);
+        const activeNonStrikerIdx = batters.findIndex((b) => !b.isOut && !b.isStriker);
+        if (activeStrikerIdx !== -1 && activeNonStrikerIdx !== -1) {
+          batters[activeStrikerIdx].isStriker = false;
+          batters[activeNonStrikerIdx].isStriker = true;
+        }
+      }
+      
       team.batters = batters;
 
 
@@ -647,12 +662,31 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
         const batters = [...team.batters];
         const strikerIndex = batters.findIndex((b) => b.isStriker);
         if (strikerIndex !== -1) {
-          batters[strikerIndex] = {
-            ...batters[strikerIndex],
-            balls: batters[strikerIndex].balls + 1,
-          };
-          team.batters = batters;
+          const striker = { ...batters[strikerIndex] };
+          striker.balls += 1;
+          
+          // Rotate strike on odd Byes/Leg-byes
+          if ((extraType === 'BYE' || extraType === 'LEG_BYE') && extraRuns % 2 !== 0) {
+            const nonStrikerIndex = batters.findIndex((b) => !b.isOut && !b.isStriker);
+            if (nonStrikerIndex !== -1) {
+              striker.isStriker = false;
+              batters[nonStrikerIndex] = { ...batters[nonStrikerIndex], isStriker: true };
+            }
+          }
+          batters[strikerIndex] = striker;
         }
+        
+        // Rotate strike at end of over
+        if (balls === 0) {
+          const activeStrikerIdx = batters.findIndex((b) => b.isStriker);
+          const activeNonStrikerIdx = batters.findIndex((b) => !b.isOut && !b.isStriker);
+          if (activeStrikerIdx !== -1 && activeNonStrikerIdx !== -1) {
+            batters[activeStrikerIdx].isStriker = false;
+            batters[activeNonStrikerIdx].isStriker = true;
+          }
+        }
+        
+        team.batters = batters;
 
         if (bowlers[activeBowlerIndex]) {
           const bw = { ...bowlers[activeBowlerIndex] };
@@ -736,6 +770,8 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
 
       const batters = [...team.batters];
       const strikerIndex = batters.findIndex((b) => b.isStriker);
+      const nonStrikerBefore = batters.find((b) => !b.isOut && !b.isStriker);
+      
       if (strikerIndex !== -1) {
         batters[strikerIndex] = {
           ...batters[strikerIndex],
@@ -744,13 +780,29 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
           dismissal: dismissalType,
         };
       }
-      const nextBatterIndex = batters.findIndex((b) => !b.isOut && !b.isStriker);
+      
+      // Find the next available batter in the order who is NOT the non-striker and NOT the dismissed striker
+      const nextBatterIndex = batters.findIndex(
+        (b) => !b.isOut && b.id !== nonStrikerBefore?.id && b.id !== batters[strikerIndex]?.id
+      );
+      
       if (nextBatterIndex !== -1) {
         batters[nextBatterIndex] = {
           ...batters[nextBatterIndex],
           isStriker: true,
         };
       }
+      
+      // Also handle strike rotation if this wicket falls on the last ball of the over
+      if (balls === 0) {
+        const activeStrikerIdx = batters.findIndex((b) => b.isStriker);
+        const activeNonStrikerIdx = batters.findIndex((b) => !b.isOut && !b.isStriker);
+        if (activeStrikerIdx !== -1 && activeNonStrikerIdx !== -1) {
+          batters[activeStrikerIdx].isStriker = false;
+          batters[activeNonStrikerIdx].isStriker = true;
+        }
+      }
+      
       team.batters = batters;
 
 
@@ -811,7 +863,7 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
     });
 
     if (typeof window !== 'undefined') {
-      fetch('http://localhost:4000/api/matches/match_live_001/undo', { method: 'POST' }).catch(() => {});
+      fetch('http://localhost:3001/api/matches/match_live_001/undo', { method: 'POST' }).catch(() => {});
     }
   },
 
@@ -1224,7 +1276,8 @@ function initWebSocketClient() {
 
   const RENDER_WS_URL = 'wss://websocket-36f4.onrender.com';
   const RENDER_HTTP_URL = 'https://websocket-36f4.onrender.com';
-  const wsUrl = window.location.protocol === 'https:' ? RENDER_WS_URL : (import.meta.env.VITE_WS_URL || RENDER_WS_URL);
+  const LOCAL_WS_URL = 'ws://localhost:3001';
+  const wsUrl = import.meta.env.VITE_WS_URL || (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' ? LOCAL_WS_URL : RENDER_WS_URL);
 
   // keepalive ping
   const pingRenderHost = () => {

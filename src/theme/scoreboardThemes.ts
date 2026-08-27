@@ -23,7 +23,8 @@ export type ThemeId =
   | 'shakti'
   | 'buzz'
   | 'diamond'
-  | 'ipl25';
+  | 'ipl25'
+  | 'customCarbon';
 
 export type CelebrationStyle = 'ticker-takeover' | 'page-center' | 'batter-bar';
 export type LayoutVariant = 'standard' | 'pill' | 'centered' | 'hundred';
@@ -934,6 +935,48 @@ export const SCOREBOARD_THEMES: Record<ThemeId, ScoreboardTheme> = {
     teamBadgeStyle: 'angled',
     isLight: false,
     hasAnimatedBg: true,
+    showHundredBalls: false,
+  },
+
+  // 21. Custom Carbon (Sleek Dark Carbon w/ Neon Cyan & Blue glows)
+  customCarbon: {
+    id: 'customCarbon',
+    name: 'Custom Carbon',
+    description: 'Sleek Dark Carbon w/ Neon Cyan & Blue glows',
+    bgPrimary: 'linear-gradient(135deg, #121212 0%, #1c1c1c 100%)',
+    bgSecondary: '#0d0d0d',
+    bgAccent: '#00f5ff',
+    bgTicker: '#121212',
+    textPrimary: '#ffffff',
+    textSecondary: '#a0aec0',
+    textAccent: '#00f5ff',
+    textMuted: '#718096',
+    accentPrimary: '#00f5ff',
+    accentSecondary: '#3b82f6',
+    borderColor: 'rgba(0, 245, 255, 0.3)',
+    glowColor: 'rgba(0, 245, 255, 0.4)',
+    glowStrength: '0 0 15px',
+    ballDot0: '#1a1a1a',
+    ballDot1: '#2d3748',
+    ballDot4: '#00f5ff',
+    ballDot6: '#3b82f6',
+    ballDotW: '#ef4444',
+    ballDotWD: '#a855f7',
+    ballDotNB: '#f97316',
+    flashFour: '#00f5ff',
+    flashSix: '#3b82f6',
+    flashWicket: '#ef4444',
+    flashExtra: '#00f5ff',
+    fontPrimary: "'Outfit', 'Inter', sans-serif",
+    fontUrl: 'https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800;900&display=swap',
+    layoutVariant: 'standard',
+    animationVariant: 'slot-machine',
+    celebrationStyle: 'ticker-takeover',
+    borderRadius: '6px',
+    stripHeight: '74px',
+    teamBadgeStyle: 'circle',
+    isLight: false,
+    hasAnimatedBg: false,
     showHundredBalls: false,
   },
 };

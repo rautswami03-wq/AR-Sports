@@ -20,7 +20,8 @@ const themes = [
     { id: 'dharma', name: 'Dharma' },
     { id: 'shakti', name: 'Shakti' },
     { id: 'buzz', name: 'Buzz' },
-    { id: 'diamond', name: 'Diamond' }
+    { id: 'diamond', name: 'Diamond' },
+    { id: 'customCarbon', name: 'Custom Carbon' }
 ];
 
 let activeTheme = 'nakshatra';

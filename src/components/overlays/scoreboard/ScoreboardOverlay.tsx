@@ -199,8 +199,8 @@ export const ScoreboardOverlay: React.FC<ScoreboardOverlayProps> = ({
   const battingTeam = isTeamA ? teamA : teamB;
   const bowlingTeam = isTeamA ? teamB : teamA;
 
-  const striker    = battingTeam.batters.find(b => b.isStriker && !b.isOut) ?? battingTeam.batters[0];
-  const nonStriker = battingTeam.batters.find(b => !b.isStriker && !b.isOut) ?? battingTeam.batters[1];
+  const striker    = battingTeam.batters.find(b => b.isStriker && !b.isOut) ?? battingTeam.batters.find(b => !b.isOut) ?? battingTeam.batters[0];
+  const nonStriker = battingTeam.batters.find(b => !b.isStriker && !b.isOut) ?? battingTeam.batters.filter(b => b.id !== striker?.id && !b.isOut)[0] ?? battingTeam.batters[1];
   const bowler     = bowlingTeam.bowlers.find(bw => bw.isCurrent) ?? bowlingTeam.bowlers[0];
   const prevBowler = bowlingTeam.bowlers.find(bw => !bw.isCurrent && bw.overs > 0);
 
