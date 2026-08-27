@@ -3,8 +3,16 @@ import { motion } from 'framer-motion';
 import { useBroadcastStore } from '../../store/useBroadcastStore';
 
 export const ManOfTheMatchCardOverlay: React.FC = () => {
-  const { teamA, teamB, battingTeamId } = useBroadcastStore();
-  const starPlayer = teamA.batters[0] || teamB.batters[0];
+  const { teamA, teamB, matchDetails } = useBroadcastStore();
+  const potm = matchDetails.playerOfTheMatch;
+  
+  // Find matching player object from either team
+  const allBatters = [...teamA.batters, ...teamB.batters];
+  const starPlayer = potm ? allBatters.find(b => b.name.toLowerCase() === potm.name.toLowerCase()) : null;
+  const targetPlayer = starPlayer || teamA.batters[0] || teamB.batters[0];
+  
+  const isTeamA = teamA.batters.some(b => b.name.toLowerCase() === targetPlayer?.name.toLowerCase());
+  const playerTeam = isTeamA ? teamA : teamB;
 
   return (
     <motion.div
@@ -21,34 +29,34 @@ export const ManOfTheMatchCardOverlay: React.FC = () => {
 
       {/* Player Photo Avatar Circle */}
       <div className="w-36 h-36 mx-auto rounded-full bg-slate-900 border-4 border-amber-300 shadow-2xl flex items-center justify-center font-black text-4xl text-amber-400 mb-6 overflow-hidden">
-        {starPlayer?.name ? starPlayer.name.substring(0, 2).toUpperCase() : 'MOM'}
+        {targetPlayer?.name ? targetPlayer.name.substring(0, 2).toUpperCase() : 'MOM'}
       </div>
 
       {/* Name & Team */}
       <h2 className="text-4xl font-black text-white uppercase tracking-tight drop-shadow">
-        {starPlayer?.name || 'SURAYAKUMAR YADAV'}
+        {potm?.name || targetPlayer?.name || 'SURAYAKUMAR YADAV'}
       </h2>
       <span className="text-base font-bold text-amber-300 uppercase block mt-1">
-        ({teamA.fullName.toUpperCase()})
+        ({(potm?.team || playerTeam.fullName).toUpperCase()})
       </span>
 
       {/* Stats Breakdown */}
       <div className="grid grid-cols-4 gap-3 mt-8 pt-6 border-t border-white/20">
         <div className="bg-black/40 p-3 rounded-2xl border border-white/10">
           <span className="text-[10px] font-black text-amber-300 uppercase block">RUNS</span>
-          <span className="text-2xl font-black text-white">{starPlayer?.runs || 84}</span>
+          <span className="text-2xl font-black text-white">{targetPlayer?.runs || 84}</span>
         </div>
         <div className="bg-black/40 p-3 rounded-2xl border border-white/10">
           <span className="text-[10px] font-black text-amber-300 uppercase block">BALLS</span>
-          <span className="text-2xl font-black text-white">{starPlayer?.balls || 38}</span>
+          <span className="text-2xl font-black text-white">{targetPlayer?.balls || 38}</span>
         </div>
         <div className="bg-black/40 p-3 rounded-2xl border border-white/10">
           <span className="text-[10px] font-black text-amber-300 uppercase block">FOURS</span>
-          <span className="text-2xl font-black text-cyan-300">{starPlayer?.fours || 8}</span>
+          <span className="text-2xl font-black text-cyan-300">{targetPlayer?.fours || 8}</span>
         </div>
         <div className="bg-black/40 p-3 rounded-2xl border border-white/10">
           <span className="text-[10px] font-black text-amber-300 uppercase block">SIXES</span>
-          <span className="text-2xl font-black text-purple-400">{starPlayer?.sixes || 6}</span>
+          <span className="text-2xl font-black text-purple-400">{targetPlayer?.sixes || 6}</span>
         </div>
       </div>
     </motion.div>

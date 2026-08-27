@@ -200,8 +200,76 @@ export const TourMatchPage: React.FC = () => {
   );
 
   const [customInputText, setCustomInputText] = useState('Jagdish Pawar');
-  const [selectedMOM, setSelectedMOM] = useState('nagesh chitia (ashtavinayak indians)');
-  const [selectedTourPlayer, setSelectedTourPlayer] = useState('ajit khade (ashtavinayak indians)');
+  const [selectedMOM, setSelectedMOM] = useState('');
+
+  // Sync selectedMOM to matchDetails.playerOfTheMatch in store
+  React.useEffect(() => {
+    if (!selectedMOM) return;
+    const allPlayers = [
+      ...teamA.batters.map(p => ({ ...p, teamName: teamA.fullName })),
+      ...teamB.batters.map(p => ({ ...p, teamName: teamB.fullName })),
+    ];
+    const player = allPlayers.find(p => p.id === selectedMOM);
+    if (player) {
+      const isTeamA = teamA.batters.some(b => b.id === player.id);
+      const team = isTeamA ? teamA : teamB;
+      
+      const batter = team.batters.find(b => b.id === player.id);
+      const bowler = team.bowlers.find(bw => bw.name.toLowerCase() === player.name.toLowerCase());
+      
+      let statsParts: string[] = [];
+      if (batter && (batter.runs > 0 || batter.balls > 0)) {
+        statsParts.push(`${batter.runs} (${batter.balls})`);
+      }
+      if (bowler && (bowler.overs > 0 || bowler.ballsInCurrentOver > 0 || bowler.runsConceded > 0 || bowler.wickets > 0)) {
+        statsParts.push(`${bowler.wickets}-${bowler.runsConceded} (${bowler.overs}.${bowler.ballsInCurrentOver} Ov)`);
+      }
+      const statsStr = statsParts.join(' & ') || 'Active Player';
+      
+      updateMatchSettings({
+        playerOfTheMatch: {
+          name: player.name,
+          team: team.fullName.toUpperCase(),
+          stats: statsStr,
+        }
+      });
+    }
+  }, [selectedMOM, teamA.batters, teamB.batters, teamA.bowlers, teamB.bowlers]);
+  const [selectedTourPlayer, setSelectedTourPlayer] = useState('');
+
+  // Sync selectedTourPlayer to matchDetails.playerOfTheTournament in store
+  React.useEffect(() => {
+    if (!selectedTourPlayer) return;
+    const allPlayers = [
+      ...teamA.batters.map(p => ({ ...p, teamName: teamA.fullName })),
+      ...teamB.batters.map(p => ({ ...p, teamName: teamB.fullName })),
+    ];
+    const player = allPlayers.find(p => p.id === selectedTourPlayer);
+    if (player) {
+      const isTeamA = teamA.batters.some(b => b.id === player.id);
+      const team = isTeamA ? teamA : teamB;
+      
+      const batter = team.batters.find(b => b.id === player.id);
+      const bowler = team.bowlers.find(bw => bw.name.toLowerCase() === player.name.toLowerCase());
+      
+      let statsParts: string[] = [];
+      if (batter && (batter.runs > 0 || batter.balls > 0)) {
+        statsParts.push(`${batter.runs} (${batter.balls})`);
+      }
+      if (bowler && (bowler.overs > 0 || bowler.ballsInCurrentOver > 0 || bowler.runsConceded > 0 || bowler.wickets > 0)) {
+        statsParts.push(`${bowler.wickets}-${bowler.runsConceded} (${bowler.overs}.${bowler.ballsInCurrentOver} Ov)`);
+      }
+      const statsStr = statsParts.join(' & ') || 'MVP Performance';
+      
+      updateMatchSettings({
+        playerOfTheTournament: {
+          name: player.name,
+          team: team.fullName.toUpperCase(),
+          stats: statsStr,
+        }
+      });
+    }
+  }, [selectedTourPlayer, teamA.batters, teamB.batters, teamA.bowlers, teamB.bowlers]);
   const [showExtraController, setShowExtraController] = useState(false);
 
   // Color Pickers
@@ -1046,11 +1114,23 @@ export const TourMatchPage: React.FC = () => {
                 <select
                   value={selectedMOM}
                   onChange={(e) => setSelectedMOM(e.target.value)}
-                  className="flex-1 bg-slate-950 border border-slate-700 px-4 py-2 rounded-xl text-white text-xs font-bold"
+                  className="flex-1 bg-slate-950 border border-slate-700 px-4 py-2 rounded-xl text-white text-xs font-bold uppercase"
                 >
-                  <option value="nagesh chitia (ashtavinayak indians)">nagesh chitia (ashtavinayak indians)</option>
-                  <option value="S. Yadav (India)">S. Yadav (India)</option>
-                  <option value="J. Bumrah (India)">J. Bumrah (India)</option>
+                  <option value="">Choose Player of the Match...</option>
+                  <optgroup label={teamA.fullName.toUpperCase()}>
+                    {teamA.batters.map((b) => (
+                      <option key={b.id} value={b.id}>
+                        {b.name} ({teamA.shortName})
+                      </option>
+                    ))}
+                  </optgroup>
+                  <optgroup label={teamB.fullName.toUpperCase()}>
+                    {teamB.batters.map((b) => (
+                      <option key={b.id} value={b.id}>
+                        {b.name} ({teamB.shortName})
+                      </option>
+                    ))}
+                  </optgroup>
                 </select>
                 <button onClick={() => toggleOverlay('playerOfTheMatch')} className="bg-emerald-500 text-slate-950 font-black text-xs px-3.5 py-2 rounded-lg uppercase">Display MOM</button>
               </div>
@@ -1061,11 +1141,42 @@ export const TourMatchPage: React.FC = () => {
               <h2 className="text-xl font-black text-center text-white uppercase tracking-widest border-b border-slate-800 pb-3">
                 TOUR STATS CONTROLLER
               </h2>
-              <div className="flex flex-wrap items-center justify-center gap-2">
+              <div className="flex flex-wrap items-center justify-center gap-2 pb-3 border-b border-slate-800/50">
                 <button onClick={() => toggleOverlay('pointsTable')} className="px-3 py-2 bg-emerald-500 text-slate-950 font-black text-xs rounded-lg uppercase">POINTS TABLE</button>
                 <button onClick={() => toggleOverlay('topBatters')} className="px-3 py-2 bg-fuchsia-600 text-white font-black text-xs rounded-lg uppercase">TOP BATTERS</button>
                 <button onClick={() => toggleOverlay('topBowlers')} className="px-3 py-2 bg-fuchsia-600 text-white font-black text-xs rounded-lg uppercase">TOP BOWLERS</button>
-                <button onClick={() => toggleOverlay('playerOfTheTournament')} className="px-3 py-2 bg-amber-500 text-slate-950 font-black text-xs rounded-lg uppercase font-black">TOP PLAYER OF SERIES</button>
+              </div>
+              
+              {/* Select Player of the Tournament */}
+              <div className="flex flex-wrap items-center gap-3 pt-1">
+                <span className="text-xs font-black text-cyan-400 uppercase w-36">Tournament MVP:</span>
+                <select
+                  value={selectedTourPlayer}
+                  onChange={(e) => setSelectedTourPlayer(e.target.value)}
+                  className="flex-1 bg-slate-950 border border-slate-700 px-4 py-2 rounded-xl text-white text-xs font-bold uppercase"
+                >
+                  <option value="">Choose Player of the Tournament...</option>
+                  <optgroup label={teamA.fullName.toUpperCase()}>
+                    {teamA.batters.map((b) => (
+                      <option key={b.id} value={b.id}>
+                        {b.name} ({teamA.shortName})
+                      </option>
+                    ))}
+                  </optgroup>
+                  <optgroup label={teamB.fullName.toUpperCase()}>
+                    {teamB.batters.map((b) => (
+                      <option key={b.id} value={b.id}>
+                        {b.name} ({teamB.shortName})
+                      </option>
+                    ))}
+                  </optgroup>
+                </select>
+                <button
+                  onClick={() => toggleOverlay('playerOfTheTournament')}
+                  className="bg-amber-500 text-slate-950 font-black text-xs px-3.5 py-2 rounded-lg uppercase"
+                >
+                  Display MVP
+                </button>
               </div>
             </div>
           </>
