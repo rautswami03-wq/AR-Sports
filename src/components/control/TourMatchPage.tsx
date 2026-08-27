@@ -33,6 +33,7 @@ import { PlayerListModal } from './PlayerListModal';
 import { TossMatchModal } from './TossMatchModal';
 import { EditMatchModal } from './EditMatchModal';
 import { DLSCalculatorModal } from './DLSCalculatorModal';
+import { BlitzCustomizerModal } from './BlitzCustomizerModal';
 import { OverlayStage } from './OverlayStage';
 
 export const TourMatchPage: React.FC = () => {
@@ -136,6 +137,7 @@ export const TourMatchPage: React.FC = () => {
   const [showTossModal, setShowTossModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDLSModal, setShowDLSModal] = useState(false);
+  const [showBlitzModal, setShowBlitzModal] = useState(false);
 
   const isTeamA = battingTeamId === teamA.id || battingTeamId === teamA.shortName || battingTeamId === 'teamA';
   const battingTeam = isTeamA ? teamA : teamB;
@@ -1085,6 +1087,18 @@ export const TourMatchPage: React.FC = () => {
                 </button>
               </div>
 
+              {/* Blitz Customizer */}
+              <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setShowBlitzModal(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-[#ff007f] hover:bg-[#ff2a95] text-white font-black text-xs rounded-lg uppercase shadow-[0_0_16px_rgba(255,0,127,0.35)] border border-[#ff007f]/60 transition-all transform hover:scale-105 active:scale-95"
+                >
+                  <Zap className="w-3.5 h-3.5 fill-white" /> BLITZ CUSTOMIZER
+                </button>
+                <span className="text-[10px] font-bold text-slate-500 uppercase">Colors · Fonts · Textures · Batter Styles</span>
+              </div>
+
               {/* League Theme Overlay Selector */}
               <div className="flex flex-wrap items-center gap-3 pt-3 border-t border-slate-800">
                 <span className="text-xs font-black text-amber-400 uppercase w-36 flex items-center gap-1.5">
@@ -1873,6 +1887,7 @@ export const TourMatchPage: React.FC = () => {
       <TossMatchModal isOpen={showTossModal} onClose={() => setShowTossModal(false)} />
       <EditMatchModal isOpen={showEditModal} onClose={() => setShowEditModal(false)} />
       <DLSCalculatorModal isOpen={showDLSModal} onClose={() => setShowDLSModal(false)} />
+      <BlitzCustomizerModal isOpen={showBlitzModal} onClose={() => setShowBlitzModal(false)} />
 
       {/* Reset Confirmation Modal */}
       {showResetConfirmModal && (

@@ -11,6 +11,8 @@ export interface HistorySnapshot {
   bowlingTeamId: string;
 }
 
+import { BlitzCustomSettings, DEFAULT_BLITZ_SETTINGS } from '../types/blitzSettings';
+
 export interface BroadcastStoreState {
   lastUpdated?: number;
   teamA: Team;
@@ -24,6 +26,7 @@ export interface BroadcastStoreState {
   tournamentId: string;
   isWsConnected: boolean;
   historyStack: HistorySnapshot[];
+  blitzSettings: BlitzCustomSettings;
   // Actions
   toggleOverlay: (type: OverlayType, forceState?: boolean) => void;
   hideAllOverlays: () => void;
@@ -57,6 +60,7 @@ export interface BroadcastStoreState {
   updatePlayerAvatar: (teamId: 'teamA' | 'teamB', playerType: 'batter' | 'bowler', playerId: string, avatarUrl: string) => void;
   applyExternalState: (newState: Partial<BroadcastStoreState>) => void;
   setWsConnected: (connected: boolean) => void;
+  updateBlitzSettings: (settings: Partial<BlitzCustomSettings>) => void;
 }
 
 const STORAGE_KEY = 'ar_sports_match_state_v2';
@@ -337,6 +341,7 @@ function loadInitialState() {
           activeOverlays: parsed.activeOverlays || INITIAL_OVERLAYS,
           activeAnimation: parsed.activeAnimation || null,
           tournamentId: parsed.tournamentId || 'tour_default',
+          blitzSettings: (() => { try { const s = localStorage.getItem('ar_blitz_settings'); return s ? JSON.parse(s) : DEFAULT_BLITZ_SETTINGS; } catch { return DEFAULT_BLITZ_SETTINGS; } })(),
         };
       }
     } catch {}
@@ -350,6 +355,7 @@ function loadInitialState() {
     activeOverlays: INITIAL_OVERLAYS,
     activeAnimation: null,
     tournamentId: 'tour_default',
+    blitzSettings: DEFAULT_BLITZ_SETTINGS,
   };
 }
 
@@ -414,8 +420,17 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
   tournamentId: loadedState.tournamentId,
   isWsConnected: false,
   historyStack: [],
+  blitzSettings: DEFAULT_BLITZ_SETTINGS,
 
   setWsConnected: (connected) => set({ isWsConnected: connected }),
+
+  updateBlitzSettings: (settings) => {
+    set((state) => {
+      const next = { blitzSettings: { ...state.blitzSettings, ...settings } };
+      try { localStorage.setItem('ar_blitz_settings', JSON.stringify(next.blitzSettings)); } catch {}
+      return next;
+    });
+  },
 
   applyExternalState: (newState) => {
     if (!newState || typeof newState !== 'object') return;
