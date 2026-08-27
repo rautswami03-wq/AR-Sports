@@ -32,6 +32,7 @@ import { WicketModal } from './WicketModal';
 import { PlayerListModal } from './PlayerListModal';
 import { TossMatchModal } from './TossMatchModal';
 import { EditMatchModal } from './EditMatchModal';
+import { DLSCalculatorModal } from './DLSCalculatorModal';
 import { OverlayStage } from './OverlayStage';
 
 export const TourMatchPage: React.FC = () => {
@@ -134,6 +135,7 @@ export const TourMatchPage: React.FC = () => {
   const [showPlayerTeamId, setShowPlayerTeamId] = useState<'teamA' | 'teamB' | null>(null);
   const [showTossModal, setShowTossModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showDLSModal, setShowDLSModal] = useState(false);
 
   const isTeamA = battingTeamId === teamA.id || battingTeamId === teamA.shortName || battingTeamId === 'teamA';
   const battingTeam = isTeamA ? teamA : teamB;
@@ -1365,6 +1367,13 @@ export const TourMatchPage: React.FC = () => {
                     >
                       Set Target
                     </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowDLSModal(true)}
+                      className="px-4 py-2 bg-cyan-600 hover:bg-cyan-500 text-white font-black text-xs rounded-lg uppercase shadow border border-cyan-400/30 flex items-center gap-1"
+                    >
+                      <Zap className="w-3.5 h-3.5 fill-white text-cyan-400" /> DLS Calculator
+                    </button>
                   </div>
                   <div className="flex flex-wrap items-center gap-1.5 text-xs font-black pt-1">
                     <button
@@ -1863,6 +1872,7 @@ export const TourMatchPage: React.FC = () => {
       )}
       <TossMatchModal isOpen={showTossModal} onClose={() => setShowTossModal(false)} />
       <EditMatchModal isOpen={showEditModal} onClose={() => setShowEditModal(false)} />
+      <DLSCalculatorModal isOpen={showDLSModal} onClose={() => setShowDLSModal(false)} />
 
       {/* Reset Confirmation Modal */}
       {showResetConfirmModal && (
