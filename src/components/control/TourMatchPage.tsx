@@ -66,6 +66,8 @@ export const TourMatchPage: React.FC = () => {
     clearAnimation,
     updateBatterStats,
     updateBowlerStats,
+    setActivePairs,
+    bulkAddPlayers,
     tournamentId,
     setTournamentId,
     startMatch,
@@ -76,6 +78,38 @@ export const TourMatchPage: React.FC = () => {
 
   // Pre-Match Setup Form State
   const [setupOvers, setSetupOvers] = useState(matchDetails.totalOvers || 20);
+  const [teamABulkText, setTeamABulkText] = useState('');
+  const [teamBBulkText, setTeamBBulkText] = useState('');
+
+  // Pre-populate textareas on load
+  React.useEffect(() => {
+    if (teamA.batters && !teamABulkText) {
+      setTeamABulkText(teamA.batters.map(b => b.name).join('\n'));
+    }
+  }, [teamA.batters]);
+
+  React.useEffect(() => {
+    if (teamB.batters && !teamBBulkText) {
+      setTeamBBulkText(teamB.batters.map(b => b.name).join('\n'));
+    }
+  }, [teamB.batters]);
+
+  const applyBulkNames = (teamId: 'teamA' | 'teamB', text: string) => {
+    const names = text.split('\n').map(n => n.trim()).filter(n => n.length > 0);
+    if (names.length === 0) return;
+    const team = teamId === 'teamA' ? teamA : teamB;
+    
+    names.forEach((name, idx) => {
+      if (idx < team.batters.length) {
+        updateBatterStats(team.batters[idx].id, { name });
+      }
+    });
+
+    if (names.length > team.batters.length) {
+      const extraNames = names.slice(team.batters.length);
+      bulkAddPlayers(teamId, extraNames);
+    }
+  };
   const [setupBallsPerOver, setSetupBallsPerOver] = useState(matchDetails.ballsPerOver || 6);
   const [setupMatchType, setSetupMatchType] = useState(matchDetails.matchType || 'Group Stage');
   const [setupMatchNo, setSetupMatchNo] = useState(matchDetails.matchNo || 1);
@@ -193,6 +227,10 @@ export const TourMatchPage: React.FC = () => {
 
   // Start Match Action
   const handleStartMatchWorkflow = () => {
+    // Apply bulk names
+    if (teamABulkText) applyBulkNames('teamA', teamABulkText);
+    if (teamBBulkText) applyBulkNames('teamB', teamBBulkText);
+
     const formattedToss = `${setupTossWinner.toUpperCase()} WON THE TOSS AND OPTED TO ${setupTossDecision.toUpperCase()}`;
     setTossText(formattedToss);
 
@@ -532,6 +570,51 @@ export const TourMatchPage: React.FC = () => {
                 </button>
               </div>
 
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                    <label className="text-xs font-bold text-slate-400 block uppercase">
+                      Bulk Paste {editTeamAShort || teamA.shortName} Players
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => applyBulkNames('teamA', teamABulkText)}
+                      className="text-[10px] font-bold text-cyan-400 uppercase hover:underline"
+                    >
+                      Save list
+                    </button>
+                  </div>
+                  <textarea
+                    rows={6}
+                    value={teamABulkText}
+                    onChange={(e) => setTeamABulkText(e.target.value)}
+                    placeholder="Enter one name per line..."
+                    className="w-full bg-slate-900 border border-slate-700 px-3.5 py-2 rounded-xl text-white font-bold text-xs focus:outline-none focus:border-cyan-400"
+                  />
+                </div>
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                    <label className="text-xs font-bold text-slate-400 block uppercase">
+                      Bulk Paste {editTeamBShort || teamB.shortName} Players
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => applyBulkNames('teamB', teamBBulkText)}
+                      className="text-[10px] font-bold text-cyan-400 uppercase hover:underline"
+                    >
+                      Save list
+                    </button>
+                  </div>
+                  <textarea
+                    rows={6}
+                    value={teamBBulkText}
+                    onChange={(e) => setTeamBBulkText(e.target.value)}
+                    placeholder="Enter one name per line..."
+                    className="w-full bg-slate-900 border border-slate-700 px-3.5 py-2 rounded-xl text-white font-bold text-xs focus:outline-none focus:border-cyan-400"
+                  />
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
                 <div>
                   <label className="text-xs font-bold text-amber-400 block mb-1 uppercase font-black">Opening Striker (*)</label>
@@ -655,35 +738,83 @@ export const TourMatchPage: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-bold bg-slate-950 p-4 rounded-2xl border border-slate-800">
                 <div>
                   <span className="text-cyan-400 block uppercase font-black mb-1">STRIKER (*)</span>
-                  <input
-                    type="text"
-                    value={striker?.name || ''}
-                    placeholder="Enter Striker Name"
-                    onChange={(e) => striker && updateBatterStats(striker.id, { name: e.target.value })}
-                    className="w-full bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg text-white font-black text-sm focus:outline-none focus:border-amber-400 mb-1"
-                  />
+                  <div className="flex gap-2 mb-1">
+                    <input
+                      type="text"
+                      value={striker?.name || ''}
+                      placeholder="Enter Striker Name"
+                      onChange={(e) => striker && updateBatterStats(striker.id, { name: e.target.value })}
+                      className="flex-1 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg text-white font-black text-sm focus:outline-none focus:border-amber-400"
+                    />
+                    <select
+                      value={striker?.id || ''}
+                      onChange={(e) => {
+                        const selId = e.target.value;
+                        if (selId && nonStriker) setActivePairs(selId, nonStriker.id);
+                      }}
+                      className="bg-slate-900 border border-slate-700 rounded-lg px-2 text-white font-black text-xs focus:outline-none focus:border-amber-400 max-w-[120px]"
+                    >
+                      <option value="">Roster...</option>
+                      {battingTeam.batters.filter(b => !b.isOut && b.id !== nonStriker?.id).map((b) => (
+                        <option key={b.id} value={b.id}>{b.name}</option>
+                      ))}
+                    </select>
+                  </div>
                   <span className="text-amber-400 block font-bold">{striker?.runs || 0} ({striker?.balls || 0}b)</span>
                 </div>
                 <div>
                   <span className="text-cyan-400 block uppercase font-black mb-1">NON-STRIKER</span>
-                  <input
-                    type="text"
-                    value={nonStriker?.name || ''}
-                    placeholder="Enter Non-Striker Name"
-                    onChange={(e) => nonStriker && updateBatterStats(nonStriker.id, { name: e.target.value })}
-                    className="w-full bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg text-white font-black text-sm focus:outline-none focus:border-cyan-400 mb-1"
-                  />
+                  <div className="flex gap-2 mb-1">
+                    <input
+                      type="text"
+                      value={nonStriker?.name || ''}
+                      placeholder="Enter Non-Striker Name"
+                      onChange={(e) => nonStriker && updateBatterStats(nonStriker.id, { name: e.target.value })}
+                      className="flex-1 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg text-white font-black text-sm focus:outline-none focus:border-cyan-400"
+                    />
+                    <select
+                      value={nonStriker?.id || ''}
+                      onChange={(e) => {
+                        const selId = e.target.value;
+                        if (selId && striker) setActivePairs(striker.id, selId);
+                      }}
+                      className="bg-slate-900 border border-slate-700 rounded-lg px-2 text-white font-black text-xs focus:outline-none focus:border-cyan-400 max-w-[120px]"
+                    >
+                      <option value="">Roster...</option>
+                      {battingTeam.batters.filter(b => !b.isOut && b.id !== striker?.id).map((b) => (
+                        <option key={b.id} value={b.id}>{b.name}</option>
+                      ))}
+                    </select>
+                  </div>
                   <span className="text-slate-400 block font-bold">{nonStriker?.runs || 0} ({nonStriker?.balls || 0}b)</span>
                 </div>
                 <div>
                   <span className="text-cyan-400 block uppercase font-black mb-1">CURRENT BOWLER</span>
-                  <input
-                    type="text"
-                    value={currentBowler?.name || ''}
-                    placeholder="Enter Bowler Name"
-                    onChange={(e) => currentBowler && updateBowlerStats(currentBowler.id, { name: e.target.value })}
-                    className="w-full bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg text-white font-black text-sm focus:outline-none focus:border-emerald-400 mb-1"
-                  />
+                  <div className="flex gap-2 mb-1">
+                    <input
+                      type="text"
+                      value={currentBowler?.name || ''}
+                      placeholder="Enter Bowler Name"
+                      onChange={(e) => currentBowler && updateBowlerStats(currentBowler.id, { name: e.target.value })}
+                      className="flex-1 bg-slate-900 border border-slate-700 px-3 py-1.5 rounded-lg text-white font-black text-sm focus:outline-none focus:border-emerald-400"
+                    />
+                    <select
+                      value={currentBowler?.id || ''}
+                      onChange={(e) => {
+                        const selId = e.target.value;
+                        if (selId) {
+                          const target = bowlingTeam.batters.find(b => b.id === selId);
+                          if (target) changeBowler(target.name);
+                        }
+                      }}
+                      className="bg-slate-900 border border-slate-700 rounded-lg px-2 text-white font-black text-xs focus:outline-none focus:border-emerald-400 max-w-[120px]"
+                    >
+                      <option value="">Roster...</option>
+                      {bowlingTeam.batters.map((b) => (
+                        <option key={b.id} value={b.id}>{b.name}</option>
+                      ))}
+                    </select>
+                  </div>
                   <span className="text-emerald-400 block font-bold">
                     {currentBowler?.wickets || 0}-{currentBowler?.runsConceded || 0} ({currentBowler?.overs || 0}.{currentBowler?.ballsInCurrentOver || 0})
                   </span>

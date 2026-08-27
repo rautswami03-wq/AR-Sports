@@ -12,6 +12,24 @@ export const PlayerListModal: React.FC<PlayerListModalProps> = ({ isOpen, teamId
   const targetTeam = teamId === 'teamA' ? teamA : teamB;
 
   const [newPlayerName, setNewPlayerName] = useState('');
+  const [bulkText, setBulkText] = useState('');
+  const [showBulk, setShowBulk] = useState(false);
+
+  const handleBulkImport = () => {
+    const names = bulkText.split('\n').map(n => n.trim()).filter(n => n.length > 0);
+    if (names.length === 0) return;
+    names.forEach((name, idx) => {
+      if (idx < targetTeam.batters.length) {
+        updateBatterStats(targetTeam.batters[idx].id, { name });
+      }
+    });
+    if (names.length > targetTeam.batters.length) {
+      const extraNames = names.slice(targetTeam.batters.length);
+      bulkAddPlayers(teamId, extraNames);
+    }
+    setBulkText('');
+    setShowBulk(false);
+  };
 
   if (!isOpen) return null;
 
@@ -48,7 +66,36 @@ export const PlayerListModal: React.FC<PlayerListModalProps> = ({ isOpen, teamId
           >
             Add Player
           </button>
+          <button
+            type="button"
+            onClick={() => setShowBulk(!showBulk)}
+            className="bg-cyan-600 hover:bg-cyan-500 text-white font-black px-4 py-2 rounded-xl text-xs uppercase"
+          >
+            Bulk Paste
+          </button>
         </form>
+
+        {showBulk && (
+          <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+            <label className="text-xs font-bold text-slate-400 block uppercase">
+              Bulk Paste Lineup (one name per line)
+            </label>
+            <textarea
+              rows={5}
+              placeholder="Virat Kohli&#10;Rohit Sharma&#10;Hardik Pandya"
+              value={bulkText}
+              onChange={(e) => setBulkText(e.target.value)}
+              className="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-white font-bold text-xs focus:outline-none focus:border-cyan-400"
+            />
+            <button
+              type="button"
+              onClick={handleBulkImport}
+              className="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-black py-2 rounded-xl text-xs uppercase"
+            >
+              Apply Lineup (Overwrites Roster)
+            </button>
+          </div>
+        )}
 
         {/* Player Roster List */}
         <div className="max-h-64 overflow-y-auto space-y-2 pr-1">
