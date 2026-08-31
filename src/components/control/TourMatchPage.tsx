@@ -132,6 +132,7 @@ export const TourMatchPage: React.FC = () => {
   const [extraWicket, setExtraWicket] = useState(false);
 
   const [showBowlerModal, setShowBowlerModal] = useState(false);
+  const [isOverEndModal, setIsOverEndModal] = useState(false);
   const [showWicketModal, setShowWicketModal] = useState(false);
   const [showPlayerTeamId, setShowPlayerTeamId] = useState<'teamA' | 'teamB' | null>(null);
   const [showTossModal, setShowTossModal] = useState(false);
@@ -142,6 +143,16 @@ export const TourMatchPage: React.FC = () => {
   const isTeamA = battingTeamId === teamA.id || battingTeamId === teamA.shortName || battingTeamId === 'teamA';
   const battingTeam = isTeamA ? teamA : teamB;
   const bowlingTeam = isTeamA ? teamB : teamA;
+
+  // Auto trigger change bowler window after over finishes
+  const prevOversRef = React.useRef(battingTeam.overs);
+  React.useEffect(() => {
+    if (battingTeam.overs > prevOversRef.current) {
+      setShowBowlerModal(true);
+      setIsOverEndModal(true);
+    }
+    prevOversRef.current = battingTeam.overs;
+  }, [battingTeam.overs]);
 
   const striker = battingTeam.batters.find((b) => !b.isOut && b.isStriker) || battingTeam.batters.find((b) => !b.isOut) || battingTeam.batters[0];
   const nonStriker = battingTeam.batters.find((b) => !b.isOut && !b.isStriker) || battingTeam.batters.filter((b) => b.id !== striker?.id && !b.isOut)[0] || battingTeam.batters[1];
@@ -1879,7 +1890,14 @@ export const TourMatchPage: React.FC = () => {
       )}
 
       {/* Dedicated CricScorer Modals */}
-      <ChangeBowlerModal isOpen={showBowlerModal} onClose={() => setShowBowlerModal(false)} />
+      <ChangeBowlerModal
+        isOpen={showBowlerModal}
+        onClose={() => {
+          setShowBowlerModal(false);
+          setIsOverEndModal(false);
+        }}
+        isOverEnd={isOverEndModal}
+      />
       <WicketModal isOpen={showWicketModal} onClose={() => setShowWicketModal(false)} />
       {showPlayerTeamId && (
         <PlayerListModal isOpen={!!showPlayerTeamId} teamId={showPlayerTeamId} onClose={() => setShowPlayerTeamId(null)} />

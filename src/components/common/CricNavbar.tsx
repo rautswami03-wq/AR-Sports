@@ -135,6 +135,14 @@ export const CricNavbar: React.FC = () => {
           >
             <Tv className="w-4 h-4 text-sky-400" /> OBS Live Stage ↗
           </a>
+          <a
+            href="https://youtube.com/@officialcrickpro"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold text-slate-300 hover:bg-slate-800/60 hover:text-red-400 transition-colors border border-slate-800"
+          >
+            <Play className="w-4 h-4 text-red-500 fill-red-500" /> Official YouTube Channel ↗
+          </a>
         </nav>
       </div>
 

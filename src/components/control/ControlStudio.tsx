@@ -4,6 +4,7 @@ import { useBroadcastStore } from '../../store/useBroadcastStore';
 import { OverlayStage } from './OverlayStage';
 import { EditMatchModal } from './EditMatchModal';
 import { TossMatchModal } from './TossMatchModal';
+import { ChangeBowlerModal } from './ChangeBowlerModal';
 import { OverlayType, EventAnimationType } from '../../types/cricket';
 import { PRESET_TEAMS, PRESET_TOURNAMENTS } from '../../theme/presetThemes';
 import { Radio, Tv, Zap, Palette, Layers, RefreshCw, Copy, Check, RotateCcw, Settings, Users, PlusCircle } from 'lucide-react';
@@ -44,6 +45,21 @@ export const ControlStudio: React.FC = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showTossModal, setShowTossModal] = useState(false);
   const [showObsGuideModal, setShowObsGuideModal] = useState(false);
+  const [showBowlerModal, setShowBowlerModal] = useState(false);
+  const [isOverEndModal, setIsOverEndModal] = useState(false);
+
+  const battingTeam = battingTeamId === teamA.id ? teamA : teamB;
+  const bowlingTeam = battingTeamId === teamA.id ? teamB : teamA;
+
+  // Auto trigger bowler selection modal when an over completes
+  const prevOversRef = React.useRef(battingTeam.overs);
+  React.useEffect(() => {
+    if (battingTeam.overs > prevOversRef.current) {
+      setShowBowlerModal(true);
+      setIsOverEndModal(true);
+    }
+    prevOversRef.current = battingTeam.overs;
+  }, [battingTeam.overs]);
 
 
   const [bowlerInput, setBowlerInput] = useState('');
@@ -58,9 +74,6 @@ export const ControlStudio: React.FC = () => {
   const [extraByes, setExtraByes] = useState(false);
   const [extraLegByes, setExtraLegByes] = useState(false);
   const [extraWicket, setExtraWicket] = useState(false);
-
-  const battingTeam = battingTeamId === teamA.id ? teamA : teamB;
-  const bowlingTeam = battingTeamId === teamA.id ? teamB : teamA;
   const baseUrl = typeof window !== 'undefined' ? window.location.href.split('#')[0].replace(/\/$/, '') : '';
   const obsUrl = `${baseUrl}/#/overlay${tournamentId ? `?theme=${tournamentId}` : ''}`;
 
@@ -442,6 +455,8 @@ export const ControlStudio: React.FC = () => {
                       if (bowlerInput) {
                         changeBowler(bowlerInput);
                         setBowlerInput('');
+                      } else {
+                        setShowBowlerModal(true);
                       }
                     }}
                     className="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs rounded shadow"
@@ -1005,6 +1020,14 @@ export const ControlStudio: React.FC = () => {
 
       <EditMatchModal isOpen={showEditModal} onClose={() => setShowEditModal(false)} />
       <TossMatchModal isOpen={showTossModal} onClose={() => setShowTossModal(false)} />
+      <ChangeBowlerModal
+        isOpen={showBowlerModal}
+        onClose={() => {
+          setShowBowlerModal(false);
+          setIsOverEndModal(false);
+        }}
+        isOverEnd={isOverEndModal}
+      />
 
       {/* OBS Setup Guide Modal */}
       {showObsGuideModal && (
