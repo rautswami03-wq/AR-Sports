@@ -15,22 +15,22 @@ export const ChangeBowlerModal: React.FC<ChangeBowlerModalProps> = ({
 }) => {
   const { teamA, teamB, battingTeamId, changeBowler } = useBroadcastStore();
 
-  const isTeamA = battingTeamId === teamA.id || battingTeamId === teamA.shortName || battingTeamId === 'teamA';
+  // battingTeamId is always stored as the canonical 'teamA' | 'teamB' string
+  const isTeamA = battingTeamId === 'teamA';
   const battingTeam = isTeamA ? teamA : teamB;
   const bowlingTeam = isTeamA ? teamB : teamA;
 
   const [newBowlerName, setNewBowlerName] = useState('');
-  const [selectedBowlerName, setSelectedBowlerName] = useState('');
 
   if (!isOpen) return null;
 
-  const currentBowler = bowlingTeam.bowlers.find((b) => b.isCurrent) || bowlingTeam.bowlers[0];
+  // Only show the current bowler card when one is explicitly flagged — no silent fallback
+  const currentBowler = bowlingTeam.bowlers.find((b) => b.isCurrent) ?? null;
 
   const handleSelectAndSave = (name: string) => {
     if (!name.trim()) return;
     changeBowler(name.trim());
     setNewBowlerName('');
-    setSelectedBowlerName('');
     onClose();
   };
 
@@ -38,8 +38,6 @@ export const ChangeBowlerModal: React.FC<ChangeBowlerModalProps> = ({
     e.preventDefault();
     if (newBowlerName.trim()) {
       handleSelectAndSave(newBowlerName.trim());
-    } else if (selectedBowlerName) {
-      handleSelectAndSave(selectedBowlerName);
     }
   };
 
@@ -107,33 +105,41 @@ export const ChangeBowlerModal: React.FC<ChangeBowlerModalProps> = ({
               <span className="text-[10px] text-cyan-400 font-normal">Click to switch instantly</span>
             </label>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-48 overflow-y-auto pr-1">
-              {allSquadPlayers.map((name) => {
-                const bwStats = bowlingTeam.bowlers.find((b) => b.name.toLowerCase() === name.toLowerCase());
-                const isCurrent = bwStats?.isCurrent || currentBowler?.name.toLowerCase() === name.toLowerCase();
+            {allSquadPlayers.length === 0 ? (
+              <div className="flex items-center gap-2 text-slate-500 text-xs py-4 px-3 bg-slate-800/40 rounded-xl border border-slate-700/50">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                No squad players found for {bowlingTeam.shortName || 'bowling team'}.
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-h-48 overflow-y-auto pr-1">
+                {allSquadPlayers.map((name) => {
+                  const bwStats = bowlingTeam.bowlers.find((b) => b.name.toLowerCase() === name.toLowerCase());
+                  // Use only the isCurrent flag — single source of truth
+                  const isCurrent = bwStats?.isCurrent ?? false;
 
-                return (
-                  <button
-                    key={name}
-                    type="button"
-                    onClick={() => handleSelectAndSave(name)}
-                    className={`flex flex-col items-start p-2.5 rounded-xl border text-left transition-all ${
-                      isCurrent
-                        ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300 shadow-md ring-1 ring-cyan-400'
-                        : 'bg-slate-800/50 hover:bg-slate-700/70 border-slate-700/60 text-slate-200 hover:border-cyan-500/40'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between w-full">
-                      <span className="text-xs font-bold truncate">{name}</span>
-                      {isCurrent && <CheckCircle className="w-3.5 h-3.5 text-cyan-400 shrink-0" />}
-                    </div>
-                    <span className="text-[10px] text-slate-400 font-mono mt-0.5">
-                      {bwStats ? `${bwStats.wickets}-${bwStats.runsConceded} (${bwStats.overs}.${bwStats.ballsInCurrentOver})` : '0-0 (0.0)'}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
+                  return (
+                    <button
+                      key={name}
+                      type="button"
+                      onClick={() => handleSelectAndSave(name)}
+                      className={`flex flex-col items-start p-2.5 rounded-xl border text-left transition-all ${
+                        isCurrent
+                          ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300 shadow-md ring-1 ring-cyan-400'
+                          : 'bg-slate-800/50 hover:bg-slate-700/70 border-slate-700/60 text-slate-200 hover:border-cyan-500/40'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between w-full">
+                        <span className="text-xs font-bold truncate">{name}</span>
+                        {isCurrent && <CheckCircle className="w-3.5 h-3.5 text-cyan-400 shrink-0" />}
+                      </div>
+                      <span className="text-[10px] text-slate-400 font-mono mt-0.5">
+                        {bwStats ? `${bwStats.wickets}-${bwStats.runsConceded} (${bwStats.overs}.${bwStats.ballsInCurrentOver})` : '0-0 (0.0)'}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           <div className="relative flex py-1 items-center">
