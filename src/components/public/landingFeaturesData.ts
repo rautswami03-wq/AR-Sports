@@ -20,74 +20,145 @@ export interface FeatureCategory {
 
 export const FEATURE_CATEGORIES_DATA: FeatureCategory[] = [
   {
-    id: 'broadcast-overlays',
-    title: '⚡ Live Broadcast & Overlay Capabilities (OBS / vMix Studio)',
-    badge: 'Broadcast Engine',
+    id: 'overlay-system-features',
+    title: '⚡ Capabilities — Overlay System Features',
+    badge: 'Overlay System',
     description:
-      'Broadcast-grade overlay panels, real-time event-driven automation, and multi-platform streaming tools engineered for professional live cricket production.',
+      'Broadcast-quality overlays with 50 live panels, 17+ themes, real-time updates, celebration animations, and full customization. Works with OBS Studio, Streamlabs, and vMix.',
     headerColor: 'text-cyan-400',
     borderColor: 'border-cyan-500/20',
     features: [
       {
-        id: 'panels-library',
-        badge: 'OBS & vMix Ready',
-        title: '50+ Broadcast Overlay Panels',
+        id: 'overlay-panels',
+        badge: '50 Overlay Panels',
+        title: '50 Overlay Panels',
         description:
-          'Comprehensive library covering every phase of the cricket broadcast from pre-toss preview to post-match awards. Renders transparent 1080p/60fps graphics directly into OBS Studio, vMix, and Streamlabs with sub-frame synchronization.',
+          'Score tickers, batting and bowling scorecards, celebrations, charts, tournament leaderboards, and sponsor panels. Built for live cricket broadcasts on OBS, vMix, YouTube Live, and Facebook Live.',
         bullets: [
-          'Always-on score ticker with active batsman strike indicator, bowler figures, over dots, and run rates.',
-          'Full-screen batting and bowling scorecards with fall-of-wickets timeline and partnership meters.',
-          'Dynamic Manhattan charts, run-rate worms, boundary counter ribbons, and tournament leaderboards.',
-          'Squad rosters, Playing XI cards with player photos, match officials, and Player of the Match awards.'
+          'Always-on score ticker with active batsman strike markers, bowler spell figures, over ball dots, and live run rates.',
+          'Comprehensive scorecards: batting scorecard, bowling scorecard, dismissed batter cards, and live partnership tracker.',
+          'Visual context charts: dynamic Manhattan charts, run-rate worms, boundary counter ribbons, and weather panels.',
+          'Tournament context: batting/bowling leaderboards, points table with NRR, squad displays, and Player of the Match awards.'
         ],
         icon: 'Layers',
         color: 'cyan'
       },
       {
-        id: 'auto-display-engine',
-        badge: 'Zero-Touch Automation',
-        title: 'Auto Display Engine (Event-Driven)',
+        id: 'broadcast-themes',
+        badge: '17+ Broadcast Themes',
+        title: '17+ Broadcast Themes',
         description:
-          'Intelligent state-machine that triggers graphical overlays automatically based on scoring events. Broadcasters never need to manually swap panels while scoring — the overlay detects boundaries, dismissals, and milestones instantly.',
+          'Diamond, Starter, Classic, Starter Cricket, Lumen, Roar, Vayu, Thunder, Apex, Volt, Blitz, Franchise, and more. Each theme with distinct typography, colors, metallic textures, and animations.',
         bullets: [
-          'Automatic boundary animations: instant full-screen celebration graphics and lower-third banners for Fours and Sixes.',
-          'Dynamic dismissal sequence: Out alert, outgoing batsman score summary card, and incoming batsman profile card.',
-          'Automatic milestone popups triggered when batsmen hit 50/100 or when bowlers claim 3+ wickets.',
-          'Automated innings break recaps, target set sequences, and live required run rate calculations.'
+          'Hand-crafted themes designed to match your specific league, YouTube channel, or broadcast identity.',
+          'Custom typography pairings, specialized score digit fonts, and calibrated motion curves per theme.',
+          'Instant theme switching during live matches without reloading browser sources or restarting streams.',
+          'Custom-branded variants engineered for television-grade production rigs and corporate league clients.'
         ],
-        icon: 'Sparkles',
+        icon: 'Palette',
         color: 'indigo'
       },
       {
-        id: 'theme-system',
-        badge: '22+ Themes',
-        title: '22+ Hand-Crafted Overlay Themes',
+        id: 'full-customization',
+        badge: 'Full Customization',
+        title: 'Full Customization',
         description:
-          'Broadcast-quality theme engine inspired by premier global tournaments (IPL, ICC World Cup, BBL, PSL). Switch visual identities instantly without reconfiguring your streaming software or restarting browser sources.',
+          'Custom team colors, logos, channel branding, fonts, and layout tweaks. Make the overlay yours with 5 dedicated color slots, digit font selectors, and customizable display styles.',
         bullets: [
-          'Handcrafted themes including Lumen, Roar, Vayu, Thunder, Apex, Volt, Blitz, and Franchise styles.',
-          'Distinct typography, custom neon accents, smooth motion curves, and metallic textures tailored per theme.',
-          'Custom team primary & secondary jersey color mapping with automated readability contrast tuning.',
-          'Channel watermarks, tournament logo badges, and custom sponsor placements seamlessly integrated.'
+          '5 color slots: primary stripe, team A background/text, team B background/text, plus texture overlays and auto-contrast.',
+          'Typography customization: choose digit and text fonts (Roboto Condensed, Inter, Oswald, Montserrat, Bebas Neue).',
+          'Batter display styling: round or square player badges, filled or outlined cards, and configurable drop shadows.',
+          'Celebration styling: ticker takeover, center-screen takeover, or batter bar with customizable auto-display frequencies.'
         ],
-        icon: 'Palette',
+        icon: 'Sliders',
         color: 'purple'
       },
       {
-        id: 'producer-control',
-        badge: 'Mobile & Web Remote',
-        title: 'Producer Studio & Mobile Remote',
+        id: 'auto-display-engine',
+        badge: 'Auto Display Engine',
+        title: 'Auto Display Engine',
         description:
-          'Dedicated web-based producer control console accessible from any smartphone, tablet, or secondary monitor. Control graphics, queue animations, and preview live feeds with sub-50ms synchronization.',
+          'Panels appear and disappear automatically based on match events — wickets, boundaries, innings breaks, and milestones. Zero-touch operation keeps your broadcast dynamic without requiring manual switching.',
         bullets: [
-          'Single-tap triggers for scorecards, sponsor takeovers, DRS reviews, and boundary counters.',
-          'Live broadcast canvas monitor displaying real-time visual output exactly as seen on stream.',
-          'On-the-fly score correction and manual graphic override without interrupting animation loops.',
-          'Multi-operator workflow allowing dedicated scorers and production directors to operate simultaneously.'
+          'Event-driven boundary takeovers: automatic full-screen celebrations and animated lower-third strips for Fours and Sixes.',
+          'Dynamic dismissal sequence: Out alert, outgoing batsman score summary card, and incoming batsman profile card.',
+          'Automated milestone celebrations triggered immediately when batsmen hit 50/100 or when bowlers take 3+ wickets.',
+          'Configurable panel display frequencies: trigger scorecards every over, every 2/3/5 overs, or on innings conclusion.'
         ],
-        icon: 'Sliders',
+        icon: 'Sparkles',
         color: 'amber'
       },
+      {
+        id: 'producer-control',
+        badge: 'Producer Control',
+        title: 'Producer Control',
+        description:
+          'Manual panel control from your phone, tablet, or secondary screen. Show, hide, queue, and sequence panels in real time with sub-50ms synchronization to the live broadcast canvas.',
+        bullets: [
+          'Single-tap remote buttons to show/hide scorecards, sponsor takeovers, DRS reviews, and boundary counters.',
+          'Live broadcast canvas monitor displaying real-time visual output exactly as seen by streaming viewers.',
+          'Instant score corrections and manual data overrides that update smoothly without interrupting active animations.',
+          'Multi-operator workflow allowing dedicated scorers and production directors to operate simultaneously from separate devices.'
+        ],
+        icon: 'Sliders',
+        color: 'emerald'
+      },
+      {
+        id: 'all-cricket-formats',
+        badge: 'All Cricket Formats',
+        title: 'All Cricket Formats',
+        description:
+          'T5, T10, T20, ODI, Test, The Hundred, Super Over, and custom formats. The overlay system adapts automatically to balls-per-over, required run rate formulas, and tournament rules.',
+        bullets: [
+          'Native format support: T5, T10, T20, 40-over, 50-over ODI, Multi-Day Test matches, and The Hundred (100-ball).',
+          'Grassroots cricket variants: Box Cricket, Tape-Ball, Super Over, and custom limited-over sets.',
+          'Automated Duckworth-Lewis-Stern (DLS) method calculations for rain-interrupted tournament fixtures.',
+          'Dynamic powerplay indicator banners, free-hit alerts, and bowler maximum-over limit tracking.'
+        ],
+        icon: 'Activity',
+        color: 'cyan'
+      },
+      {
+        id: 'animation-system',
+        badge: 'Animation System',
+        title: 'Animation System',
+        description:
+          'Slot-machine score rolls, confetti bursts, strobe flashes, shake effects, and smooth panel transitions. Powered by GSAP hardware-accelerated transforms delivering fluid 60fps animations.',
+        bullets: [
+          'Slot-machine rolling digits: independent rolling cascades on each digit update with configurable speed.',
+          'Boundary & wicket celebration effects: confetti blasts, neon glow bursts, ticker takeovers, and screen tremors.',
+          'Configurable GSAP entrance and exit timelines: panels slide, scale, or fade in from configurable directions with eased timing.',
+          'Four & Six counter +1 animations with scale-bounce and color flash effects on each new boundary event.'
+        ],
+        icon: 'Zap',
+        color: 'red'
+      },
+      {
+        id: 'obs-streamlabs-setup',
+        badge: 'OBS & Streamlabs Setup',
+        title: 'OBS & Streamlabs Setup',
+        description:
+          'One-click browser source URL. Works with OBS Studio, Streamlabs, vMix, and any browser-source-compatible tool. Set resolution to 1920x1080 and receive real-time transparent overlays.',
+        bullets: [
+          'Dedicated unique browser-source URL per match with embedded secure access code and transparent alpha channel.',
+          'Automatic scaling for Full HD (1920x1080), QHD (2560x1440), and 4K UHD (3840x2160) production canvases.',
+          'Low resource consumption: utilizes under 100MB RAM with sub-100ms real-time WebSocket score delivery.',
+          'Clean scene switching with built-in state preservation and automatic reconnection recovery.'
+        ],
+        icon: 'Tv',
+        color: 'indigo'
+      }
+    ]
+  },
+  {
+    id: 'studio-streaming-production',
+    title: '🎥 Live Streaming & Studio Production Engine',
+    badge: 'Broadcast Studio',
+    description:
+      'Enterprise live streaming pipeline featuring multi-destination RTMP broadcast, 60s instant replay buffer, AI highlights, multi-camera switching, and 48kHz audio capture.',
+    headerColor: 'text-indigo-400',
+    borderColor: 'border-indigo-500/20',
+    features: [
       {
         id: 'multi-streaming',
         badge: 'Multi-Destination RTMP',
@@ -177,36 +248,6 @@ export const FEATURE_CATEGORIES_DATA: FeatureCategory[] = [
         ],
         icon: 'Mic',
         color: 'amber'
-      },
-      {
-        id: 'local-recording',
-        badge: 'Lossless Archive',
-        title: 'Local Master Recording & Bookmarks',
-        description:
-          'High-bitrate master recording saved directly to your local SSD independent of live streaming bandwidth. Ensures you retain an uncompressed archive of the entire match for TV syndication and post-production.',
-        bullets: [
-          'Lossless MP4/MKV container recording with multi-track audio stream isolation.',
-          'Automated segmented file splitting preventing corrupted footage in case of power failure.',
-          'Metadata-stamped timeline bookmarks corresponding to every ball, wicket, and milestone.',
-          'Instant background remuxing for rapid upload into Adobe Premiere or DaVinci Resolve.'
-        ],
-        icon: 'HardDrive',
-        color: 'red'
-      },
-      {
-        id: 'format-engine',
-        badge: 'Universal Formats',
-        title: 'All Cricket Formats Engine',
-        description:
-          'Comprehensive rules engine supporting every recognized standard and grassroots cricket variant. The scoring math, overs calculation, run rates, and Duckworth-Lewis-Stern targets adjust automatically.',
-        bullets: [
-          'Native support for T5, T10, T20, 40-over, 50-over ODI, Multi-Day Test, and The Hundred.',
-          'Grassroots formats: Box Cricket, Tape-Ball, Super Over, and custom limited-over sets.',
-          'Automated Duckworth-Lewis-Stern (DLS) method calculations for rain-interrupted fixtures.',
-          'Dynamic powerplay indicator banners and free-hit notification alerts.'
-        ],
-        icon: 'Activity',
-        color: 'emerald'
       }
     ]
   },
@@ -216,8 +257,8 @@ export const FEATURE_CATEGORIES_DATA: FeatureCategory[] = [
     badge: 'Website Builder',
     description:
       'Launch an enterprise-grade official league website in minutes with automated standings, ball-by-ball match centers, and player profile archives.',
-    headerColor: 'text-indigo-400',
-    borderColor: 'border-indigo-500/20',
+    headerColor: 'text-purple-400',
+    borderColor: 'border-purple-500/20',
     features: [
       {
         id: 'page-builder',
@@ -362,8 +403,8 @@ export const FEATURE_CATEGORIES_DATA: FeatureCategory[] = [
     badge: 'Operations Hub',
     description:
       'All-in-one command center for tournament directors, team managers, and official scorers to coordinate fixtures, venue logistics, and live broadcast graphics.',
-    headerColor: 'text-purple-400',
-    borderColor: 'border-purple-500/20',
+    headerColor: 'text-amber-400',
+    borderColor: 'border-amber-500/20',
     features: [
       {
         id: 'command-center',
