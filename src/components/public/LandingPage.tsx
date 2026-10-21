@@ -35,6 +35,94 @@ import { PRESET_TOURNAMENTS } from '../../theme/presetThemes';
 import { THEME_LINKS_DATA } from '../control/ThemeLinksPage';
 import { useBroadcastStore } from '../../store/useBroadcastStore';
 import { OverlayStage } from '../control/OverlayStage';
+import { FEATURE_CATEGORIES_DATA } from './landingFeaturesData';
+
+const COLOR_STYLES: Record<string, {
+  bg: string;
+  border: string;
+  iconBg: string;
+  badge: string;
+  bulletCheck: string;
+  glow: string;
+}> = {
+  cyan: {
+    bg: 'bg-cyan-500/10',
+    border: 'border-cyan-500/30',
+    iconBg: 'bg-cyan-500/20 border-cyan-400/40 text-cyan-400',
+    badge: 'text-cyan-300 bg-cyan-950/70 border-cyan-800/60',
+    bulletCheck: 'text-cyan-400',
+    glow: 'hover:border-cyan-500/40 hover:shadow-cyan-500/10'
+  },
+  indigo: {
+    bg: 'bg-indigo-500/10',
+    border: 'border-indigo-500/30',
+    iconBg: 'bg-indigo-500/20 border-indigo-400/40 text-indigo-400',
+    badge: 'text-indigo-300 bg-indigo-950/70 border-indigo-800/60',
+    bulletCheck: 'text-indigo-400',
+    glow: 'hover:border-indigo-500/40 hover:shadow-indigo-500/10'
+  },
+  purple: {
+    bg: 'bg-purple-500/10',
+    border: 'border-purple-500/30',
+    iconBg: 'bg-purple-500/20 border-purple-400/40 text-purple-400',
+    badge: 'text-purple-300 bg-purple-950/70 border-purple-800/60',
+    bulletCheck: 'text-purple-400',
+    glow: 'hover:border-purple-500/40 hover:shadow-purple-500/10'
+  },
+  amber: {
+    bg: 'bg-amber-500/10',
+    border: 'border-amber-500/30',
+    iconBg: 'bg-amber-500/20 border-amber-400/40 text-amber-400',
+    badge: 'text-amber-300 bg-amber-950/70 border-amber-800/60',
+    bulletCheck: 'text-amber-400',
+    glow: 'hover:border-amber-500/40 hover:shadow-amber-500/10'
+  },
+  red: {
+    bg: 'bg-red-500/10',
+    border: 'border-red-500/30',
+    iconBg: 'bg-red-500/20 border-red-400/40 text-red-400',
+    badge: 'text-red-300 bg-red-950/70 border-red-800/60',
+    bulletCheck: 'text-red-400',
+    glow: 'hover:border-red-500/40 hover:shadow-red-500/10'
+  },
+  emerald: {
+    bg: 'bg-emerald-500/10',
+    border: 'border-emerald-500/30',
+    iconBg: 'bg-emerald-500/20 border-emerald-400/40 text-emerald-400',
+    badge: 'text-emerald-300 bg-emerald-950/70 border-emerald-800/60',
+    bulletCheck: 'text-emerald-400',
+    glow: 'hover:border-emerald-500/40 hover:shadow-emerald-500/10'
+  }
+};
+
+const renderFeatureIcon = (iconName: string) => {
+  switch (iconName) {
+    case 'Radio': return <Radio className="w-5 h-5" />;
+    case 'RotateCcw': return <RotateCcw className="w-5 h-5" />;
+    case 'Video': return <Video className="w-5 h-5" />;
+    case 'Camera': return <Camera className="w-5 h-5" />;
+    case 'Zap': return <Zap className="w-5 h-5" />;
+    case 'Mic': return <Mic className="w-5 h-5" />;
+    case 'HardDrive': return <HardDrive className="w-5 h-5" />;
+    case 'Layers': return <Layers className="w-5 h-5" />;
+    case 'Activity': return <Activity className="w-5 h-5" />;
+    case 'Palette': return <Palette className="w-5 h-5" />;
+    case 'Globe': return <Globe className="w-5 h-5" />;
+    case 'Tv': return <Tv className="w-5 h-5" />;
+    case 'Users': return <Users className="w-5 h-5" />;
+    case 'Sliders': return <Sliders className="w-5 h-5" />;
+    case 'Sparkles': return <Sparkles className="w-5 h-5" />;
+    case 'Cloud': return <Cloud className="w-5 h-5" />;
+    case 'FileCheck': return <FileCheck className="w-5 h-5" />;
+    case 'Settings': return <Settings className="w-5 h-5" />;
+    case 'Mail': return <Mail className="w-5 h-5" />;
+    case 'Shield': return <Shield className="w-5 h-5" />;
+    case 'MapPin': return <MapPin className="w-5 h-5" />;
+    case 'FolderOpen': return <FolderOpen className="w-5 h-5" />;
+    case 'Check': return <Check className="w-5 h-5" />;
+    default: return <Layers className="w-5 h-5" />;
+  }
+};
 
 export const LandingPage: React.FC = () => {
   const { tournamentId, setTournamentId } = useBroadcastStore();
@@ -248,301 +336,89 @@ export const LandingPage: React.FC = () => {
 
       {/* Tab 2: Feature Highlights */}
       {activeTab === 'features' && (
-        <section className="px-6 max-w-7xl mx-auto mb-20 animate-fade-in space-y-16">
-          
-          {/* Subcategory 1: Live Broadcast & Overlays */}
-          <div>
-            <h3 className="text-xl sm:text-2xl font-black text-cyan-400 uppercase tracking-wider mb-6 border-b border-cyan-500/20 pb-2">
-              ⚡ Live Broadcast & Overlay Features
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-                <div className="w-12 h-12 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-cyan-400 mb-4">
-                  <Radio className="w-6 h-6" />
-                </div>
-                <h4 className="text-lg font-black text-white uppercase">Live Streaming</h4>
-                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                  Stream to YouTube, Facebook, and custom RTMP destinations simultaneously. Broadcast to up to 3 platforms at once with ultra-low delay.
-                </p>
-              </div>
-
-              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-                <div className="w-12 h-12 rounded-xl bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center text-indigo-400 mb-4">
-                  <RotateCcw className="w-6 h-6" />
-                </div>
-                <h4 className="text-lg font-black text-white uppercase">Instant Replay</h4>
-                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                  Integrated 60-second instant replay buffer with support for slow motion, ball-event bookmarks, and live DRS review overlays.
-                </p>
-              </div>
-
-              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-                <div className="w-12 h-12 rounded-xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-purple-400 mb-4">
-                  <Video className="w-6 h-6" />
-                </div>
-                <h4 className="text-lg font-black text-white uppercase">Auto Highlights</h4>
-                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                  Automatically generated match highlights reels filtered dynamically by wickets, sixes, fours, innings, or specific players.
-                </p>
-              </div>
-
-              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-                <div className="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400 mb-4">
-                  <Camera className="w-6 h-6" />
-                </div>
-                <h4 className="text-lg font-black text-white uppercase">Camera Support</h4>
-                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                  Seamless switching between local cameras, external USB capture cards, manual zoom levels, and live display frame capture.
-                </p>
-              </div>
-
-              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-                <div className="w-12 h-12 rounded-xl bg-red-500/20 border border-red-400/40 flex items-center justify-center text-red-400 mb-4">
-                  <Sliders className="w-6 h-6" />
-                </div>
-                <h4 className="text-lg font-black text-white uppercase">Video Quality</h4>
-                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                  Broadcast-grade hardware encoding scaling from 720p up to 4K UHD resolutions at 30/60fps with adaptive streaming bitrates.
-                </p>
-              </div>
-
-              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-                <div className="w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400 mb-4">
-                  <Mic className="w-6 h-6" />
-                </div>
-                <h4 className="text-lg font-black text-white uppercase">48kHz Audio Capture</h4>
-                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                  Professional stereo capture featuring noise cancellation filters, separate volume sliders, and live VU metering.
-                </p>
-              </div>
-
-              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-                <div className="w-12 h-12 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-cyan-400 mb-4">
-                  <HardDrive className="w-6 h-6" />
-                </div>
-                <h4 className="text-lg font-black text-white uppercase">Local Recording</h4>
-                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                  High-definition local MP4 recording with timeline bookmark tracking, segmented files, and pause/resume actions.
-                </p>
-              </div>
-
-              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-                <div className="w-12 h-12 rounded-xl bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center text-indigo-400 mb-4">
-                  <Layers className="w-6 h-6" />
-                </div>
-                <h4 className="text-lg font-black text-white uppercase">Overlay Integration</h4>
-                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                  Native overlay compositing engines rendering scoreboard layouts in real-time with automated data APIs.
-                </p>
-              </div>
-
-              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-                <div className="w-12 h-12 rounded-xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-purple-400 mb-4">
-                  <Activity className="w-6 h-6" />
-                </div>
-                <h4 className="text-lg font-black text-white uppercase">Real-Time Diagnostics</h4>
-                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                  Detailed streaming statistics dashboard displaying connection strength, dropped frames, device logs, and diagnostics.
-                </p>
-              </div>
+        <section className="px-6 max-w-7xl mx-auto mb-24 animate-fade-in space-y-20">
+          {/* Header intro */}
+          <div className="text-center max-w-3xl mx-auto">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-black tracking-widest uppercase mb-4 shadow-lg shadow-cyan-500/5">
+              <Zap className="w-3.5 h-3.5" /> Full Platform Capabilities & Architecture
             </div>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-white uppercase">
+              Deeply Engineered For Live Cricket
+            </h2>
+            <p className="text-slate-400 text-sm sm:text-base mt-4 leading-relaxed font-medium">
+              Every feature is built from the ground up for high-stakes cricket broadcasting. From millisecond-accurate graphic automation and 50+ live overlay panels to self-updating tournament portals and multi-tenant league websites.
+            </p>
           </div>
 
-          {/* Subcategory 2: League Website Builder */}
-          <div>
-            <h3 className="text-xl sm:text-2xl font-black text-indigo-400 uppercase tracking-wider mb-6 border-b border-indigo-500/20 pb-2">
-              🌐 League Website Builder Platform
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-                <div className="w-12 h-12 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-cyan-400 mb-4">
-                  <Palette className="w-6 h-6" />
+          {FEATURE_CATEGORIES_DATA.map((cat) => (
+            <div key={cat.id} className="space-y-8">
+              {/* Category Header */}
+              <div className={`border-b ${cat.borderColor} pb-5`}>
+                <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
+                  <h3 className={`text-xl sm:text-2xl font-black uppercase tracking-wider flex items-center gap-2.5 ${cat.headerColor}`}>
+                    {cat.title}
+                  </h3>
+                  <span className="text-[11px] font-black uppercase tracking-widest px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700 text-slate-300">
+                    {cat.features.length} Modules
+                  </span>
                 </div>
-                <h4 className="text-lg font-black text-white uppercase">Drag-and-Drop Page Builder</h4>
-                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                  Easily build your website using 21 custom content blocks—including stats counters, image sliders, match widgets, and leaderboards.
+                <p className="text-slate-400 text-sm max-w-3xl leading-relaxed">
+                  {cat.description}
                 </p>
               </div>
 
-              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-                <div className="w-12 h-12 rounded-xl bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center text-indigo-400 mb-4">
-                  <Globe className="w-6 h-6" />
-                </div>
-                <h4 className="text-lg font-black text-white uppercase">Tournament & Standings</h4>
-                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                  Auto-generated tournament pages containing standing tables, schedule tables, matches, teams lists, and player squad rosters.
-                </p>
-              </div>
+              {/* Cards Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {cat.features.map((feat) => {
+                  const style = COLOR_STYLES[feat.color] || COLOR_STYLES.cyan;
+                  return (
+                    <div
+                      key={feat.id}
+                      className={`bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl transition-all duration-300 ${style.glow} flex flex-col justify-between group hover:border-slate-700/80`}
+                    >
+                      <div>
+                        {/* Top row: Icon & Badge */}
+                        <div className="flex items-center justify-between gap-3 mb-4">
+                          <div className={`w-11 h-11 rounded-xl border flex items-center justify-center shrink-0 transition-transform duration-300 group-hover:scale-105 shadow-md ${style.iconBg}`}>
+                            {renderFeatureIcon(feat.icon)}
+                          </div>
+                          <span className={`text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border ${style.badge}`}>
+                            {feat.badge}
+                          </span>
+                        </div>
 
-              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-                <div className="w-12 h-12 rounded-xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-purple-400 mb-4">
-                  <Tv className="w-6 h-6" />
-                </div>
-                <h4 className="text-lg font-black text-white uppercase">Match & Commentary Pages</h4>
-                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                  Dynamic match detail pages containing complete scorecards, overs charts, ball-by-ball commentary lines, and player charts.
-                </p>
-              </div>
+                        {/* Title */}
+                        <h4 className="text-lg font-black text-white uppercase tracking-tight group-hover:text-cyan-300 transition-colors">
+                          {feat.title}
+                        </h4>
 
-              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-                <div className="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400 mb-4">
-                  <Users className="w-6 h-6" />
-                </div>
-                <h4 className="text-lg font-black text-white uppercase">Team & Player Profiles</h4>
-                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                  Comprehensive profile pages showcasing batting averages, bowling records, historical matches, and achievement badges.
-                </p>
-              </div>
+                        {/* In-depth Description */}
+                        <p className="text-slate-300 text-xs sm:text-sm mt-3 leading-relaxed font-normal">
+                          {feat.description}
+                        </p>
+                      </div>
 
-              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-                <div className="w-12 h-12 rounded-xl bg-red-500/20 border border-red-400/40 flex items-center justify-center text-red-400 mb-4">
-                  <Sliders className="w-6 h-6" />
-                </div>
-                <h4 className="text-lg font-black text-white uppercase">Theme Customization</h4>
-                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                  Choose from 5 premium theme presets. Customize layouts, colors, navigation headers, footer links, and fonts instantly.
-                </p>
-              </div>
-
-              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-                <div className="w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400 mb-4">
-                  <Sparkles className="w-6 h-6" />
-                </div>
-                <h4 className="text-lg font-black text-white uppercase">Custom Domain & SSL</h4>
-                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                  Connect your own league domain. Provison automatic SSL certificates, handle DNS verifications, and www redirection.
-                </p>
-              </div>
-
-              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-                <div className="w-12 h-12 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-cyan-400 mb-4">
-                  <Cloud className="w-6 h-6" />
-                </div>
-                <h4 className="text-lg font-black text-white uppercase">SEO & AI Optimization</h4>
-                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                  Optimized metadata, Open Graph preview tags, and structured JSON-LD schema layouts with 60s ISR caching.
-                </p>
-              </div>
-
-              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-                <div className="w-12 h-12 rounded-xl bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center text-indigo-400 mb-4">
-                  <Layers className="w-6 h-6" />
-                </div>
-                <h4 className="text-lg font-black text-white uppercase">Multi-Tenant Subdomains</h4>
-                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                  Isolated workspaces. Each league gets its own subdomain, unique database table partitions, and administrative settings.
-                </p>
-              </div>
-
-              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-                <div className="w-12 h-12 rounded-xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-purple-400 mb-4">
-                  <FileCheck className="w-6 h-6" />
-                </div>
-                <h4 className="text-lg font-black text-white uppercase">Waiver & Signatures</h4>
-                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                  Digital injury waiver and liability consent forms. Complete with e-signature captures and compliant PDF generation.
-                </p>
+                      {/* Capabilities Bullets */}
+                      <div className="mt-5 pt-4 border-t border-slate-800/80">
+                        <div className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2.5 flex items-center gap-1.5">
+                          <Sparkles className="w-3 h-3 text-cyan-400" />
+                          Key Capabilities:
+                        </div>
+                        <ul className="space-y-2">
+                          {feat.bullets.map((b, idx) => (
+                            <li key={idx} className="flex items-start gap-2 text-xs text-slate-300/90 leading-snug">
+                              <Check className={`w-3.5 h-3.5 shrink-0 mt-0.5 ${style.bulletCheck}`} />
+                              <span>{b}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
-          </div>
-
-          {/* Subcategory 3: Tournament Management Dashboard */}
-          <div>
-            <h3 className="text-xl sm:text-2xl font-black text-purple-400 uppercase tracking-wider mb-6 border-b border-purple-500/20 pb-2">
-              🛠️ Tournament Management Web Dashboard
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-                <div className="w-12 h-12 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-cyan-400 mb-4">
-                  <Settings className="w-6 h-6" />
-                </div>
-                <h4 className="text-lg font-black text-white uppercase">Tournament Command Center</h4>
-                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                  Configure leagues, manage team lists, register squads, publish match schedules, and track outcomes from a single tab.
-                </p>
-              </div>
-
-              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-                <div className="w-12 h-12 rounded-xl bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center text-indigo-400 mb-4">
-                  <Sliders className="w-6 h-6" />
-                </div>
-                <h4 className="text-lg font-black text-white uppercase">Overlay Control Studio</h4>
-                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                  Full control panel dashboard to update active overlays. Change scores, customize sponsors, swap layouts, and trigger ads in real-time.
-                </p>
-              </div>
-
-              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-                <div className="w-12 h-12 rounded-xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-purple-400 mb-4">
-                  <Mail className="w-6 h-6" />
-                </div>
-                <h4 className="text-lg font-black text-white uppercase">Email & Notification Campaigns</h4>
-                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                  Design rich email newsletters. Target distribution lists by roles, track delivery stats, and manage contact submissions.
-                </p>
-              </div>
-
-              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-                <div className="w-12 h-12 rounded-xl bg-amber-500/20 border border-amber-400/40 flex items-center justify-center text-amber-400 mb-4">
-                  <Users className="w-6 h-6" />
-                </div>
-                <h4 className="text-lg font-black text-white uppercase">Role-Based Access Control</h4>
-                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                  Set permissions for league administrators, team managers, and scorers. Gate menu actions based on strict authorization rules.
-                </p>
-              </div>
-
-              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-                <div className="w-12 h-12 rounded-xl bg-red-500/20 border border-red-400/40 flex items-center justify-center text-red-400 mb-4">
-                  <Sparkles className="w-6 h-6" />
-                </div>
-                <h4 className="text-lg font-black text-white uppercase">Sponsor Asset Management</h4>
-                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                  Manage league sponsor logos, tier groups, campaigns, and overlay placement details with delivery tracking metrics.
-                </p>
-              </div>
-
-              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-                <div className="w-12 h-12 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-emerald-400 mb-4">
-                  <MapPin className="w-6 h-6" />
-                </div>
-                <h4 className="text-lg font-black text-white uppercase">Ground & Venue Management</h4>
-                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                  Register grounds with maps, coordinate availability timeslots, assign pitches, and track venue booking schedules.
-                </p>
-              </div>
-
-              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-                <div className="w-12 h-12 rounded-xl bg-cyan-500/20 border border-cyan-400/40 flex items-center justify-center text-cyan-400 mb-4">
-                  <FolderOpen className="w-6 h-6" />
-                </div>
-                <h4 className="text-lg font-black text-white uppercase">Document Center</h4>
-                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                  Upload and publish league documents—including registration rules, seasonal handbooks, and team schedules.
-                </p>
-              </div>
-
-              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-                <div className="w-12 h-12 rounded-xl bg-indigo-500/20 border border-indigo-400/40 flex items-center justify-center text-indigo-400 mb-4">
-                  <Layers className="w-6 h-6" />
-                </div>
-                <h4 className="text-lg font-black text-white uppercase">CMS & Editor.js integration</h4>
-                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                  Write blog articles using Editor.js, build pages with Tiptap, organize media files, and display galleries in lightboxes.
-                </p>
-              </div>
-
-              <div className="bg-slate-900/90 border border-slate-800 p-6 rounded-2xl shadow-xl">
-                <div className="w-12 h-12 rounded-xl bg-purple-500/20 border border-purple-400/40 flex items-center justify-center text-purple-400 mb-4">
-                  <Shield className="w-6 h-6" />
-                </div>
-                <h4 className="text-lg font-black text-white uppercase">Guided Setup Onboarding</h4>
-                <p className="text-slate-400 text-sm mt-2 leading-relaxed font-medium">
-                  Interactive setup guide for new organizations. Upload assets, map domains, configure presets, and import rosters easily.
-                </p>
-              </div>
-            </div>
-          </div>
+          ))}
         </section>
       )}
 
