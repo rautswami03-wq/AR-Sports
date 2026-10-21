@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>T20 Emerging Asia Cup Broadcast Overlay</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0A1628;
+      --secondary: #1A2A4A;
+      --accent: #FFD700;
+      --highlight: #00D4FF;
+      --text: #FFFFFF;
+      --text-sec: #B0B8C8;
+      --panel-bg: rgba(10, 22, 40, 0.94);
+      --border-gold: rgba(255, 215, 0, 0.35);
+    }
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background-color: transparent;
+      color: var(--text);
+      width: 1920px;
+      height: 1080px;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+    }
+    .asia-panel {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      border: 1px solid var(--border-gold);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), inset 0 0 15px rgba(255, 215, 0, 0.05);
+      border-radius: 4px;
+    }
+    .accent-bar-gold {
+      background: linear-gradient(90deg, var(--accent), transparent);
+    }
+    .accent-text-gold {
+      color: var(--accent);
+      text-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
+    }
+    .accent-text-cyan {
+      color: var(--highlight);
+    }
+    /* Simple transitions */
+    .screen-container {
+      transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .hidden-screen {
+      opacity: 0 !important;
+      transform: translateY(30px) scale(0.98) !important;
+      pointer-events: none !important;
+    }
+  </style>
+</head>
+<body class="relative">
+
+  <!-- ==========================================
+       OBS VIEWPORT (1920x1080)
+       ========================================== -->
+  <div id="viewport" class="relative w-[1920px] h-[1080px] bg-transparent">
+
+    <!-- 17. TOURNAMENT HEADER (Persistent Context display at top of screen) -->
+    <div id="screen-header" class="absolute top-8 left-12 right-12 flex items-center justify-between border-b border-white/10 pb-4 z-20">
+      <div>
+        <h1 class="text-2xl font-black uppercase tracking-wider text-white flex items-center gap-2">
+          <span class="text-amber-400">🏆</span> CRICSCORER EMERGES ASIA CUP 2026
+        </h1>
+        <p class="text-xs font-bold text-[#B0B8C8] uppercase tracking-widest mt-0.5" id="match-stage-label">
+          Match 2, Group Stage • IND-A vs PAK-A
+        </p>
+      </div>
+      <div class="text-right">
+        <span class="text-xs font-black uppercase tracking-widest text-[#B0B8C8]">Live Production Feed</span>
+        <div class="text-xs font-black text-amber-400 uppercase tracking-wider mt-0.5">AR Sports Broadcast</div>
+      </div>
+    </div>
+
+    <!-- ==========================================
+         REUSABLE SCREEN COMPONENTS
+         ========================================== -->
+
+    <!-- 1. MAIN SCOREBOARD -->
+    <div id="screen-1" class="screen-container absolute bottom-12 left-1/2 -translate-x-1/2 w-[1160px] asia-panel p-4 flex flex-col gap-2 z-10 hidden-screen">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <span class="px-3 py-1 bg-amber-500 text-slate-950 font-black text-xs uppercase tracking-wider rounded">1st Innings</span>
+          <span class="text-xl font-black tracking-wide">INDIA A</span>
+        </div>
+        <div class="flex items-center gap-6">
+          <div class="text-right">
+            <span class="text-xs font-bold text-slate-400 block uppercase">OVERS</span>
+            <span class="text-lg font-black">15.3 <span class="opacity-40 text-xs">/ 20</span></span>
+          </div>
+          <div class="text-right">
+            <span class="text-xs font-bold text-slate-400 block uppercase">EXTRAS</span>
+            <span class="text-lg font-black text-amber-400">12</span>
+          </div>
+          <div class="px-6 py-2 bg-slate-950/60 rounded border border-white/5 text-center min-w-[140px]">
+            <span class="text-[10px] font-bold text-slate-500 uppercase block tracking-wider">SCORE</span>
+            <span class="text-3xl font-black text-amber-400">174 - 3</span>
+          </div>
+        </div>
+      </div>
+      <div class="h-px bg-white/10 w-full"></div>
+      <div class="flex justify-between items-center text-xs font-bold text-[#B0B8C8]">
+        <span>CRR: 11.23 • Projected: 224</span>
+        <span class="text-amber-400 font-extrabold uppercase">India A won the toss and elected to bat</span>
+      </div>
+    </div>
+
+    <!-- 2. BATTER CARD -->
+    <div id="screen-2" class="screen-container absolute bottom-12 left-1/2 -translate-x-1/2 w-[800px] asia-panel p-4 flex items-center justify-between z-10 hidden-screen border-l-4 border-l-amber-400">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+          <span class="text-sm font-bold text-slate-400 uppercase tracking-wider">CURRENT BATTER</span>
+        </div>
+        <h3 class="text-2xl font-black uppercase text-white tracking-wide">Abhishek Sharma</h3>
+        <p class="text-xs font-bold text-cyan-400 uppercase tracking-widest">Left Hand Batter</p>
+      </div>
+      <div class="flex items-center gap-6 text-center">
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase block">RUNS</span>
+          <span class="text-2xl font-black text-amber-400">74</span>
+        </div>
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase block">BALLS</span>
+          <span class="text-2xl font-black text-white">42</span>
+        </div>
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase block">4s / 6s</span>
+          <span class="text-lg font-black text-white">6 / 4</span>
+        </div>
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase block">S/R</span>
+          <span class="text-2xl font-black text-cyan-400">176.2</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. BOWLER CARD -->
+    <div id="screen-3" class="screen-container absolute bottom-12 left-1/2 -translate-x-1/2 w-[800px] asia-panel p-4 flex items-center justify-between z-10 hidden-screen border-l-4 border-l-cyan-400">
+      <div>
+        <span class="text-sm font-bold text-slate-400 uppercase tracking-wider block mb-1">ACTIVE BOWLER</span>
+        <h3 class="text-2xl font-black uppercase text-white tracking-wide">Sufiyan Muqeem</h3>
+        <p class="text-xs font-bold text-amber-400 uppercase tracking-widest">Slow Left-Arm Orthodox</p>
+      </div>
+      <div class="flex items-center gap-6 text-center">
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase block">OVERS</span>
+          <span class="text-2xl font-black text-white">3.3</span>
+        </div>
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase block">RUNS</span>
+          <span class="text-2xl font-black text-white">34</span>
+        </div>
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase block">WICKETS</span>
+          <span class="text-2xl font-black text-amber-400">2</span>
+        </div>
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase block">ECON</span>
+          <span class="text-2xl font-black text-cyan-400">9.71</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. BATTING SUMMARY -->
+    <div id="screen-4" class="screen-container absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] asia-panel p-6 z-10 hidden-screen">
+      <div class="flex items-center justify-between border-b border-slate-700 pb-3 mb-4">
+        <h2 class="text-2xl font-black uppercase tracking-wide text-amber-400">India A Batting Summary</h2>
+        <span class="text-lg font-black text-white">174/3 (15.3 overs)</span>
+      </div>
+      <div class="space-y-2" id="batting-summary-container">
+        <!-- Dynamic Rows populated in script -->
+      </div>
+    </div>
+
+    <!-- 5. BOWLING SUMMARY -->
+    <div id="screen-5" class="screen-container absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1000px] asia-panel p-6 z-10 hidden-screen">
+      <div class="flex items-center justify-between border-b border-slate-700 pb-3 mb-4">
+        <h2 class="text-2xl font-black uppercase tracking-wide text-cyan-400">Pakistan A Bowling Summary</h2>
+        <span class="text-sm font-bold text-[#B0B8C8] uppercase">1st Innings stats</span>
+      </div>
+      <div class="space-y-2" id="bowling-summary-container">
+        <!-- Dynamic Bowler Rows -->
+      </div>
+    </div>
+
+    <!-- 6. MATCH SUMMARY -->
+    <div id="screen-6" class="screen-container absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1160px] asia-panel p-6 z-10 hidden-screen">
+      <h2 class="text-2xl font-black uppercase text-center text-amber-400 tracking-wider mb-6">MATCH SUMMARY</h2>
+      <div class="grid grid-cols-2 gap-8">
+        <div>
+          <div class="flex justify-between border-b border-slate-700 pb-2 mb-3">
+            <span class="font-black text-white text-lg">INDIA A</span>
+            <span class="font-black text-amber-400 text-lg">186/6 (20.0)</span>
+          </div>
+          <div class="space-y-1 text-sm font-semibold text-slate-300">
+            <div class="flex justify-between"><span>Abhishek Sharma</span><span>74 (42)</span></div>
+            <div class="flex justify-between"><span>Tilak Varma</span><span>44 (30)</span></div>
+            <div class="flex justify-between"><span>Sufiyan Muqeem</span><span>2/34 (4.0)</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="flex justify-between border-b border-slate-700 pb-2 mb-3">
+            <span class="font-black text-white text-lg">PAKISTAN A</span>
+            <span class="font-black text-amber-400 text-lg">179/7 (20.0)</span>
+          </div>
+          <div class="space-y-1 text-sm font-semibold text-slate-300">
+            <div class="flex justify-between"><span>Yasir Khan</span><span>58 (36)</span></div>
+            <div class="flex justify-between"><span>Qasim Akram</span><span>32 (18)</span></div>
+            <div class="flex justify-between"><span>Anshul Kamboj</span><span>3/22 (4.0)</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="mt-6 border-t border-slate-700 pt-4 text-center">
+        <span class="bg-amber-500/10 border border-amber-400/40 text-amber-400 font-black text-base px-6 py-2 rounded">
+          INDIA A WON BY 7 RUNS
+        </span>
+      </div>
+    </div>
+
+    <!-- 7. RESULT BANNER -->
+    <div id="screen-7" class="screen-container absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] asia-panel p-8 text-center z-10 hidden-screen border-t-4 border-t-amber-400">
+      <div class="text-amber-400 text-4xl mb-3">🏆</div>
+      <h2 class="text-3xl font-black tracking-wide text-white uppercase mb-2">MATCH COMPLETED</h2>
+      <p class="text-xl font-extrabold text-amber-400 uppercase tracking-widest mb-4">INDIA A WON BY 7 RUNS</p>
+      <div class="h-px bg-white/10 w-48 mx-auto my-3"></div>
+      <p class="text-sm font-bold text-[#B0B8C8] uppercase tracking-wider">Tournament Champions stage match</p>
+    </div>
+
+    <!-- 8. DISMISSAL CARD -->
+    <div id="screen-8" class="screen-container absolute bottom-12 left-1/2 -translate-x-1/2 w-[800px] asia-panel p-4 flex items-center justify-between z-10 hidden-screen border-l-4 border-l-rose-500">
+      <div>
+        <span class="text-xs font-bold text-rose-400 uppercase block mb-1">OUT / WICKET</span>
+        <h3 class="text-2xl font-black uppercase text-white tracking-wide">Tilak Varma</h3>
+        <p class="text-sm font-bold text-amber-400 uppercase mt-0.5">c Qasim Akram b Sufiyan Muqeem</p>
+      </div>
+      <div class="flex items-center gap-6 text-center">
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase block">RUNS</span>
+          <span class="text-2xl font-black text-white">44</span>
+        </div>
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase block">BALLS</span>
+          <span class="text-2xl font-black text-white">30</span>
+        </div>
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase block">S/R</span>
+          <span class="text-2xl font-black text-cyan-400">146.6</span>
+        </div>
+        <div class="bg-rose-950/40 border border-rose-900/60 rounded px-4 py-2">
+          <span class="text-[9px] font-bold text-slate-400 uppercase block">FOW</span>
+          <span class="text-lg font-black text-rose-400">148-3</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. PARTNERSHIP DISPLAY -->
+    <div id="screen-9" class="screen-container absolute bottom-12 left-1/2 -translate-x-1/2 w-[800px] asia-panel p-4 flex items-center justify-between z-10 hidden-screen border-t-2 border-t-amber-400">
+      <div class="flex-1 text-left">
+        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">CURRENT PARTNERSHIP</span>
+        <div class="flex items-center gap-3">
+          <span class="text-sm font-bold uppercase text-white">A. Sharma</span>
+          <span class="text-xs text-[#B0B8C8]">34 (20)</span>
+        </div>
+        <div class="flex items-center gap-3 mt-1">
+          <span class="text-sm font-bold uppercase text-white">T. Varma</span>
+          <span class="text-xs text-[#B0B8C8]">18 (14)</span>
+        </div>
+      </div>
+      <div class="text-center px-8 border-l border-white/10 shrink-0">
+        <span class="text-[10px] font-bold text-slate-400 uppercase block">TOTAL</span>
+        <span class="text-3xl font-black text-amber-400">52</span>
+        <span class="text-[10px] font-bold text-slate-400 uppercase block">runs (34b)</span>
+      </div>
+    </div>
+
+    <!-- 10. TOURNAMENT PLAYER STATS -->
+    <div id="screen-10" class="screen-container absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] asia-panel p-6 z-10 hidden-screen">
+      <div class="flex items-center gap-4 mb-4 border-b border-slate-700 pb-3">
+        <div class="text-3xl">🏏</div>
+        <div>
+          <h3 class="text-2xl font-black uppercase text-amber-400">Abhishek Sharma</h3>
+          <p class="text-xs font-bold text-[#B0B8C8] uppercase tracking-wider">Tournament Batting Statistics</p>
+        </div>
+      </div>
+      <div class="grid grid-cols-4 gap-4 text-center">
+        <div class="bg-slate-950/60 p-3 rounded border border-white/5">
+          <span class="text-[10px] font-bold text-slate-400 uppercase block">MATCHES</span>
+          <span class="text-2xl font-black text-white">5</span>
+        </div>
+        <div class="bg-slate-950/60 p-3 rounded border border-white/5">
+          <span class="text-[10px] font-bold text-slate-400 uppercase block">RUNS</span>
+          <span class="text-2xl font-black text-amber-400">284</span>
+        </div>
+        <div class="bg-slate-950/60 p-3 rounded border border-white/5">
+          <span class="text-[10px] font-bold text-slate-400 uppercase block">STRIKE RATE</span>
+          <span class="text-2xl font-black text-cyan-400">188.5</span>
+        </div>
+        <div class="bg-slate-950/60 p-3 rounded border border-white/5">
+          <span class="text-[10px] font-bold text-slate-400 uppercase block">BEST</span>
+          <span class="text-2xl font-black text-white">84*</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 11. POINTS TABLE -->
+    <div id="screen-11" class="screen-container absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] asia-panel p-6 z-10 hidden-screen">
+      <h3 class="text-2xl font-black text-center text-amber-400 uppercase tracking-widest mb-4">POINTS TABLE - GROUP A</h3>
+      <table class="w-full text-left text-sm font-semibold">
+        <thead>
+          <tr class="text-slate-400 border-b border-slate-700 uppercase tracking-wider text-[11px]">
+            <th class="py-2 px-3">POS</th>
+            <th class="py-2 px-3">TEAM</th>
+            <th class="py-2 px-3">P</th>
+            <th class="py-2 px-3">W</th>
+            <th class="py-2 px-3">L</th>
+            <th class="py-2 px-3 text-right">NRR</th>
+            <th class="py-2 px-3 text-right">PTS</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="border-b border-slate-800 bg-white/5">
+            <td class="py-2 px-3 text-amber-400 font-bold">1</td>
+            <td class="py-2 px-3 font-black">INDIA A</td>
+            <td class="py-2 px-3">3</td>
+            <td class="py-2 px-3 text-emerald-400">3</td>
+            <td class="py-2 px-3">0</td>
+            <td class="py-2 px-3 text-right text-cyan-400">+1.842</td>
+            <td class="py-2 px-3 text-right text-amber-400 font-black">6</td>
+          </tr>
+          <tr class="border-b border-slate-800">
+            <td class="py-2 px-3 font-bold">2</td>
+            <td class="py-2 px-3 font-black">PAKISTAN A</td>
+            <td class="py-2 px-3">3</td>
+            <td class="py-2 px-3 text-emerald-400">2</td>
+            <td class="py-2 px-3">1</td>
+            <td class="py-2 px-3 text-right text-cyan-400">+0.952</td>
+            <td class="py-2 px-3 text-right text-amber-400 font-black">4</td>
+          </tr>
+          <tr class="border-b border-slate-800">
+            <td class="py-2 px-3 font-bold">3</td>
+            <td class="py-2 px-3 font-black">UAE A</td>
+            <td class="py-2 px-3">3</td>
+            <td class="py-2 px-3 text-emerald-400">1</td>
+            <td class="py-2 px-3">2</td>
+            <td class="py-2 px-3 text-right text-rose-400">-0.824</td>
+            <td class="py-2 px-3 text-right text-amber-400 font-black">2</td>
+          </tr>
+          <tr class="border-b border-slate-800">
+            <td class="py-2 px-3 font-bold">4</td>
+            <td class="py-2 px-3 font-black">OMAN A</td>
+            <td class="py-2 px-3">3</td>
+            <td class="py-2 px-3 text-emerald-400">0</td>
+            <td class="py-2 px-3">3</td>
+            <td class="py-2 px-3 text-right text-rose-400">-1.974</td>
+            <td class="py-2 px-3 text-right text-amber-400 font-black">0</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 12. TOP BATTERS -->
+    <div id="screen-12" class="screen-container absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[850px] asia-panel p-6 z-10 hidden-screen">
+      <h3 class="text-2xl font-black text-center text-amber-400 uppercase tracking-widest mb-4">TOURNAMENT LEADING RUN SCORERS</h3>
+      <div class="space-y-2">
+        <div class="bg-white/5 border border-white/10 p-3 rounded flex justify-between items-center text-sm font-semibold">
+          <div class="flex items-center gap-4">
+            <span class="text-amber-400 font-black">1</span>
+            <span class="font-black uppercase text-white">Abhishek Sharma (IND)</span>
+          </div>
+          <div class="flex gap-8">
+            <span>Runs: <span class="font-black text-amber-400">284</span></span>
+            <span>Avg: <span class="font-black">56.8</span></span>
+            <span>SR: <span class="font-black text-cyan-400">188.5</span></span>
+          </div>
+        </div>
+        <div class="bg-slate-900 border border-white/5 p-3 rounded flex justify-between items-center text-sm font-semibold">
+          <div class="flex items-center gap-4">
+            <span class="text-slate-400 font-black">2</span>
+            <span class="font-black uppercase text-white">Yasir Khan (PAK)</span>
+          </div>
+          <div class="flex gap-8">
+            <span>Runs: <span class="font-black text-amber-400">242</span></span>
+            <span>Avg: <span class="font-black">48.4</span></span>
+            <span>SR: <span class="font-black text-cyan-400">165.2</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 13. TOP 4/6 STRIKERS -->
+    <div id="screen-13" class="screen-container absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[850px] asia-panel p-6 z-10 hidden-screen">
+      <h3 class="text-2xl font-black text-center text-amber-400 uppercase tracking-widest mb-4">TOURNAMENT SIXES LEADERBOARD</h3>
+      <div class="space-y-2">
+        <div class="bg-white/5 border border-white/10 p-3 rounded flex justify-between items-center text-sm font-semibold">
+          <div class="flex items-center gap-4">
+            <span class="text-amber-400 font-black">1</span>
+            <span class="font-black uppercase text-white">Abhishek Sharma (IND)</span>
+          </div>
+          <div class="flex gap-8">
+            <span>Fours: <span class="font-black">22</span></span>
+            <span>Sixes: <span class="font-black text-amber-400">18</span></span>
+          </div>
+        </div>
+        <div class="bg-slate-900 border border-white/5 p-3 rounded flex justify-between items-center text-sm font-semibold">
+          <div class="flex items-center gap-4">
+            <span class="text-slate-400 font-black">2</span>
+            <span class="font-black uppercase text-white">Qasim Akram (PAK)</span>
+          </div>
+          <div class="flex gap-8">
+            <span>Fours: <span class="font-black">18</span></span>
+            <span>Sixes: <span class="font-black text-amber-400">12</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 14. TOP PLAYER OF THE SERIES -->
+    <div id="screen-14" class="screen-container absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[850px] asia-panel p-6 z-10 hidden-screen">
+      <h3 class="text-2xl font-black text-center text-amber-400 uppercase tracking-widest mb-4">PLAYER OF THE SERIES RATINGS</h3>
+      <div class="space-y-2">
+        <div class="bg-white/5 border border-white/10 p-3 rounded flex justify-between items-center text-sm font-semibold">
+          <div class="flex items-center gap-4">
+            <span class="text-amber-400 font-black">1</span>
+            <span class="font-black uppercase text-white">Abhishek Sharma (IND)</span>
+          </div>
+          <div class="flex gap-8">
+            <span>Runs: <span class="font-black">284</span></span>
+            <span>Wickets: <span class="font-black">4</span></span>
+            <span>Rating Points: <span class="font-black text-amber-400">364</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 15. NEED RUNS DISPLAY -->
+    <div id="screen-15" class="screen-container absolute bottom-12 left-1/2 -translate-x-1/2 w-[800px] asia-panel p-4 flex items-center justify-between z-10 hidden-screen border-t-2 border-t-cyan-400">
+      <div>
+        <span class="text-[10px] font-bold text-slate-400 uppercase block mb-1">TARGET CHASE</span>
+        <h4 class="text-xl font-black uppercase text-white tracking-wide">PAKISTAN A NEED 76 RUNS</h4>
+      </div>
+      <div class="text-right">
+        <span class="text-[10px] font-bold text-slate-400 uppercase block">BALLS REMAINING</span>
+        <span class="text-3xl font-black text-amber-400">42 <span class="text-xs text-white/50">(7.0 overs)</span></span>
+      </div>
+    </div>
+
+    <!-- 16. TEAM PLAYERS LIST -->
+    <div id="screen-16" class="screen-container absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[1160px] asia-panel p-6 z-10 hidden-screen">
+      <h3 class="text-2xl font-black text-center text-amber-400 uppercase tracking-wider mb-6">PLAYING XI ROSTERS</h3>
+      <div class="grid grid-cols-2 gap-8">
+        <div>
+          <span class="font-black text-white text-lg block border-b border-slate-700 pb-2 mb-3">INDIA A</span>
+          <div class="grid grid-cols-2 gap-2 text-sm font-semibold text-slate-300">
+            <div>1. Abhishek Sharma</div>
+            <div>2. Prabhsimran Singh</div>
+            <div>3. Tilak Varma (c)</div>
+            <div>4. Ayush Badoni</div>
+            <div>5. Nehal Wadhera</div>
+            <div>6. Ramandeep Singh</div>
+          </div>
+        </div>
+        <div>
+          <span class="font-black text-white text-lg block border-b border-slate-700 pb-2 mb-3">PAKISTAN A</span>
+          <div class="grid grid-cols-2 gap-2 text-sm font-semibold text-slate-300">
+            <div>1. Yasir Khan</div>
+            <div>2. Arafat Minhas</div>
+            <div>3. Qasim Akram (c)</div>
+            <div>4. Haider Ali</div>
+            <div>5. Mohammad Haris</div>
+            <div>6. Sufiyan Muqeem</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ==========================================
+       FLOATING SWITCHER CONTROL PANEL (OPERATOR HUD)
+       ========================================== -->
+  <div class="fixed bottom-4 right-4 bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-2xl z-50 w-72 text-white font-sans text-xs">
+    <div class="flex items-center justify-between mb-3">
+      <span class="font-black uppercase tracking-wider text-amber-400">Broadcast Switcher</span>
+      <span class="text-[9px] bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded font-black">ASIA CUP</span>
+    </div>
+    
+    <div class="space-y-1 max-h-[220px] overflow-y-auto">
+      <button onclick="switchScreen(1)" class="w-full text-left p-2 hover:bg-slate-800 rounded font-semibold text-slate-300 transition flex items-center justify-between">
+        <span>1. Main Scoreboard</span> <span class="opacity-50">Scorebug</span>
+      </button>
+      <button onclick="switchScreen(2)" class="w-full text-left p-2 hover:bg-slate-800 rounded font-semibold text-slate-300 transition flex items-center justify-between">
+        <span>2. Batter Card</span> <span class="opacity-50">Batter stats</span>
+      </button>
+      <button onclick="switchScreen(3)" class="w-full text-left p-2 hover:bg-slate-800 rounded font-semibold text-slate-300 transition flex items-center justify-between">
+        <span>3. Bowler Card</span> <span class="opacity-50">Bowler stats</span>
+      </button>
+      <button onclick="switchScreen(4)" class="w-full text-left p-2 hover:bg-slate-800 rounded font-semibold text-slate-300 transition flex items-center justify-between">
+        <span>4. Batting Summary</span> <span class="opacity-50">Full innings</span>
+      </button>
+      <button onclick="switchScreen(5)" class="w-full text-left p-2 hover:bg-slate-800 rounded font-semibold text-slate-300 transition flex items-center justify-between">
+        <span>5. Bowling Summary</span> <span class="opacity-50">Bowling card</span>
+      </button>
+      <button onclick="switchScreen(6)" class="w-full text-left p-2 hover:bg-slate-800 rounded font-semibold text-slate-300 transition flex items-center justify-between">
+        <span>6. Match Summary</span> <span class="opacity-50">Brief results</span>
+      </button>
+      <button onclick="switchScreen(7)" class="w-full text-left p-2 hover:bg-slate-800 rounded font-semibold text-slate-300 transition flex items-center justify-between">
+        <span>7. Result Banner</span> <span class="opacity-50">End match</span>
+      </button>
+      <button onclick="switchScreen(8)" class="w-full text-left p-2 hover:bg-slate-800 rounded font-semibold text-slate-300 transition flex items-center justify-between">
+        <span>8. Dismissal Card</span> <span class="opacity-50">How Out</span>
+      </button>
+      <button onclick="switchScreen(9)" class="w-full text-left p-2 hover:bg-slate-800 rounded font-semibold text-slate-300 transition flex items-center justify-between">
+        <span>9. Partnership Display</span> <span class="opacity-50">Partnership</span>
+      </button>
+      <button onclick="switchScreen(10)" class="w-full text-left p-2 hover:bg-slate-800 rounded font-semibold text-slate-300 transition flex items-center justify-between">
+        <span>10. Tournament Player Stats</span> <span class="opacity-50">Ind. stats</span>
+      </button>
+      <button onclick="switchScreen(11)" class="w-full text-left p-2 hover:bg-slate-800 rounded font-semibold text-slate-300 transition flex items-center justify-between">
+        <span>11. Points Table</span> <span class="opacity-50">Standings</span>
+      </button>
+      <button onclick="switchScreen(12)" class="w-full text-left p-2 hover:bg-slate-800 rounded font-semibold text-slate-300 transition flex items-center justify-between">
+        <span>12. Top Batters</span> <span class="opacity-50">Runs list</span>
+      </button>
+      <button onclick="switchScreen(13)" class="w-full text-left p-2 hover:bg-slate-800 rounded font-semibold text-slate-300 transition flex items-center justify-between">
+        <span>13. Top 4/6 Strikers</span> <span class="opacity-50">Sixes list</span>
+      </button>
+      <button onclick="switchScreen(14)" class="w-full text-left p-2 hover:bg-slate-800 rounded font-semibold text-slate-300 transition flex items-center justify-between">
+        <span>14. Player of Series</span> <span class="opacity-50">Ratings</span>
+      </button>
+      <button onclick="switchScreen(15)" class="w-full text-left p-2 hover:bg-slate-800 rounded font-semibold text-slate-300 transition flex items-center justify-between">
+        <span>15. Need Runs Display</span> <span class="opacity-50">Chase bug</span>
+      </button>
+      <button onclick="switchScreen(16)" class="w-full text-left p-2 hover:bg-slate-800 rounded font-semibold text-slate-300 transition flex items-center justify-between">
+        <span>16. Team Players List</span> <span class="opacity-50">Lineups</span>
+      </button>
+    </div>
+    
+    <div class="mt-3 border-t border-slate-800 pt-3">
+      <button onclick="hideAll()" class="w-full bg-rose-600 hover:bg-red-500 font-bold p-2 text-center rounded uppercase text-white transition active:scale-95">
+        Clear All Screens
+      </button>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       CONTROLLER SCRIPT
+       ========================================== -->
+  <script>
+    const mockBatters = [
+      { name: "Abhishek Sharma", status: "c Qasim Akram b Sufiyan Muqeem", runs: 74, balls: 42, fours: 6, sixes: 4, sr: 176.2 },
+      { name: "Prabhsimran Singh", status: "c & b Arafat Minhas", runs: 36, balls: 24, fours: 4, sixes: 1, sr: 150.0 },
+      { name: "Tilak Varma", status: "not out", runs: 44, balls: 30, fours: 3, sixes: 1, sr: 146.6 },
+      { name: "Ayush Badoni", status: "not out", runs: 12, balls: 6, fours: 1, sixes: 1, sr: 200.0 }
+    ];
+
+    const mockBowlers = [
+      { name: "Sufiyan Muqeem", overs: 4.0, runs: 34, wickets: 2, econ: 8.5 },
+      { name: "Arafat Minhas", overs: 3.0, runs: 28, wickets: 1, econ: 9.3 },
+      { name: "Qasim Akram", overs: 2.0, runs: 22, wickets: 0, econ: 11.0 },
+      { name: "Yasir Khan", overs: 1.0, runs: 12, wickets: 0, econ: 12.0 }
+    ];
+
+    // Populate dynamic UI tables
+    function populateTables() {
+      const batWrap = document.getElementById('batting-summary-container');
+      batWrap.innerHTML = mockBatters.map(b => `
+        <div class="flex justify-between items-center text-sm font-semibold p-2.5 bg-slate-950/40 rounded border border-white/5">
+          <span class="w-64 font-black uppercase text-white">${b.name}</span>
+          <span class="flex-1 text-slate-400 text-xs">${b.status}</span>
+          <div class="flex gap-10 font-black text-slate-100 w-44 justify-end">
+            <span>${b.runs} <span class="text-xs font-normal text-slate-400">(${b.balls})</span></span>
+            <span class="text-amber-400 w-16 text-right">${b.sr}</span>
+          </div>
+        </div>
+      `).join('');
+
+      const bowlWrap = document.getElementById('bowling-summary-container');
+      bowlWrap.innerHTML = mockBowlers.map(bw => `
+        <div class="flex justify-between items-center text-sm font-semibold p-2.5 bg-slate-950/40 rounded border border-white/5">
+          <span class="w-64 font-black uppercase text-white">${bw.name}</span>
+          <div class="flex-1 flex gap-12 font-black text-slate-100 justify-end">
+            <span>Overs: <span class="text-slate-400">${bw.overs}</span></span>
+            <span>Runs: <span class="text-slate-400">${bw.runs}</span></span>
+            <span>Wkts: <span class="text-amber-400">${bw.wickets}</span></span>
+            <span>Econ: <span class="text-cyan-400 w-12 text-right">${bw.econ}</span></span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Switch active display overlay
+    function switchScreen(screenNum) {
+      hideAll();
+      const target = document.getElementById(`screen-${screenNum}`);
+      if (target) {
+        target.classList.remove('hidden-screen');
+      }
+    }
+
+    function hideAll() {
+      for (let i = 1; i <= 16; i++) {
+        const el = document.getElementById(`screen-${i}`);
+        if (el) {
+          el.classList.add('hidden-screen');
+        }
+      }
+    }
+
+    // Initial setup
+    populateTables();
+    // Default show Main Scoreboard (screen-1)
+    switchScreen(1);
+  </script>
+
+</body>
+</html>
