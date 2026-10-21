@@ -174,7 +174,7 @@ export const LiveScoreBug: React.FC = () => {
       </AnimatePresence>
 
       {/* 2. Target Progress Bar Header (if chasing second innings) */}
-      {theme.showTargetBar && matchDetails.targetRuns && layoutStyle !== 't20-asia-cup' && layoutStyle !== 'icc-navarasa' && layoutStyle !== 'centered-pill' && layoutStyle !== 'minimal-center' && (
+      {theme.showTargetBar && typeof matchDetails.targetRuns === 'number' && matchDetails.targetRuns > 0 && layoutStyle !== 't20-asia-cup' && layoutStyle !== 'icc-navarasa' && layoutStyle !== 'centered-pill' && layoutStyle !== 'minimal-center' ? (
         <div className="w-full max-w-[1080px] pointer-events-auto">
           <TargetProgressBar
             targetRuns={matchDetails.targetRuns}
@@ -184,7 +184,7 @@ export const LiveScoreBug: React.FC = () => {
             primaryAccent={theme.primaryAccent}
           />
         </div>
-      )}
+      ) : null}
 
       {/* ------------------------------------------------------------------ */}
       {/* 30. LOCAL MATCH STREAM PRO (1-to-1 Exact Screenshot Match)         */}
@@ -288,7 +288,7 @@ export const LiveScoreBug: React.FC = () => {
           className="w-full max-w-[1340px] flex flex-col font-sans pointer-events-auto relative select-none"
         >
           {/* Target top tab overlay (centered over center section) */}
-          {matchDetails.targetRuns && (
+          {Boolean(matchDetails.targetRuns && matchDetails.targetRuns > 0) && (
             <div className="absolute left-[38%] top-[-26px] z-20">
               <div 
                 className="bg-[#0a041f] text-white text-[11px] font-black px-6 py-1 rounded-t-lg tracking-widest uppercase border-t border-x border-white/20 shadow-md flex items-center justify-center gap-1.5"
@@ -758,7 +758,7 @@ export const LiveScoreBug: React.FC = () => {
           className="w-full max-w-[1240px] flex flex-col font-sans pointer-events-auto shadow-2xl relative"
         >
           {/* Top Target Pill (if target exists) */}
-          {matchDetails.targetRuns && (
+          {Boolean(matchDetails.targetRuns && matchDetails.targetRuns > 0) && (
             <div className="self-center -mb-2 z-10">
               <div className="bg-[#20003b] text-white text-xs font-black px-6 py-1 rounded-t-lg tracking-wider uppercase border-t border-x border-pink-500 shadow-md">
                 TARGET - {matchDetails.targetRuns}
@@ -857,7 +857,7 @@ export const LiveScoreBug: React.FC = () => {
           transition={{ type: 'spring', damping: 24, stiffness: 220 }}
           className="w-full max-w-[1200px] flex flex-col font-sans pointer-events-auto shadow-2xl relative"
         >
-          {matchDetails.targetRuns && (
+          {Boolean(matchDetails.targetRuns && matchDetails.targetRuns > 0) && (
             <div className="self-start ml-28 -mb-2 z-10">
               <div className="bg-[#09093b] text-[#00ff22] text-xs font-black px-5 py-1 rounded-t-lg tracking-wider uppercase border-t border-x border-[#00ff22]/50">
                 TARGET - {matchDetails.targetRuns}
@@ -902,7 +902,7 @@ export const LiveScoreBug: React.FC = () => {
           transition={{ type: 'spring', damping: 24, stiffness: 220 }}
           className="flex flex-col items-center gap-1 pointer-events-auto"
         >
-          {matchDetails.targetRuns && (
+          {Boolean(matchDetails.targetRuns && matchDetails.targetRuns > 0) && (
             <div
               className="text-white text-[11px] font-black px-8 py-1 rounded-t-xl tracking-widest uppercase border-t border-x border-white/30 shadow-md"
               style={{ background: teamLabelBg }}
@@ -1031,7 +1031,7 @@ export const LiveScoreBug: React.FC = () => {
             className="flex flex-col justify-center items-center px-4 shrink-0 border-r border-white/10 min-w-[135px]"
             style={{ background: scoreBoxBg }}
           >
-            {matchDetails.targetRuns && (
+            {Boolean(matchDetails.targetRuns && matchDetails.targetRuns > 0) && (
               <div
                 className="text-[10px] font-black uppercase tracking-wider mb-0.5"
                 style={{ color: scoreColor }}

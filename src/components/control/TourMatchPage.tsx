@@ -407,7 +407,7 @@ export const TourMatchPage: React.FC = () => {
               </span>
             ) : (
               <span className="px-3 py-1 bg-amber-500/20 text-amber-400 border border-amber-500/40 rounded-full flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-amber-400"></span> PRE-MATCH SETUP (OVERLAY HIDDEN)
+                <span className="w-2 h-2 rounded-full bg-amber-400"></span> PRE-MATCH PREVIEW (READY TO START)
               </span>
             )}
           </div>
@@ -419,9 +419,20 @@ export const TourMatchPage: React.FC = () => {
             <span className="text-xs font-bold uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
               <Tv className="w-4 h-4 text-sky-400" /> Live Stage Preview (1920×1080)
             </span>
-            <span className="text-[10px] bg-slate-800 text-slate-400 px-2.5 py-0.5 rounded font-mono">
-              {isMatchStarted ? 'OBS Broadcast Active' : 'Overlay Hidden Until Match Starts'}
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-[10px] bg-slate-800 text-slate-300 px-2.5 py-0.5 rounded font-mono">
+                {isMatchStarted ? 'OBS Broadcast Active' : 'Pre-Match Preview Mode'}
+              </span>
+              {!isMatchStarted && (
+                <button
+                  type="button"
+                  onClick={handleStartMatchWorkflow}
+                  className="px-3 py-1 bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-black uppercase rounded-lg shadow flex items-center gap-1 transition-all"
+                >
+                  <Play className="w-3.5 h-3.5 fill-current" /> Go Live
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="relative w-full aspect-video bg-slate-950 rounded-2xl overflow-hidden border border-slate-800 shadow-2xl flex items-center justify-center">
@@ -435,14 +446,11 @@ export const TourMatchPage: React.FC = () => {
             />
 
             {!isMatchStarted && (
-              <div className="absolute inset-0 z-20 bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center">
-                <Sparkles className="w-12 h-12 text-amber-400 mb-3 animate-bounce" />
-                <h3 className="text-xl font-black text-white uppercase tracking-wider mb-1">
-                  MATCH NOT STARTED YET
-                </h3>
-                <p className="text-xs font-bold text-slate-400 max-w-md uppercase mb-4">
-                  Enter match, overs & player details below, then click <span className="text-emerald-400 font-black">START MATCH & LAUNCH OVERLAY</span> to activate the broadcast graphics!
-                </p>
+              <div className="absolute top-3 left-3 z-20 bg-slate-950/80 border border-amber-500/40 px-3 py-1.5 rounded-xl backdrop-blur-md flex items-center gap-2 shadow-lg">
+                <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping" />
+                <span className="text-[11px] font-black text-amber-300 uppercase tracking-wider">
+                  Pre-Match Preview — Overlay Active
+                </span>
               </div>
             )}
 
@@ -455,13 +463,13 @@ export const TourMatchPage: React.FC = () => {
         {/* Versus Match Banner */}
         <div style={{ background: "linear-gradient(145deg, #0c1220, #070c16)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: "14px", padding: "20px 22px", marginBottom: "20px", display: "flex", flexDirection: "column", alignItems: "center", gap: "12px" }}>
           <div className="flex items-center justify-between w-full gap-4">
-            <h2 className="text-xl md:text-3xl font-black uppercase tracking-tight flex-1 truncate text-slate-950">
+            <h2 className="text-xl md:text-3xl font-black uppercase tracking-tight flex-1 truncate text-white">
               {teamA.fullName}
             </h2>
             <div className="px-5 py-1.5 bg-slate-950 text-amber-400 font-black text-xl rounded-2xl border border-white/20 shadow">
               VS
             </div>
-            <h2 className="text-xl md:text-3xl font-black uppercase tracking-tight flex-1 truncate text-slate-950">
+            <h2 className="text-xl md:text-3xl font-black uppercase tracking-tight flex-1 truncate text-white">
               {teamB.fullName}
             </h2>
           </div>

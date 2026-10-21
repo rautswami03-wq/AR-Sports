@@ -226,14 +226,14 @@ export const ScoreTicker: React.FC<ScoreTickerProps> = ({
 
         {/* CRR / RRR */}
         <span className="shrink-0">CRR <span style={{ color: 'var(--sb-accent-primary)' }}>{crr}</span></span>
-        {rrr && targetRuns && (
+        {Boolean(rrr && targetRuns && targetRuns > 0) && (
           <>
             <span className="mx-1 opacity-30">·</span>
             <span className="shrink-0">RRR <span style={{ color: '#f87171' }}>{rrr}</span></span>
           </>
         )}
 
-        {targetRuns && (
+        {Boolean(targetRuns && targetRuns > 0) && (
           <>
             <Sep />
             <span className="shrink-0 font-black" style={{ color: 'var(--sb-flash-four)' }}>

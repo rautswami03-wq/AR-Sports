@@ -253,7 +253,7 @@ export const ScoreStrip: React.FC<ScoreStripProps> = ({
           />
           <div className="flex items-center gap-2 mt-0.5">
             <span className="text-[11px] font-bold opacity-70">{oversFormatted}/{totalOvers} OVERS</span>
-            {targetRuns && (
+            {Boolean(targetRuns && targetRuns > 0) && (
               <span className="text-[11px] font-bold" style={{ color: 'var(--sb-accent-primary)' }}>
                 RRR: {rrr}
               </span>
@@ -385,7 +385,7 @@ export const ScoreStrip: React.FC<ScoreStripProps> = ({
             <span className="text-[10px] font-bold uppercase opacity-50" style={{ color: 'var(--sb-text-secondary)' }}>CRR</span>
             <span className="text-sm font-black" style={{ color: 'var(--sb-text-primary)' }}>{crr}</span>
           </div>
-          {rrr && targetRuns && (
+          {Boolean(rrr && targetRuns && targetRuns > 0) && (
             <div className="flex flex-col items-center">
               <span className="text-[10px] font-bold uppercase opacity-50" style={{ color: 'var(--sb-text-secondary)' }}>RRR</span>
               <span className="text-sm font-black" style={{ color: 'var(--sb-accent-primary)' }}>{rrr}</span>
