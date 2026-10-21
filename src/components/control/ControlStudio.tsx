@@ -542,10 +542,14 @@ export const ControlStudio: React.FC = () => {
                     </div>
                   </div>
                   <button
-                    onClick={() => toggleOverlay('scoreBug', true)}
-                    className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded shadow"
+                    onClick={() => toggleOverlay('scoreBug')}
+                    className={`px-3 py-1.5 font-bold text-xs rounded shadow transition-all ${
+                      activeOverlays.scoreBug
+                        ? 'bg-emerald-600 hover:bg-emerald-500 text-white ring-2 ring-emerald-300'
+                        : 'bg-slate-700 hover:bg-slate-600 text-slate-300'
+                    }`}
                   >
-                    Default
+                    {activeOverlays.scoreBug ? 'Scoreboard ON' : 'Scoreboard OFF'}
                   </button>
                   <button
                     onClick={() => toggleOverlay('scoreBug')}

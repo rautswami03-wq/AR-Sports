@@ -342,7 +342,13 @@ export const TourMatchPage: React.FC = () => {
   };
 
   const displayButtons: { id: OverlayType; label: string; bg: string }[] = [
-    { id: 'scoreBug', label: 'DEFAULT', bg: 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black' },
+    {
+      id: 'scoreBug',
+      label: activeOverlays.scoreBug ? 'SCOREBOARD (ON)' : 'SCOREBOARD (OFF)',
+      bg: activeOverlays.scoreBug
+        ? 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black ring-2 ring-emerald-300'
+        : 'bg-slate-800 text-slate-400 hover:bg-slate-700 font-bold',
+    },
     { id: 'battingLowerThird', label: '11BAT', bg: 'bg-pink-600 hover:bg-pink-500 text-white font-black' },
     { id: 'bowlingLowerThird', label: '11BALL', bg: 'bg-pink-600 hover:bg-pink-500 text-white font-black' },
     { id: 'battingScorecard', label: '12BAT', bg: 'bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-black' },
@@ -1017,11 +1023,15 @@ export const TourMatchPage: React.FC = () => {
               <button
                 onClick={() => {
                   toggleOverlay('tournamentTitle', false);
-                  toggleOverlay('scoreBug', true);
+                  toggleOverlay('scoreBug');
                 }}
-                className="py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-base rounded-2xl shadow-lg active:scale-95 transition-all uppercase tracking-wider"
+                className={`py-3.5 font-black text-base rounded-2xl shadow-lg active:scale-95 transition-all uppercase tracking-wider flex items-center justify-center gap-1.5 ${
+                  activeOverlays.scoreBug
+                    ? 'bg-emerald-500 hover:bg-emerald-400 text-slate-950 ring-2 ring-emerald-300'
+                    : 'bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700'
+                }`}
               >
-                Default
+                {activeOverlays.scoreBug ? 'SCOREBOARD: ON' : 'SCOREBOARD: OFF'}
               </button>
               <button
                 onClick={() => hideAllOverlays()}

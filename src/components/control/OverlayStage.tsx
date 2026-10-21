@@ -183,10 +183,34 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
 
   const isVisible = (type: OverlayType) => {
     if (forcedOverlay) return forcedOverlay === type;
-    if (activeOverlays[type]) return true;
-    if (isStandaloneRoute && type === 'scoreBug') return true;
-    if (matchDetails?.isMatchStarted && activeOverlays[type]) return true;
-    return false;
+
+    // If explicitly turned off in activeOverlays, always respect it
+    if (activeOverlays[type] === false) return false;
+
+    // For the main bottom scoreboard (scoreBug)
+    if (type === 'scoreBug') {
+      // Auto-hide scoreBug if another full-screen overlay or card is active
+      const isExclusiveOverlayActive = Boolean(
+        activeOverlays.battingScorecard ||
+        activeOverlays.bowlingScorecard ||
+        activeOverlays.matchSummary ||
+        activeOverlays.playingXI ||
+        activeOverlays.tournamentTitle ||
+        activeOverlays.winnerScreen ||
+        activeOverlays.manOfTheMatchCard
+      );
+      if (isExclusiveOverlayActive) return false;
+
+      // In standalone broadcast source (e.g. #/overlay in OBS/vMix):
+      // Hide the scoreboard until the match has been started, unless preview query is set
+      if (isStandaloneRoute && !matchDetails?.isMatchStarted && !params.get('preview')) {
+        return false;
+      }
+
+      return Boolean(activeOverlays.scoreBug);
+    }
+
+    return Boolean(activeOverlays[type]);
   };
 
   return (

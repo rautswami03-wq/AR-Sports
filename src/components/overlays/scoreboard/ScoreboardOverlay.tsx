@@ -193,7 +193,24 @@ export const ScoreboardOverlay: React.FC<ScoreboardOverlayProps> = ({
     teamB,
     battingTeamId,
     matchDetails,
+    activeOverlays,
   } = useBroadcastStore();
+
+  // OBS broadcast visibility: respect activeOverlays.scoreBug, exclusive cards, and match start state
+  if (obsMode) {
+    if (activeOverlays && activeOverlays.scoreBug === false) return null;
+    const isExclusiveOverlayActive = Boolean(
+      activeOverlays?.battingScorecard ||
+      activeOverlays?.bowlingScorecard ||
+      activeOverlays?.matchSummary ||
+      activeOverlays?.playingXI ||
+      activeOverlays?.tournamentTitle ||
+      activeOverlays?.winnerScreen ||
+      activeOverlays?.manOfTheMatchCard
+    );
+    if (isExclusiveOverlayActive) return null;
+    if (!matchDetails?.isMatchStarted && !getUrlParam('preview')) return null;
+  }
 
   const isTeamA = battingTeamId === teamA.id || battingTeamId === teamA.shortName || battingTeamId === 'teamA';
   const battingTeam = isTeamA ? teamA : teamB;
