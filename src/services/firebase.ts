@@ -1,5 +1,5 @@
 import { initializeApp, getApps } from 'firebase/app';
-import { getFirestore, doc, onSnapshot, setDoc } from 'firebase/firestore';
+import { getFirestore, doc, onSnapshot, setDoc, Firestore } from 'firebase/firestore';
 import { useBroadcastStore } from '../store/useBroadcastStore';
 
 const firebaseConfig = {
@@ -12,10 +12,25 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
-export const db = getFirestore(app);
+const isTestEnv = import.meta.env.MODE === 'test' || !firebaseConfig.apiKey;
+
+let db: Firestore | null = null;
+if (!isTestEnv) {
+  try {
+    const app = !getApps().length ? initializeApp(firebaseConfig) : getApps()[0];
+    db = getFirestore(app);
+  } catch (err) {
+    console.warn('Firebase initialization skipped:', err);
+  }
+}
+
+export { db };
 
 export function subscribeToLiveMatch(matchId: string, onUpdate: (data: any) => void) {
+  if (isTestEnv || !db) {
+    return () => {};
+  }
+
   let unsubFirestore = () => {};
   try {
     const matchDoc = doc(db, 'matches', matchId);
@@ -45,13 +60,17 @@ let publishTimer: any = null;
 let pendingStateToPublish: any = null;
 
 export function publishLiveMatchState(matchId: string, state: any) {
+  if (isTestEnv || !db) {
+    return;
+  }
+
   pendingStateToPublish = JSON.parse(JSON.stringify(state));
 
   if (publishTimer) return;
 
   publishTimer = setTimeout(async () => {
     publishTimer = null;
-    if (!pendingStateToPublish) return;
+    if (!pendingStateToPublish || !db) return;
 
     const stateToSend = pendingStateToPublish;
     pendingStateToPublish = null;
