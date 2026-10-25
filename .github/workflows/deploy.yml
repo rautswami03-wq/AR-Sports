@@ -32,7 +32,9 @@ jobs:
           cache: 'npm'
 
       - name: Install Dependencies
-        run: npm install --legacy-peer-deps
+        run: npm install --include=dev --legacy-peer-deps
+        env:
+          NODE_ENV: development
 
       - name: Run Tests
         run: npm test
