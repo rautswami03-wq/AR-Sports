@@ -34,8 +34,11 @@ jobs:
       - name: Install Dependencies
         run: npm install --legacy-peer-deps
 
+      - name: Run Tests
+        run: npm test
+
       - name: Build Application
-        run: npx vite build
+        run: npm run build
 
       - name: Setup Pages
         uses: actions/configure-pages@v4

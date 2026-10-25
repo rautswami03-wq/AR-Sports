@@ -1,12 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { useBroadcastStore } from '../../store/useBroadcastStore';
+import { useBroadcastStore, clientId } from '../../store/useBroadcastStore';
 import { OverlayType } from '../../types/cricket';
-import { subscribeToLiveMatch } from '../../services/firebase';
+import { subscribeToLiveMatch, publishLiveMatchState } from '../../services/firebase';
 import { THEME_ID_MAP } from '../../theme/presetThemes';
 
 // Overlays
 import { LiveScoreBug } from '../overlays/LiveScoreBug';
+import { LowerThird } from '../overlays/LowerThird';
 import { BattingLowerThird } from '../overlays/BattingLowerThird';
 import { BowlingLowerThird } from '../overlays/BowlingLowerThird';
 import { BattingScorecard } from '../overlays/BattingScorecard';
@@ -38,6 +39,7 @@ import { ManOfTheMatchCardOverlay } from '../overlays/ManOfTheMatchCardOverlay';
 import { DecisionOverlay } from '../overlays/DecisionOverlay';
 import { PitchMapOverlay } from '../overlays/PitchMapOverlay';
 import { ManhattanOverlay } from '../overlays/ManhattanOverlay';
+import { MatchCharts } from '../overlays/MatchCharts';
 import { CommentatorOverlay } from '../overlays/CommentatorOverlay';
 import { WatermarkOverlay } from '../overlays/WatermarkOverlay';
 import { TournamentTitleOverlay } from '../overlays/TournamentTitleOverlay';
@@ -116,7 +118,7 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
     };
 
     syncFromStorage();
-    const pollInterval = setInterval(syncFromStorage, 100);
+    const pollInterval = setInterval(syncFromStorage, 2000);
 
     const handleStorageChange = (e: StorageEvent) => {
       if ((e.key === 'ar_sports_match_state_v2' || e.key === 'cricscorer_match_state_v2') && e.newValue) {
@@ -149,9 +151,32 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
       } catch {}
     }
 
+    const sendOverlayAck = () => {
+      const now = Date.now();
+      const currentMatchId = useBroadcastStore.getState().matchId || 'live_match_default';
+      const ackPayload = { originId: clientId, overlayAckAt: now };
+      if (bc) {
+        try {
+          bc.postMessage({ ...ackPayload, type: 'OVERLAY_ACK' });
+        } catch {}
+      }
+      try {
+        publishLiveMatchState(currentMatchId, ackPayload);
+      } catch {}
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.setItem('ar_sports_overlay_ack', String(now));
+        } catch {}
+      }
+    };
+
+    sendOverlayAck();
+    const ackInterval = setInterval(sendOverlayAck, 2000);
+
     let unsubFirebase: (() => void) | null = null;
     try {
-      unsubFirebase = subscribeToLiveMatch('live_match_default', (data) => {
+      const matchIdToSub = useBroadcastStore.getState().matchId || 'live_match_default';
+      unsubFirebase = subscribeToLiveMatch(matchIdToSub, (data) => {
         if (data) {
           useBroadcastStore.getState().applyExternalState(data);
         }
@@ -159,6 +184,7 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
     } catch {}
 
     return () => {
+      clearInterval(ackInterval);
       clearInterval(pollInterval);
       window.removeEventListener('storage', handleStorageChange);
       window.removeEventListener('ar_sports_local_update', handleCustomSync);
@@ -222,12 +248,12 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
         {/* Overlays */}
         {isVisible('scoreBug') && <LiveScoreBug key="scoreBug" />}
         {isVisible('tournamentTitle') && <TournamentTitleOverlay key="tournamentTitle" />}
-        {isVisible('battingLowerThird') && <BattingLowerThird key="battingL3" />}
-        {isVisible('bowlingLowerThird') && <BowlingLowerThird key="bowlingL3" />}
+        {isVisible('battingLowerThird') && <LowerThird key="battingL3" type="batter" />}
+        {isVisible('bowlingLowerThird') && <LowerThird key="bowlingL3" type="bowler" />}
         {isVisible('battingScorecard') && <BattingScorecard key="battingCard" />}
         {isVisible('bowlingScorecard') && <BowlingScorecard key="bowlingCard" />}
         {isVisible('matchSummary') && <MatchSummary key="matchSummary" />}
-        {isVisible('partnership') && <PartnershipOverlay key="partnership" />}
+        {isVisible('partnership') && <LowerThird key="partnership" type="partnership" />}
         {isVisible('currentBatters') && <CurrentBattersOverlay key="currentBatters" />}
         {isVisible('currentBowler') && <CurrentBowlerOverlay key="currentBowler" />}
         {isVisible('requiredRunRate') && <RequiredRunRateOverlay key="rrr" />}
@@ -252,7 +278,8 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
         {isVisible('manOfTheMatchCard') && <ManOfTheMatchCardOverlay key="momCard" />}
         {isVisible('decision') && <DecisionOverlay key="decision" />}
         {isVisible('pitchMap') && <PitchMapOverlay key="pitchMap" />}
-        {isVisible('manhattan') && <ManhattanOverlay key="manhattan" />}
+        {isVisible('manhattan') && <MatchCharts key="manhattan" view="bar" />}
+        {isVisible('graph') && <MatchCharts key="matchCharts" />}
         {isVisible('winPredictor') && <WinPredictorOverlay key="winPredictor" />}
         {isVisible('commentator') && <CommentatorOverlay key="commentator" />}
         {isVisible('watermark') && <WatermarkOverlay key="watermark" />}

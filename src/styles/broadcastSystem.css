@@ -1,4 +1,25 @@
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;1,600;1,700&family=Inter:wght@400;600;700&display=swap');
 @import "tailwindcss";
+
+:root {
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-ui: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-condensed: 'Barlow Condensed', sans-serif;
+  --font-numbers: 'Barlow Condensed', sans-serif;
+  --font-headers: 'Barlow Condensed', sans-serif;
+  --font-score: 'Barlow Condensed', sans-serif;
+  --font-overs: 'Barlow Condensed', sans-serif;
+  --font-runrate: 'Barlow Condensed', sans-serif;
+  --font-display: 'Barlow Condensed', sans-serif;
+  --sb-font-primary: 'Barlow Condensed', sans-serif;
+  --sb-font-mono: 'Barlow Condensed', monospace;
+
+  --overlay-bg-dark: rgba(7, 12, 22, 0.92);
+  --overlay-bg-card: rgba(11, 27, 61, 0.95);
+  --overlay-bg-row-even: #0B1B3D;
+  --overlay-bg-row-odd: #132B5A;
+  --overlay-text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
+}
 
 @layer base {
   html,
@@ -11,10 +32,47 @@
     overflow-x: hidden;
     background: transparent !important;
     background-color: transparent !important;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
     user-select: none;
   }
+}
+
+/* Any score, over count, or run rate MUST use condensed font */
+.font-condensed,
+.score-number,
+.font-score,
+.font-numbers,
+.font-overs,
+.font-runrate,
+.broadcast-score,
+.broadcast-number,
+.sb-slot-digit,
+.sb-score,
+.scorebug-score,
+[data-stat="score"],
+[data-stat="overs"],
+[data-stat="runrate"],
+.stat-number {
+  font-family: var(--font-condensed) !important;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+/* Overlay text shadow for readability against bright stadium lights or pitch */
+.broadcast-canvas,
+.broadcast-canvas *,
+.overlay,
+.overlay *,
+.overlay-mode,
+.overlay-mode *,
+.scorebug,
+.scorebug *,
+.full-card-base,
+.full-card-base *,
+[data-overlay],
+[data-overlay] * {
+  text-shadow: var(--overlay-text-shadow);
 }
 
 /* Custom Sleek Scrollbar */
@@ -131,4 +189,19 @@
 
 .glow-pulse-blue {
   animation: glow-pulse 2s infinite ease-in-out;
+}
+
+@keyframes slide-in-bottom-300 {
+  0% {
+    transform: translateY(80px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-bottom {
+  animation: slide-in-bottom-300 300ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

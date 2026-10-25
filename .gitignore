@@ -12,3 +12,10 @@ out/
 Thumbs.db
 coverage/
 *.tsbuildinfo
+
+# Scraped / archive files & scratch folders
+*.har
+scraped_*
+optimize_wifi.bat
+New folder*/
+T20 EMERGING ASIA CUP Theme/

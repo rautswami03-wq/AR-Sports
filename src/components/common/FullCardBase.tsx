@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useBroadcastStore } from '../../store/useBroadcastStore';
-import { resolveThemeFromUrlOrStore } from '../../theme/presetThemes';
+import { resolveThemeFromUrlOrStore, getContrastTextColor } from '../../theme/presetThemes';
 
 interface FullCardBaseProps {
   title: string;
@@ -9,6 +9,7 @@ interface FullCardBaseProps {
   tournament?: string;
   children: React.ReactNode;
   width?: string;
+  headerBg?: string;
 }
 
 export const FullCardBase: React.FC<FullCardBaseProps> = ({
@@ -17,12 +18,17 @@ export const FullCardBase: React.FC<FullCardBaseProps> = ({
   tournament,
   children,
   width = 'w-[1100px]',
+  headerBg,
 }) => {
-  const { tournamentId, matchDetails } = useBroadcastStore();
+  const { tournamentId, matchDetails, teamA, teamB, battingTeamId } = useBroadcastStore();
   const theme = resolveThemeFromUrlOrStore(tournamentId, matchDetails.tournament || tournament);
 
+  const isTeamA = battingTeamId === teamA?.id || battingTeamId === teamA?.shortName || battingTeamId === 'teamA' || battingTeamId === teamA?.fullName;
+  const battingTeam = isTeamA ? teamA : teamB;
+
   const accentColor = theme.primaryAccent || '#facc15';
-  const isLight = theme.id === 'bbl_white';
+  const topHeaderBackground = headerBg || battingTeam?.primaryColor || theme.headerGradient || 'linear-gradient(90deg, #0f172a 0%, #1e293b 100%)';
+  const topHeaderTextColor = getContrastTextColor(topHeaderBackground);
 
   return (
     <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-30 p-6 bg-black/50 backdrop-blur-md">
@@ -40,23 +46,30 @@ export const FullCardBase: React.FC<FullCardBaseProps> = ({
           {/* Top Banner */}
           <div
             className="px-8 py-4 border-b border-white/20 flex items-center justify-between shadow-inner"
-            style={{ background: theme.headerGradient || 'linear-gradient(90deg, #0f172a 0%, #1e293b 100%)' }}
+            style={{ background: topHeaderBackground }}
           >
             <div>
               <span
                 className="text-xs font-black uppercase tracking-widest block mb-0.5"
-                style={{ color: accentColor }}
+                style={{ color: topHeaderTextColor === '#000000' ? '#1e293b' : accentColor }}
               >
                 {tournament || matchDetails.tournament || theme.name}
               </span>
-              <h2 className="text-white text-2xl font-black uppercase tracking-wide drop-shadow-md">
+              <h2
+                className="text-2xl font-black uppercase tracking-wide drop-shadow-md font-headers"
+                style={{ color: topHeaderTextColor }}
+              >
                 {title}
               </h2>
             </div>
             {subtitle && (
               <div
-                className="border px-4 py-1.5 rounded-lg font-black text-sm uppercase tracking-wider text-slate-950 shadow-md"
-                style={{ backgroundColor: accentColor, borderColor: accentColor }}
+                className="border px-4 py-1.5 rounded-lg font-black text-sm uppercase tracking-wider shadow-md font-headers"
+                style={{
+                  backgroundColor: accentColor,
+                  borderColor: accentColor,
+                  color: getContrastTextColor(accentColor)
+                }}
               >
                 {subtitle}
               </div>
@@ -67,8 +80,8 @@ export const FullCardBase: React.FC<FullCardBaseProps> = ({
           <div
             className="p-6 transition-colors"
             style={{
-              background: theme.cardBg || (isLight ? '#ffffff' : '#020617'),
-              color: isLight ? '#0f172a' : '#ffffff'
+              background: theme.cardBg || 'rgba(11, 27, 61, 0.95)',
+              color: '#ffffff'
             }}
           >
             {children}

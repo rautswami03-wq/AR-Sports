@@ -91,7 +91,144 @@ export const PRESET_TEAMS: Record<string, TeamPreset> = {
     accentColor: '#FFF',
     badgeGradient: 'linear-gradient(135deg, #3A225D 0%, #22123B 100%)',
   },
+  RR: {
+    id: 'RR',
+    shortName: 'RR',
+    fullName: 'Rajasthan Royals',
+    primaryColor: '#EA1A85',
+    secondaryColor: '#004B8C',
+    accentColor: '#FFFFFF',
+    badgeGradient: 'linear-gradient(135deg, #EA1A85 0%, #004B8C 100%)',
+  },
+  DC: {
+    id: 'DC',
+    shortName: 'DC',
+    fullName: 'Delhi Capitals',
+    primaryColor: '#004C93',
+    secondaryColor: '#D71921',
+    accentColor: '#EF4123',
+    badgeGradient: 'linear-gradient(135deg, #004C93 0%, #D71921 100%)',
+  },
+  SRH: {
+    id: 'SRH',
+    shortName: 'SRH',
+    fullName: 'Sunrisers Hyderabad',
+    primaryColor: '#F26522',
+    secondaryColor: '#000000',
+    accentColor: '#FFD200',
+    badgeGradient: 'linear-gradient(135deg, #F26522 0%, #B8440B 100%)',
+  },
+  PBKS: {
+    id: 'PBKS',
+    shortName: 'PBKS',
+    fullName: 'Punjab Kings',
+    primaryColor: '#ED1B24',
+    secondaryColor: '#DCDDDF',
+    accentColor: '#A7A9AC',
+    badgeGradient: 'linear-gradient(135deg, #ED1B24 0%, #A31017 100%)',
+  },
+  LSG: {
+    id: 'LSG',
+    shortName: 'LSG',
+    fullName: 'Lucknow Super Giants',
+    primaryColor: '#0057E7',
+    secondaryColor: '#E31B23',
+    accentColor: '#FFC72C',
+    badgeGradient: 'linear-gradient(135deg, #0057E7 0%, #003691 100%)',
+  },
+  GT: {
+    id: 'GT',
+    shortName: 'GT',
+    fullName: 'Gujarat Titans',
+    primaryColor: '#1B2133',
+    secondaryColor: '#BE9F55',
+    accentColor: '#0B4973',
+    badgeGradient: 'linear-gradient(135deg, #1B2133 0%, #0B4973 100%)',
+  },
+  SL: {
+    id: 'SL',
+    shortName: 'SL',
+    fullName: 'Sri Lanka',
+    primaryColor: '#0033A0',
+    secondaryColor: '#FFD100',
+    accentColor: '#EB1C24',
+    badgeGradient: 'linear-gradient(135deg, #0033A0 0%, #001F60 100%)',
+  },
+  BAN: {
+    id: 'BAN',
+    shortName: 'BAN',
+    fullName: 'Bangladesh',
+    primaryColor: '#006A4E',
+    secondaryColor: '#F42A41',
+    accentColor: '#FFD100',
+    badgeGradient: 'linear-gradient(135deg, #006A4E 0%, #004231 100%)',
+  },
+  WI: {
+    id: 'WI',
+    shortName: 'WI',
+    fullName: 'West Indies',
+    primaryColor: '#7B003A',
+    secondaryColor: '#FFC72C',
+    accentColor: '#FFFFFF',
+    badgeGradient: 'linear-gradient(135deg, #7B003A 0%, #4D0024 100%)',
+  },
+  AFG: {
+    id: 'AFG',
+    shortName: 'AFG',
+    fullName: 'Afghanistan',
+    primaryColor: '#0066B2',
+    secondaryColor: '#D32027',
+    accentColor: '#FFFFFF',
+    badgeGradient: 'linear-gradient(135deg, #0066B2 0%, #D32027 100%)',
+  },
 };
+
+/**
+ * Utility functions for broadcast theme colors and dynamic contrast calculations.
+ */
+export function hexToRgb(hex: string): { r: number; g: number; b: number } {
+  let cleaned = (hex || '#000000').replace('#', '').trim();
+  if (cleaned.length === 3) {
+    cleaned = cleaned.split('').map((c) => c + c).join('');
+  }
+  const num = parseInt(cleaned, 16);
+  if (isNaN(num)) return { r: 0, g: 0, b: 0 };
+  return {
+    r: (num >> 16) & 255,
+    g: (num >> 8) & 255,
+    b: num & 255,
+  };
+}
+
+export function hexToRgba(hex: string, alpha: number = 1): string {
+  if (!hex) return `rgba(0, 0, 0, ${alpha})`;
+  if (hex.startsWith('rgba') || hex.startsWith('rgb')) {
+    return hex;
+  }
+  const { r, g, b } = hexToRgb(hex);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+/**
+ * Returns '#ffffff' or '#000000' based on the background color contrast (YIQ formula).
+ */
+export function getContrastTextColor(hexColor: string): '#ffffff' | '#000000' {
+  if (!hexColor) return '#ffffff';
+  if (hexColor.startsWith('rgba') || hexColor.startsWith('rgb')) {
+    const match = hexColor.match(/\d+/g);
+    if (match && match.length >= 3) {
+      const r = parseInt(match[0], 10);
+      const g = parseInt(match[1], 10);
+      const b = parseInt(match[2], 10);
+      const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+      return yiq >= 140 ? '#000000' : '#ffffff';
+    }
+    return '#ffffff';
+  }
+  const { r, g, b } = hexToRgb(hexColor);
+  const yiq = (r * 299 + g * 587 + b * 114) / 1000;
+  return yiq >= 140 ? '#000000' : '#ffffff';
+}
 
 export const PRESET_TOURNAMENTS: Record<string, TournamentTheme> = {
   local_match_pro: {

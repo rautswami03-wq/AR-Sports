@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useBroadcastStore } from '../../store/useBroadcastStore';
-import { resolveThemeFromUrlOrStore } from '../../theme/presetThemes';
-import { OverProgressDots } from './OverProgressDots';
+import { resolveThemeFromUrlOrStore, hexToRgba } from '../../theme/presetThemes';
+import { OverProgressDots, SustainabilityTreeIcon } from './OverProgressDots';
 import { TargetProgressBar } from './TargetProgressBar';
 import { AsiaCupLeftCyanWings, AsiaCupRightYellowWings } from '../theme-graphics/AsiaCupGraphics';
 import { NavarasaVerticalRibbon } from '../theme-graphics/NavarasaGraphics';
@@ -13,16 +13,19 @@ import { NavarasaVerticalRibbon } from '../theme-graphics/NavarasaGraphics';
 interface BallDotProps { balls: string[]; size?: 'sm' | 'md' }
 const ColoredBallDots: React.FC<BallDotProps> = ({ balls, size = 'md' }) => {
   const dim = size === 'sm' ? 'w-4 h-4 text-[9px]' : 'w-[22px] h-[22px] text-[10px]';
+  const iconSize = size === 'sm' ? 10 : 13;
 
-  const getStyle = (ball: string): { bg: string; color: string; label: string } => {
+  const getStyle = (ball: string): { bg: string; color: string; label: string; isDot: boolean } => {
     switch (ball) {
-      case '6':  return { bg: '#16a34a', color: '#fff', label: '6' };
-      case '4':  return { bg: '#ca8a04', color: '#fff', label: '4' };
-      case 'W':  return { bg: '#dc2626', color: '#fff', label: 'W' };
-      case 'WD': return { bg: '#7c3aed', color: '#fff', label: 'WD' };
-      case 'NB': return { bg: '#ea580c', color: '#fff', label: 'NB' };
-      case '0':  return { bg: '#1e293b', color: '#475569', label: '●' };
-      default:   return { bg: '#1e293b', color: '#e2e8f0', label: ball };
+      case '6':  return { bg: '#FF207C', color: '#fff', label: '6', isDot: false }; // Electric Pink
+      case '4':  return { bg: '#FFDC35', color: '#000', label: '4', isDot: false }; // Coral Yellow
+      case 'W':  return { bg: '#dc2626', color: '#fff', label: 'W', isDot: false };
+      case 'WD': return { bg: '#7c3aed', color: '#fff', label: 'WD', isDot: false };
+      case 'NB': return { bg: '#ea580c', color: '#fff', label: 'NB', isDot: false };
+      case '0':
+      case '.':
+        return { bg: '#0a1f12', color: '#27E64B', label: '', isDot: true }; // Sustainability Tree Icon
+      default:   return { bg: '#1e293b', color: '#e2e8f0', label: ball, isDot: false };
     }
   };
 
@@ -36,10 +39,12 @@ const ColoredBallDots: React.FC<BallDotProps> = ({ balls, size = 'md' }) => {
         return (
           <span
             key={idx}
-            className={`${dim} rounded-full flex items-center justify-center font-black shrink-0`}
+            className={`${dim} rounded-full flex items-center justify-center font-black shrink-0 ${
+              s.isDot ? 'border border-[#27E64B]/40 shadow-[0_0_6px_rgba(39,230,75,0.4)]' : ''
+            }`}
             style={{ background: s.bg, color: s.color }}
           >
-            {s.label}
+            {s.isDot ? <SustainabilityTreeIcon size={iconSize} color="#27E64B" /> : s.label}
           </span>
         );
       })}
@@ -372,7 +377,7 @@ export const LiveScoreBug: React.FC = () => {
                     clipPath: 'polygon(15% 0%, 100% 0%, 85% 100%, 0% 100%)',
                   }}
                 >
-                  <span className="text-[26px] font-black tracking-tight leading-none">
+                  <span className="text-[26px] font-black tracking-tight leading-none font-numbers" data-stat="score">
                     {battingTeam.score}-{battingTeam.wickets}
                   </span>
                 </div>
@@ -397,20 +402,20 @@ export const LiveScoreBug: React.FC = () => {
                 }}
               >
                 <span className="text-[9px] font-extrabold opacity-60 uppercase tracking-widest leading-none">PART</span>
-                <span className="text-[12px] font-black text-yellow-300 mt-0.5 leading-none">
+                <span className="text-[12px] font-black text-yellow-300 mt-0.5 leading-none font-numbers">
                   {partnershipRuns}({partnershipBalls})
                 </span>
               </div>
             </div>
 
-            {/* ── D. BOWLER BOX (White ground) ── */}
-            <div className="bg-white text-[#160c30] flex-[1.4] px-6 flex flex-col justify-center border-l-2 border-r-2 border-slate-950">
+            {/* ── D. BOWLER BOX ── */}
+            <div className="bg-white/95 text-[#160c30] flex-[1.4] px-6 flex flex-col justify-center border-l-2 border-r-2 border-slate-950">
               {currentBowler && (
                 <div className="flex items-center justify-between text-[13px] font-black uppercase mb-1">
                   <span className="truncate max-w-[150px]">{currentBowler.name}</span>
-                  <span className="text-rose-600 font-black">
+                  <span className="text-rose-600 font-black font-numbers">
                     {currentBowler.wickets}-{currentBowler.runsConceded} 
-                    <span className="text-[10px] font-normal text-slate-600 align-baseline"> ({currentBowler.overs}.{currentBowler.ballsInCurrentOver})</span>
+                    <span className="text-[10px] font-normal text-slate-600 align-baseline font-numbers"> ({currentBowler.overs}.{currentBowler.ballsInCurrentOver})</span>
                   </span>
                 </div>
               )}
@@ -420,19 +425,24 @@ export const LiveScoreBug: React.FC = () => {
                 {matchDetails.recentBalls.slice(-6).map((ball, idx) => {
                   let dotColor = 'bg-slate-800 text-white';
                   let label = ball;
-                  if (ball === '6') { dotColor = 'bg-[#16a34a] text-white'; }
-                  else if (ball === '4') { dotColor = 'bg-[#ca8a04] text-white'; }
+                  let isDot = false;
+                  if (ball === '6') { dotColor = 'bg-[#FF207C] text-white shadow-[0_0_8px_rgba(255,32,124,0.6)]'; }
+                  else if (ball === '4') { dotColor = 'bg-[#FFDC35] text-slate-950 font-black shadow-[0_0_8px_rgba(255,220,53,0.5)]'; }
                   else if (ball === 'W') { dotColor = 'bg-[#dc2626] text-white'; }
                   else if (ball === 'WD') { dotColor = 'bg-[#7c3aed] text-white'; label = 'Wd'; }
                   else if (ball === 'NB') { dotColor = 'bg-[#ea580c] text-white'; label = 'Nb'; }
-                  else if (ball === '0') { dotColor = 'bg-slate-900 text-slate-400'; label = '●'; }
+                  else if (ball === '0' || ball === '.') {
+                    dotColor = 'bg-[#0a1f12] text-[#27E64B] border border-[#27E64B]/40 shadow-[0_0_6px_rgba(39,230,75,0.4)]';
+                    label = '';
+                    isDot = true;
+                  }
 
                   return (
                     <span 
                       key={idx} 
-                      className={`w-[22px] h-[22px] rounded-full font-black text-[10px] flex items-center justify-center shadow-sm shrink-0 ${dotColor}`}
+                      className={`w-[22px] h-[22px] rounded-full font-black text-[10px] flex items-center justify-center shadow-sm shrink-0 font-numbers ${dotColor}`}
                     >
-                      {label}
+                      {isDot ? <SustainabilityTreeIcon size={13} color="#27E64B" /> : label}
                     </span>
                   );
                 })}
@@ -461,7 +471,7 @@ export const LiveScoreBug: React.FC = () => {
                 <span className="text-[8px] font-black">&lt;</span>
               </div>
 
-              <span className="font-black text-xl uppercase tracking-tighter text-center line-clamp-1 pl-2">
+              <span className="font-black text-xl uppercase tracking-tighter text-center line-clamp-1 pl-2 font-headers">
                 {bowlingTeam.shortName || bowlingTeam.fullName}
               </span>
             </div>
@@ -469,10 +479,10 @@ export const LiveScoreBug: React.FC = () => {
           </div>
 
           {/* Bottom Running ticker strip */}
-          <div className="h-6 bg-[#0a041f] text-white text-[11px] font-black uppercase tracking-wider flex items-center justify-between px-6 border-t-2 border-pink-500 shadow-md">
-            <span className="text-yellow-400">CRR: {crr} {rrr ? ` | RRR: ${rrr}` : ''}</span>
+          <div className="h-6 bg-[#0a041f] text-white text-[11px] font-black uppercase tracking-wider flex items-center justify-between px-6 border-t-2 border-pink-500 shadow-md font-numbers">
+            <span className="text-yellow-400 font-numbers" data-stat="runrate">CRR: {crr} {rrr ? ` | RRR: ${rrr}` : ''}</span>
             <span className="text-white/80">{matchDetails.customInputText || `${battingTeam.fullName} INNINGS OVER ${oversFormatted}`}</span>
-            <span className="text-cyan-400">OVERS: {oversFormatted}</span>
+            <span className="text-cyan-400 font-numbers" data-stat="overs">OVERS: {oversFormatted}</span>
           </div>
 
         </motion.div>
@@ -717,11 +727,27 @@ export const LiveScoreBug: React.FC = () => {
                 <span className="uppercase tracking-wider text-[11px]">OVER</span>
                 <div className="flex items-center gap-1">
                   {matchDetails.recentBalls.length > 0 ? (
-                    matchDetails.recentBalls.slice(-6).map((ball, idx) => (
-                      <span key={idx} className="w-5 h-5 rounded-full border border-slate-900 flex items-center justify-center font-black text-[10px] bg-white">
-                        {ball === '0' ? '●' : ball}
-                      </span>
-                    ))
+                    matchDetails.recentBalls.slice(-6).map((ball, idx) => {
+                      const isDot = ball === '0' || ball === '.';
+                      const is4 = ball === '4';
+                      const is6 = ball === '6';
+                      const isW = ball === 'W';
+                      const bg = is6
+                        ? 'bg-[#FF207C] text-white border-transparent'
+                        : is4
+                        ? 'bg-[#FFDC35] text-slate-950 font-black border-transparent'
+                        : isW
+                        ? 'bg-red-600 text-white border-transparent'
+                        : isDot
+                        ? 'bg-[#0a1f12] text-[#27E64B] border border-[#27E64B]/50'
+                        : 'bg-white text-slate-900 border-slate-900';
+
+                      return (
+                        <span key={idx} className={`w-5 h-5 rounded-full border flex items-center justify-center font-black text-[10px] ${bg}`}>
+                          {isDot ? <SustainabilityTreeIcon size={12} color="#27E64B" /> : ball}
+                        </span>
+                      );
+                    })
                   ) : (
                     <span className="text-xs opacity-75">0 0 0 0 0 0</span>
                   )}
@@ -817,16 +843,26 @@ export const LiveScoreBug: React.FC = () => {
               <div className="flex items-center gap-1.5">
                 {matchDetails.recentBalls.length > 0 ? (
                   matchDetails.recentBalls.slice(-6).map((ball, idx) => {
-                    const isBoundary = ball === '4' || ball === '6';
+                    const isDot = ball === '0' || ball === '.';
+                    const is4 = ball === '4';
+                    const is6 = ball === '6';
                     const isW = ball === 'W';
                     return (
                       <span
                         key={idx}
-                        className={`w-5 h-5 rounded-full flex items-center justify-center font-black text-[10px] text-white shadow-sm ${
-                          isBoundary ? 'bg-[#e91e63]' : isW ? 'bg-red-600' : ball === '0' ? 'bg-slate-950' : 'bg-[#20003b]'
+                        className={`w-5 h-5 rounded-full flex items-center justify-center font-black text-[10px] shadow-sm ${
+                          is6
+                            ? 'bg-[#FF207C] text-white'
+                            : is4
+                            ? 'bg-[#FFDC35] text-slate-950'
+                            : isW
+                            ? 'bg-red-600 text-white'
+                            : isDot
+                            ? 'bg-[#0a1f12] text-[#27E64B] border border-[#27E64B]/40'
+                            : 'bg-[#20003b] text-white'
                         }`}
                       >
-                        {ball === '0' ? '●' : ball}
+                        {isDot ? <SustainabilityTreeIcon size={12} color="#27E64B" /> : ball}
                       </span>
                     );
                   })
@@ -1000,148 +1036,176 @@ export const LiveScoreBug: React.FC = () => {
         </motion.div>
       ) : (
         /* ------------------------------------------------------------------ */
-        /* 3F. BROADCAST FULL — Standard full-width flat scorebug             */
-        /*     Matches IPL 2025, CWC19, WT20 2024, JIO Cinema, SA20, etc.    */
+        /* 3F. IPL 2025 KITE-LIKE IGNITION SCOREBUG                           */
         /* ------------------------------------------------------------------ */
         <motion.div
-          initial={{ opacity: 0, y: 60 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ type: 'spring', damping: 24, stiffness: 220 }}
-          className="w-full max-w-[1280px] flex items-stretch h-[76px] shadow-2xl overflow-hidden font-sans pointer-events-auto"
-          style={{ boxShadow: `0 16px 40px -8px ${theme.badgeBg || '#000000'}99` }}
+          initial={{ scale: 0.84, opacity: 0, y: 30, filter: 'brightness(2.6) drop-shadow(0 0 35px #0570F0)' }}
+          animate={{ scale: 1, opacity: 1, y: 0, filter: 'brightness(1) drop-shadow(0 8px 24px rgba(5, 112, 240, 0.45))' }}
+          exit={{ scale: 0.88, opacity: 0, filter: 'brightness(0.6)' }}
+          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+          className="pointer-events-auto relative select-none font-condensed"
+          style={{ fontFamily: "'Barlow Condensed', sans-serif" }}
         >
-          {/* ── LEFT: BATTING TEAM LABEL ── */}
+          {/* Outer glowing container with kite shape drop shadow */}
           <div
-            className="px-5 flex flex-col items-center justify-center shrink-0 min-w-[155px] border-r border-white/10"
-            style={{ background: teamLabelBg }}
+            className="relative"
+            style={{
+              filter: 'drop-shadow(0 0 10px rgba(5, 112, 240, 0.8)) drop-shadow(0 4px 14px rgba(0,0,0,0.85))',
+            }}
           >
-            <span
-              className="font-black text-sm uppercase tracking-tight leading-tight text-center line-clamp-2"
-              style={{ color: teamLabelColor }}
-            >
-              {battingTeam.fullName || battingTeam.shortName}
-            </span>
-            <span className="text-[10px] font-bold opacity-50 uppercase tracking-wider" style={{ color: teamLabelColor }}>
-              BATTING
-            </span>
-          </div>
+            {/* 2px glowing Blue Fire (#0570F0) accent border along kite perimeter */}
+            <div
+              className="absolute inset-0 pointer-events-none"
+              style={{
+                clipPath: 'polygon(0% 0%, 95% 0%, 100% 50%, 95% 100%, 0% 100%, 5% 50%)',
+                background: 'linear-gradient(135deg, #0570F0 0%, #00F2FE 40%, rgba(5, 112, 240, 0.5) 75%, transparent 100%)',
+              }}
+            />
 
-          {/* ── SCORE BOX ── */}
-          <div
-            className="flex flex-col justify-center items-center px-4 shrink-0 border-r border-white/10 min-w-[135px]"
-            style={{ background: scoreBoxBg }}
-          >
-            {Boolean(matchDetails.targetRuns && matchDetails.targetRuns > 0) && (
+            {/* Glowing Accent Top Line (2px Blue Fire #0570F0) */}
+            <div
+              className="absolute top-0 left-0 right-[5%] h-[2px] z-20 pointer-events-none"
+              style={{
+                background: 'linear-gradient(90deg, #0570F0 0%, #00F2FE 45%, #0570F0 80%, transparent 100%)',
+                boxShadow: '0 0 10px #0570F0, 0 0 4px #00F2FE',
+              }}
+            />
+
+            {/* Glowing Accent Left Edge (2px Blue Fire #0570F0) */}
+            <div
+              className="absolute inset-0 z-20 pointer-events-none"
+              style={{
+                clipPath: 'polygon(0% 0%, 5% 50%, 0% 100%, 1.8% 100%, 6.8% 50%, 1.8% 0%)',
+                background: '#0570F0',
+                boxShadow: '0 0 12px #0570F0',
+              }}
+            />
+
+            {/* Main body of the kite shape with dynamic team color linear gradient */}
+            <div
+              className="relative flex items-center h-[76px] px-8 pl-12 pr-14 overflow-hidden"
+              style={{
+                clipPath: 'polygon(0% 0%, 95% 0%, 100% 50%, 95% 100%, 0% 100%, 5% 50%)',
+                background: `linear-gradient(110deg, ${battingTeam.primaryColor || teamA.primaryColor || '#00529B'} 0%, ${hexToRgba(battingTeam.primaryColor || teamA.primaryColor || '#00529B', 0.65)} 35%, rgba(6, 12, 28, 0.92) 70%, rgba(3, 7, 18, 0.98) 100%)`,
+              }}
+            >
+              {/* Subtle angled ignition sheen texture */}
               <div
-                className="text-[10px] font-black uppercase tracking-wider mb-0.5"
-                style={{ color: scoreColor }}
-              >
-                TGT {matchDetails.targetRuns}
-              </div>
-            )}
-            <div className="font-black text-2xl leading-none flex items-baseline gap-0.5">
-              <span style={{ color: scoreColor }}>{battingTeam.score}</span>
-              <span className="text-white/80 text-lg">-{battingTeam.wickets}</span>
-            </div>
-            <div className="text-[11px] font-bold mt-0.5" style={{ color: 'rgba(255,255,255,0.6)' }}>
-              {oversFormatted} OVS
-            </div>
-          </div>
+                className="absolute inset-0 pointer-events-none opacity-20"
+                style={{
+                  background: 'repeating-linear-gradient(120deg, transparent, transparent 15px, rgba(255,255,255,0.08) 15px, rgba(255,255,255,0.08) 17px)',
+                }}
+              />
 
-          {/* ── BATTERS ── */}
-          <div
-            className="flex-1 px-4 flex flex-col justify-center border-r border-white/10 min-w-[200px]"
-            style={{ background: battersBg }}
-          >
-            {/* Striker */}
-            {striker && (
-              <div className="flex items-center justify-between mb-0.5">
-                <span
-                  className="flex items-center gap-1.5 text-sm font-black truncate min-w-0 uppercase"
-                  style={{ color: battersTextColor }}
-                >
-                  <span className="text-xs shrink-0" style={{ color: scoreColor }}>✏</span>
-                  <span className="truncate">{striker.name}</span>
-                </span>
-                <span className="font-black text-sm shrink-0 ml-2" style={{ color: scoreColor }}>
-                  {striker.runs} <span className="font-bold text-[11px] opacity-75">({striker.balls})</span>
-                </span>
-              </div>
-            )}
-            {/* Non-striker */}
-            {nonStriker && (
-              <div className="flex items-center justify-between">
-                <span
-                  className="flex items-center gap-1.5 text-xs font-bold truncate min-w-0 uppercase pl-4"
-                  style={{ color: battersText2Color }}
-                >
-                  <span className="shrink-0">●</span>
-                  <span className="truncate">{nonStriker.name}</span>
-                </span>
-                <span className="text-xs shrink-0 ml-2 font-bold" style={{ color: battersText2Color }}>
-                  {nonStriker.runs} <span className="opacity-75">({nonStriker.balls})</span>
-                </span>
-              </div>
-            )}
-          </div>
-
-          {/* ── CENTER: CRR / RRR or match status ── */}
-          <div
-            className="px-4 flex flex-col justify-center items-center border-r border-white/10 shrink-0 min-w-[130px]"
-            style={{ background: centerBoxBg }}
-          >
-            {matchDetails.winnerMargin || matchDetails.customInputText ? (
-              <span className="text-white font-black text-[11px] text-center uppercase tracking-wide truncate max-w-[125px]">
-                {matchDetails.winnerMargin || matchDetails.customInputText}
-              </span>
-            ) : matchDetails.targetRuns ? (
-              <>
-                <div className="text-[11px] font-bold" style={{ color: 'rgba(255,255,255,0.65)' }}>CRR: {crr}</div>
-                <div className="font-black text-sm mt-0.5" style={{ color: scoreColor }}>
-                  RRR: {rrr}
+              {/* Horizontal elements layout */}
+              <div className="relative z-10 flex items-center gap-6 sm:gap-8 h-full">
+                {/* 1. Team Shortname */}
+                <div className="flex items-center gap-2.5 shrink-0">
+                  {battingTeam.logoUrl && (
+                    <img
+                      src={battingTeam.logoUrl}
+                      alt={battingTeam.shortName}
+                      className="w-9 h-9 object-contain drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
+                    />
+                  )}
+                  <div className="flex flex-col justify-center">
+                    <span className="font-black text-3xl uppercase tracking-wider text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)] leading-none">
+                      {battingTeam.shortName || 'BAT'}
+                    </span>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-[#00F2FE] drop-shadow leading-none mt-1">
+                      v {bowlingTeam.shortName || 'BOWL'}
+                    </span>
+                  </div>
                 </div>
-              </>
-            ) : (
-              <>
-                <div className="text-[11px] font-bold" style={{ color: 'rgba(255,255,255,0.6)' }}>CRR</div>
-                <div className="font-black text-lg" style={{ color: scoreColor }}>{crr}</div>
-              </>
-            )}
-          </div>
 
-          {/* ── BOWLER + BALL DOTS ── */}
-          <div
-            className="px-4 flex flex-col justify-center border-r border-white/10 shrink-0 min-w-[215px]"
-            style={{ background: bowlerBg }}
-          >
-            {currentBowler && (
-              <div className="flex items-center justify-between mb-1.5">
-                <span className="text-xs font-black uppercase truncate max-w-[105px]" style={{ color: '#ffffff' }}>
-                  {currentBowler.name}
-                </span>
-                <span className="font-black text-xs shrink-0 ml-1" style={{ color: scoreColor }}>
-                  {currentBowler.wickets}-{currentBowler.runsConceded}
-                  <span className="text-[10px] opacity-75 font-bold"> ({currentBowler.overs}.{currentBowler.ballsInCurrentOver})</span>
-                </span>
+                {/* Angled Divider */}
+                <div className="w-[1.5px] h-9 bg-gradient-to-b from-transparent via-cyan-400/40 to-transparent skew-x-[-15deg] shrink-0" />
+
+                {/* 2. Score (Runs-Wickets) — LARGEST and BRIGHTEST element, colored #FFFFFF */}
+                <div className="flex items-baseline gap-1 shrink-0">
+                  <span className="font-black text-5xl text-[#FFFFFF] drop-shadow-[0_2px_14px_rgba(255,255,255,0.7)] tracking-tight leading-none">
+                    {battingTeam.score}
+                  </span>
+                  <span className="font-black text-3xl text-white/70 leading-none">
+                    -{battingTeam.wickets}
+                  </span>
+                </div>
+
+                {/* Angled Divider */}
+                <div className="w-[1.5px] h-9 bg-gradient-to-b from-transparent via-cyan-400/40 to-transparent skew-x-[-15deg] shrink-0" />
+
+                {/* 3. Overs */}
+                <div className="flex flex-col justify-center shrink-0">
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">
+                    OVERS
+                  </span>
+                  <span className="font-black text-2xl text-white tracking-wide leading-none mt-0.5">
+                    {oversFormatted}
+                    <span className="text-xs font-semibold text-slate-400 ml-1">
+                      /{matchDetails.totalOvers || 20}
+                    </span>
+                  </span>
+                </div>
+
+                {/* Angled Divider */}
+                <div className="w-[1.5px] h-9 bg-gradient-to-b from-transparent via-cyan-400/40 to-transparent skew-x-[-15deg] shrink-0" />
+
+                {/* 4. CRR (and RRR if target is set) */}
+                <div className="flex flex-col justify-center min-w-[70px] shrink-0">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider leading-none">
+                      CRR
+                    </span>
+                    <span className="font-black text-xl text-[#00F2FE] drop-shadow leading-none">
+                      {crr}
+                    </span>
+                  </div>
+                  {Boolean(matchDetails.targetRuns && matchDetails.targetRuns > 0) && (
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <span className="text-[9px] font-bold text-amber-400 uppercase tracking-wider leading-none">
+                        RRR
+                      </span>
+                      <span className="font-black text-sm text-amber-300 leading-none">
+                        {rrr}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                {/* 5. Striker & Bowler Live Details */}
+                {(striker || currentBowler) && (
+                  <>
+                    <div className="hidden md:block w-[1.5px] h-9 bg-gradient-to-b from-transparent via-cyan-400/40 to-transparent skew-x-[-15deg] shrink-0" />
+                    <div className="hidden md:flex items-center gap-4 text-xs">
+                      {striker && (
+                        <div className="flex flex-col justify-center">
+                          <span className="text-slate-300 font-bold uppercase truncate max-w-[120px] flex items-center gap-1 text-[11px] leading-tight">
+                            <span className="text-[#0570F0] font-black">▶</span> {striker.name}
+                          </span>
+                          <span className="font-black text-sm text-white leading-tight">
+                            {striker.runs}{' '}
+                            <span className="text-[10px] font-normal text-slate-400">({striker.balls}b)</span>
+                          </span>
+                        </div>
+                      )}
+                      {currentBowler && (
+                        <div className="flex flex-col justify-center">
+                          <span className="text-slate-300 font-bold uppercase truncate max-w-[120px] text-[11px] leading-tight">
+                            {currentBowler.name}
+                          </span>
+                          <span className="font-black text-sm text-[#00F2FE] leading-tight">
+                            {currentBowler.wickets}-{currentBowler.runsConceded}{' '}
+                            <span className="text-[10px] font-normal text-slate-400">
+                              ({currentBowler.overs}.{currentBowler.ballsInCurrentOver})
+                            </span>
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
               </div>
-            )}
-            <ColoredBallDots balls={matchDetails.recentBalls} />
-          </div>
-
-          {/* ── RIGHT: BOWLING TEAM LABEL ── */}
-          <div
-            className="px-5 flex flex-col items-center justify-center shrink-0 min-w-[155px]"
-            style={{ background: teamLabelBg }}
-          >
-            <span
-              className="font-black text-sm uppercase tracking-tight leading-tight text-center line-clamp-2"
-              style={{ color: teamLabelColor }}
-            >
-              {bowlingTeam.fullName || bowlingTeam.shortName}
-            </span>
-            <span className="text-[10px] font-bold opacity-50 uppercase tracking-wider" style={{ color: teamLabelColor }}>
-              BOWLING
-            </span>
+            </div>
           </div>
         </motion.div>
       )}

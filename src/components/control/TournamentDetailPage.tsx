@@ -349,7 +349,7 @@ export const TournamentDetailPage: React.FC = () => {
           <div className="w-full bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-xl space-y-4">
             <h3 className="text-2xl font-black uppercase text-cyan-400">{tournamentName}</h3>
             <p className="text-slate-300 font-medium">Total Matches Created: {filteredMatches.length}</p>
-            <p className="text-slate-400 text-xs">All matches in this tournament stream in real-time over Render WebSockets, ntfy.sh SSE, and Firebase RTDB.</p>
+            <p className="text-slate-400 text-xs">All matches in this tournament stream in real-time over WebSockets, BroadcastChannel, and Firestore.</p>
           </div>
         )}
       </main>

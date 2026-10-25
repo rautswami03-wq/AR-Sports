@@ -82,6 +82,8 @@ export const TourMatchPage: React.FC = () => {
   const [setupOvers, setSetupOvers] = useState(matchDetails.totalOvers || 20);
   const [teamABulkText, setTeamABulkText] = useState('');
   const [teamBBulkText, setTeamBBulkText] = useState('');
+  const [teamASaved, setTeamASaved] = useState(false);
+  const [teamBSaved, setTeamBSaved] = useState(false);
 
   // Pre-populate textareas on load
   React.useEffect(() => {
@@ -99,7 +101,8 @@ export const TourMatchPage: React.FC = () => {
   const applyBulkNames = (teamId: 'teamA' | 'teamB', text: string) => {
     const names = text.split('\n').map(n => n.trim()).filter(n => n.length > 0);
     if (names.length === 0) return;
-    const team = teamId === 'teamA' ? teamA : teamB;
+    const store = useBroadcastStore.getState();
+    const team = store[teamId];
     
     names.forEach((name, idx) => {
       if (idx < team.batters.length) {
@@ -112,6 +115,38 @@ export const TourMatchPage: React.FC = () => {
       bulkAddPlayers(teamId, extraNames);
     }
   };
+
+  const handleSaveBulk = (teamId: 'teamA' | 'teamB') => {
+    const text = teamId === 'teamA' ? teamABulkText : teamBBulkText;
+    applyBulkNames(teamId, text);
+    if (teamId === 'teamA') {
+      setTeamASaved(true);
+      setTimeout(() => setTeamASaved(false), 2000);
+    } else {
+      setTeamBSaved(true);
+      setTimeout(() => setTeamBSaved(false), 2000);
+    }
+  };
+
+  // Debounce applyBulkNames on bulk text change
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      if (teamABulkText.trim()) {
+        applyBulkNames('teamA', teamABulkText);
+      }
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [teamABulkText]);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      if (teamBBulkText.trim()) {
+        applyBulkNames('teamB', teamBBulkText);
+      }
+    }, 400);
+    return () => clearTimeout(timer);
+  }, [teamBBulkText]);
+
   const [setupBallsPerOver, setSetupBallsPerOver] = useState(matchDetails.ballsPerOver || 6);
   const [setupMatchType, setSetupMatchType] = useState(matchDetails.matchType || 'Group Stage');
   const [setupMatchNo, setSetupMatchNo] = useState(matchDetails.matchNo || 1);
@@ -159,28 +194,35 @@ export const TourMatchPage: React.FC = () => {
   const currentBowler = bowlingTeam.bowlers.find((bw) => bw.isCurrent) || bowlingTeam.bowlers[0];
 
   const handleScoreClick = (runs: number) => {
-    if (extraWicket) {
-      addWicket();
-      setExtraWicket(false);
-      return;
-    }
+    let hasExtra = false;
 
     if (extraWide) {
       addExtra('WIDE', runs + 1);
       setExtraWide(false);
+      hasExtra = true;
     } else if (extraNoBall) {
       addExtra('NO_BALL', runs + 1);
       setExtraNoBall(false);
+      hasExtra = true;
     } else if (extraByes) {
       addExtra('BYE', runs);
       setExtraByes(false);
+      hasExtra = true;
     } else if (extraLegByes) {
       addExtra('LEG_BYE', runs);
       setExtraLegByes(false);
-    } else {
+      hasExtra = true;
+    }
+
+    if (!hasExtra && !extraWicket) {
       const isBoundary = runs === 4 || runs === 6;
       const boundaryType = runs === 4 ? 4 : runs === 6 ? 6 : undefined;
       addRuns(runs, isBoundary, boundaryType);
+    }
+
+    if (extraWicket) {
+      addWicket();
+      setExtraWicket(false);
     }
   };
 
@@ -190,6 +232,66 @@ export const TourMatchPage: React.FC = () => {
   const [editTeamBShort, setEditTeamBShort] = useState(teamB.shortName);
   const [editTourName, setEditTourName] = useState(matchDetails.tournament);
   const [editTotalOvers, setEditTotalOvers] = useState(matchDetails.totalOvers);
+
+  const isWinnerTeamA = setupTossWinner === editTeamA || setupTossWinner === teamA.fullName || setupTossWinner === teamA.shortName || setupTossWinner === 'teamA';
+  const setupBattingTeamKey: 'teamA' | 'teamB' = setupTossDecision === 'bat'
+    ? (isWinnerTeamA ? 'teamA' : 'teamB')
+    : (isWinnerTeamA ? 'teamB' : 'teamA');
+  const setupBowlingTeamKey: 'teamA' | 'teamB' = setupBattingTeamKey === 'teamA' ? 'teamB' : 'teamA';
+
+  const setupBattingTeam = setupBattingTeamKey === 'teamA' ? teamA : teamB;
+  const setupBowlingTeam = setupBowlingTeamKey === 'teamA' ? teamA : teamB;
+
+  const parseBulkTextNames = (text: string) => {
+    return text
+      .split(/[\n,]+/)
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0);
+  };
+
+  const battingParsedNames = React.useMemo(() => {
+    const rawText = setupBattingTeamKey === 'teamA' ? teamABulkText : teamBBulkText;
+    const names = parseBulkTextNames(rawText);
+    if (names.length > 0) return Array.from(new Set(names));
+    return Array.from(new Set(setupBattingTeam.batters.map((b) => b.name?.trim()).filter(Boolean)));
+  }, [setupBattingTeamKey, teamABulkText, teamBBulkText, setupBattingTeam.batters]);
+
+  const bowlingParsedNames = React.useMemo(() => {
+    const rawText = setupBowlingTeamKey === 'teamA' ? teamABulkText : teamBBulkText;
+    const names = parseBulkTextNames(rawText);
+    if (names.length > 0) return Array.from(new Set(names));
+    const seen = new Set<string>();
+    const list: string[] = [];
+    for (const bw of setupBowlingTeam.bowlers) {
+      const trimmed = bw.name?.trim();
+      if (trimmed && !seen.has(trimmed.toLowerCase())) {
+        seen.add(trimmed.toLowerCase());
+        list.push(trimmed);
+      }
+    }
+    for (const b of setupBowlingTeam.batters) {
+      const trimmed = b.name?.trim();
+      if (trimmed && !seen.has(trimmed.toLowerCase())) {
+        seen.add(trimmed.toLowerCase());
+        list.push(trimmed);
+      }
+    }
+    return list;
+  }, [setupBowlingTeamKey, teamABulkText, teamBBulkText, setupBowlingTeam.bowlers, setupBowlingTeam.batters]);
+
+  const handleTossWinnerChange = (winner: string) => {
+    setSetupTossWinner(winner);
+    const isWinA = winner === editTeamA || winner === teamA.fullName || winner === teamA.shortName || winner === 'teamA';
+    const batKey = setupTossDecision === 'bat' ? (isWinA ? 'teamA' : 'teamB') : (isWinA ? 'teamB' : 'teamA');
+    setBattingTeam(batKey);
+  };
+
+  const handleTossDecisionChange = (decision: 'bat' | 'bowl') => {
+    setSetupTossDecision(decision);
+    const isWinA = setupTossWinner === editTeamA || setupTossWinner === teamA.fullName || setupTossWinner === teamA.shortName || setupTossWinner === 'teamA';
+    const batKey = decision === 'bat' ? (isWinA ? 'teamA' : 'teamB') : (isWinA ? 'teamB' : 'teamA');
+    setBattingTeam(batKey);
+  };
 
   React.useEffect(() => {
     if (!id || typeof window === 'undefined') return;
@@ -675,10 +777,10 @@ export const TourMatchPage: React.FC = () => {
                     </label>
                     <button
                       type="button"
-                      onClick={() => applyBulkNames('teamA', teamABulkText)}
-                      className="text-[10px] font-bold text-cyan-400 uppercase hover:underline"
+                      onClick={() => handleSaveBulk('teamA')}
+                      className="text-[10px] font-bold text-cyan-400 uppercase hover:underline flex items-center gap-1"
                     >
-                      Save list
+                      {teamASaved ? <span className="text-emerald-400 font-black">Saved ✓</span> : 'Save list'}
                     </button>
                   </div>
                   <textarea
@@ -696,10 +798,10 @@ export const TourMatchPage: React.FC = () => {
                     </label>
                     <button
                       type="button"
-                      onClick={() => applyBulkNames('teamB', teamBBulkText)}
-                      className="text-[10px] font-bold text-cyan-400 uppercase hover:underline"
+                      onClick={() => handleSaveBulk('teamB')}
+                      className="text-[10px] font-bold text-cyan-400 uppercase hover:underline flex items-center gap-1"
                     >
-                      Save list
+                      {teamBSaved ? <span className="text-emerald-400 font-black">Saved ✓</span> : 'Save list'}
                     </button>
                   </div>
                   <textarea
@@ -713,32 +815,135 @@ export const TourMatchPage: React.FC = () => {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                {/* Opening Striker Dropdown */}
                 <div>
-                  <label className="text-xs font-bold text-amber-400 block mb-1 uppercase font-black">Opening Striker (*)</label>
-                  <input
-                    type="text"
-                    value={striker?.name || ''}
-                    onChange={(e) => striker && updateBatterStats(striker.id, { name: e.target.value })}
-                    className="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-white font-black text-sm focus:outline-none focus:border-amber-400"
-                  />
+                  <div className="flex justify-between items-center mb-1">
+                    <label className="text-xs font-bold text-amber-400 block uppercase font-black">
+                      Opening Striker (*)
+                    </label>
+                    <span className="text-[10px] text-slate-400 font-bold uppercase">
+                      {setupBattingTeam.shortName || 'BAT'}
+                    </span>
+                  </div>
+                  <div className="relative">
+                    <select
+                      value={striker?.name || ''}
+                      disabled={battingParsedNames.length === 0}
+                      onChange={(e) => {
+                        const newStrikerName = e.target.value;
+                        if (!newStrikerName) return;
+                        const currentNonStrikerName = nonStriker?.name || '';
+                        const fallbackNonStriker = battingParsedNames.find((n) => n !== newStrikerName) || '';
+                        const finalNonStriker = (currentNonStrikerName && currentNonStrikerName !== newStrikerName)
+                          ? currentNonStrikerName
+                          : fallbackNonStriker;
+                        setActivePairs(newStrikerName, finalNonStriker);
+                      }}
+                      className={`w-full bg-slate-900 border border-slate-700 px-3 py-2 pr-9 rounded-xl text-white font-black text-sm focus:outline-none focus:border-amber-400 appearance-none cursor-pointer ${
+                        battingParsedNames.length === 0 ? 'opacity-60 cursor-not-allowed text-slate-400' : ''
+                      }`}
+                    >
+                      {battingParsedNames.length === 0 ? (
+                        <option value="" disabled>-- Paste players above first --</option>
+                      ) : (
+                        <>
+                          <option value="">Select Opening Striker...</option>
+                          {battingParsedNames.map((name) => (
+                            <option key={name} value={name}>
+                              {name}
+                            </option>
+                          ))}
+                        </>
+                      )}
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                  </div>
                 </div>
+
+                {/* Non-Striker Dropdown */}
                 <div>
-                  <label className="text-xs font-bold text-cyan-400 block mb-1 uppercase font-black">Non-Striker</label>
-                  <input
-                    type="text"
-                    value={nonStriker?.name || ''}
-                    onChange={(e) => nonStriker && updateBatterStats(nonStriker.id, { name: e.target.value })}
-                    className="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-white font-black text-sm focus:outline-none focus:border-cyan-400"
-                  />
+                  <div className="flex justify-between items-center mb-1">
+                    <label className="text-xs font-bold text-cyan-400 block uppercase font-black">
+                      Non-Striker
+                    </label>
+                    <span className="text-[10px] text-slate-400 font-bold uppercase">
+                      {setupBattingTeam.shortName || 'BAT'}
+                    </span>
+                  </div>
+                  <div className="relative">
+                    <select
+                      value={nonStriker?.name || ''}
+                      disabled={battingParsedNames.length === 0}
+                      onChange={(e) => {
+                        const newNonStrikerName = e.target.value;
+                        if (!newNonStrikerName) return;
+                        const currentStrikerName = striker?.name || '';
+                        const fallbackStriker = battingParsedNames.find((n) => n !== newNonStrikerName) || '';
+                        const finalStriker = (currentStrikerName && currentStrikerName !== newNonStrikerName)
+                          ? currentStrikerName
+                          : fallbackStriker;
+                        setActivePairs(finalStriker, newNonStrikerName);
+                      }}
+                      className={`w-full bg-slate-900 border border-slate-700 px-3 py-2 pr-9 rounded-xl text-white font-black text-sm focus:outline-none focus:border-cyan-400 appearance-none cursor-pointer ${
+                        battingParsedNames.length === 0 ? 'opacity-60 cursor-not-allowed text-slate-400' : ''
+                      }`}
+                    >
+                      {battingParsedNames.length === 0 ? (
+                        <option value="" disabled>-- Paste players above first --</option>
+                      ) : (
+                        <>
+                          <option value="">Select Non-Striker...</option>
+                          {battingParsedNames.map((name) => (
+                            <option key={name} value={name} disabled={name === striker?.name}>
+                              {name} {name === striker?.name ? '(Striker)' : ''}
+                            </option>
+                          ))}
+                        </>
+                      )}
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                  </div>
                 </div>
+
+                {/* Opening Bowler Dropdown */}
                 <div>
-                  <label className="text-xs font-bold text-emerald-400 block mb-1 uppercase font-black">Opening Bowler</label>
-                  <input
-                    type="text"
-                    value={currentBowler?.name || ''}
-                    onChange={(e) => currentBowler && updateBowlerStats(currentBowler.id, { name: e.target.value })}
-                    className="w-full bg-slate-900 border border-slate-700 px-3 py-2 rounded-xl text-white font-black text-sm focus:outline-none focus:border-emerald-400"
-                  />
+                  <div className="flex justify-between items-center mb-1">
+                    <label className="text-xs font-bold text-emerald-400 block mb-1 uppercase font-black">
+                      Opening Bowler
+                    </label>
+                    <span className="text-[10px] text-slate-400 font-bold uppercase">
+                      {setupBowlingTeam.shortName || 'BOWL'}
+                    </span>
+                  </div>
+                  <div className="relative">
+                    <select
+                      value={currentBowler?.name || ''}
+                      disabled={bowlingParsedNames.length === 0}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (val) {
+                          changeBowler(val);
+                        }
+                      }}
+                      className={`w-full bg-slate-900 border border-slate-700 px-3 py-2 pr-9 rounded-xl text-white font-black text-sm focus:outline-none focus:border-emerald-400 appearance-none cursor-pointer ${
+                        bowlingParsedNames.length === 0 ? 'opacity-60 cursor-not-allowed text-slate-400' : ''
+                      }`}
+                    >
+                      {bowlingParsedNames.length === 0 ? (
+                        <option value="" disabled>-- Paste players above first --</option>
+                      ) : (
+                        <>
+                          <option value="">Select Opening Bowler...</option>
+                          {bowlingParsedNames.map((name) => (
+                            <option key={name} value={name}>
+                              {name}
+                            </option>
+                          ))}
+                        </>
+                      )}
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+                  </div>
                 </div>
               </div>
             </div>
@@ -751,7 +956,7 @@ export const TourMatchPage: React.FC = () => {
                   <label className="text-xs font-bold text-slate-400 block mb-1 uppercase">Toss Winner</label>
                   <select
                     value={setupTossWinner}
-                    onChange={(e) => setSetupTossWinner(e.target.value)}
+                    onChange={(e) => handleTossWinnerChange(e.target.value)}
                     className="w-full bg-slate-900 border border-slate-700 px-3.5 py-2 rounded-xl text-white font-bold text-sm focus:outline-none focus:border-cyan-400"
                   >
                     <option value={editTeamA || teamA.fullName}>{editTeamA || teamA.fullName}</option>
@@ -762,7 +967,7 @@ export const TourMatchPage: React.FC = () => {
                   <label className="text-xs font-bold text-slate-400 block mb-1 uppercase">Opted To</label>
                   <select
                     value={setupTossDecision}
-                    onChange={(e) => setSetupTossDecision(e.target.value as 'bat' | 'bowl')}
+                    onChange={(e) => handleTossDecisionChange(e.target.value as 'bat' | 'bowl')}
                     className="w-full bg-slate-900 border border-slate-700 px-3.5 py-2 rounded-xl text-white font-bold text-sm focus:outline-none focus:border-cyan-400 uppercase"
                   >
                     <option value="bat">Bat First</option>

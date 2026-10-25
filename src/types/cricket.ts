@@ -116,6 +116,7 @@ export interface MatchDetails {
     best: string;
   }>;
   sponsors?: Array<{
+    id?: string;
     name: string;
     logoUrl?: string;
   }>;

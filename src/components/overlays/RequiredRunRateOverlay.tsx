@@ -18,15 +18,15 @@ export const RequiredRunRateOverlay: React.FC = () => {
       category="TARGET EQUATION"
       primaryColor={battingTeam.primaryColor}
     >
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between font-numbers">
         <div>
-          <span className="text-slate-400 text-xs font-semibold block">NEED FOR VICTORY</span>
-          <span className="text-amber-400 font-black text-3xl">{runsNeeded} RUNS</span>
-          <span className="text-white text-sm font-bold ml-2">FROM {totalRemainingBalls} BALLS</span>
+          <span className="text-slate-400 text-xs font-semibold block font-ui">NEED FOR VICTORY</span>
+          <span className="text-amber-400 font-black text-3xl font-numbers">{runsNeeded} RUNS</span>
+          <span className="text-white text-sm font-bold ml-2 font-numbers">FROM {totalRemainingBalls} BALLS</span>
         </div>
         <div className="bg-slate-900 px-5 py-2.5 rounded-xl border border-white/10 text-right">
-          <span className="text-slate-400 text-[10px] uppercase font-bold block">REQ RUN RATE</span>
-          <span className="text-amber-300 font-black text-2xl">{rrr}</span>
+          <span className="text-slate-400 text-[10px] uppercase font-bold block font-ui">REQ RUN RATE</span>
+          <span className="text-amber-300 font-black text-2xl font-numbers">{rrr}</span>
         </div>
       </div>
     </LowerThirdBase>

@@ -1,0 +1,143 @@
+/* ==========================================================================
+   AR SPORTS — BROADCAST OVERLAY DESIGN SYSTEM & OBS OPTIMIZATIONS
+   ========================================================================== */
+
+/* 1. Google Fonts Import: Barlow Condensed (600, 700) & Inter (400, 600, 700) */
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;1,600;1,700&family=Inter:wght@400;600;700&display=swap');
+
+:root {
+  /* Typography Variables */
+  --font-body: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-ui: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-condensed: 'Barlow Condensed', sans-serif;
+  --font-numbers: 'Barlow Condensed', sans-serif;
+  --font-headers: 'Barlow Condensed', sans-serif;
+  --font-score: 'Barlow Condensed', sans-serif;
+  --font-overs: 'Barlow Condensed', sans-serif;
+  --font-runrate: 'Barlow Condensed', sans-serif;
+  --font-display: 'Barlow Condensed', sans-serif;
+
+  /* Scoreboard overlay runtime bindings */
+  --sb-font-primary: 'Barlow Condensed', sans-serif;
+  --sb-font-mono: 'Barlow Condensed', monospace;
+
+  /* Broadcast Overlay Colors with exact opacity */
+  --overlay-bg-dark: rgba(7, 12, 22, 0.92);
+  --overlay-bg-card: rgba(11, 27, 61, 0.95);
+  --overlay-bg-row-even: #0B1B3D;
+  --overlay-bg-row-odd: #132B5A;
+  --overlay-text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* 2. Broadcast Typography Rules */
+body, html {
+  font-family: var(--font-body);
+}
+
+/* All score, over count, run rate, and numeric badges MUST use the condensed font */
+.font-condensed,
+.score-number,
+.font-score,
+.font-numbers,
+.font-overs,
+.font-runrate,
+.broadcast-score,
+.broadcast-number,
+.sb-slot-digit,
+.sb-score,
+.scorebug-score,
+[data-stat="score"],
+[data-stat="overs"],
+[data-stat="runrate"],
+.stat-number {
+  font-family: var(--font-condensed) !important;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+
+/* Broadcast headers */
+h1, h2, h3, h4,
+.broadcast-header,
+.overlay-title {
+  font-family: var(--font-headers);
+}
+
+/* 3. Text Shadow for readability against bright stadium lights or pitch */
+.broadcast-canvas,
+.broadcast-canvas *,
+.overlay,
+.overlay *,
+.overlay-mode,
+.overlay-mode *,
+.scorebug,
+.scorebug *,
+.full-card-base,
+.full-card-base *,
+[data-overlay],
+[data-overlay] * {
+  text-shadow: var(--overlay-text-shadow);
+}
+
+/* 4. Strict Overlay Transparency Rules for OBS Studio / vMix */
+.overlay-container,
+.broadcast-canvas,
+.overlay-root {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+/* Ensure no accidental opaque white backgrounds on overlay cards */
+.overlay-card-glass {
+  background: rgba(11, 27, 61, 0.95) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+}
+
+.overlay-table-row-even {
+  background-color: #0B1B3D !important;
+}
+
+.overlay-table-row-odd {
+  background-color: #132B5A !important;
+}
+
+/* 5. Lower Third 300ms Slide-in Entry Animation */
+@keyframes slide-in-bottom-300 {
+  0% {
+    transform: translateY(80px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-in-bottom {
+  animation: slide-in-bottom-300 300ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* 6. IPL 2025 Kite-like Ignition Animation */
+@keyframes kite-ignition {
+  0% {
+    transform: scale(0.85) translateY(20px);
+    opacity: 0;
+    filter: brightness(2.6) drop-shadow(0 0 35px #0570F0);
+  }
+  30% {
+    opacity: 1;
+    filter: brightness(2) drop-shadow(0 0 25px #0570F0);
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+    filter: brightness(1) drop-shadow(0 6px 20px rgba(5, 112, 240, 0.45));
+  }
+}
+
+.animate-kite-ignition {
+  animation: kite-ignition 380ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+

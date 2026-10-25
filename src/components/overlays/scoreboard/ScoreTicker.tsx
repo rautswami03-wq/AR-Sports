@@ -67,38 +67,55 @@ const AnimatedNumber: React.FC<{ value: number | string; className?: string; sty
   );
 };
 
+import { SustainabilityTreeIcon } from '../OverProgressDots';
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Ball dot chip inside ticker
 // ─────────────────────────────────────────────────────────────────────────────
 
 function getTickerBallColor(ball: string): string {
   switch (ball) {
-    case '6':  return 'var(--sb-ball-dot-6)';
-    case '4':  return 'var(--sb-ball-dot-4)';
+    case '6':  return '#FF207C'; // Electric Pink
+    case '4':  return '#FFDC35'; // Coral Yellow
     case 'W':  return 'var(--sb-ball-dot-w)';
     case 'WD': return 'var(--sb-ball-dot-wd)';
     case 'NB': return 'var(--sb-ball-dot-nb)';
-    case '0':  return 'var(--sb-ball-dot-0)';
+    case '0':
+    case '.':  return '#0a1f12';
     default:   return 'var(--sb-ball-dot-1)';
   }
 }
 
-const TickerBall: React.FC<{ ball: string; isNew: boolean }> = ({ ball, isNew }) => (
-  <motion.span
-    initial={isNew ? { x: 32, scale: 0.6, opacity: 0 } : false}
-    animate={{ x: 0, scale: 1, opacity: 1 }}
-    transition={{ type: 'spring', damping: 12, stiffness: 220 }}
-    className="inline-flex items-center justify-center rounded-full font-black text-[9px] text-white shrink-0"
-    style={{
-      width: 18,
-      height: 18,
-      background: getTickerBallColor(ball),
-      boxShadow: `0 0 4px ${getTickerBallColor(ball)}99`,
-    }}
-  >
-    {ball === '0' ? '•' : ball.length > 2 ? ball.slice(0, 2) : ball}
-  </motion.span>
-);
+const TickerBall: React.FC<{ ball: string; isNew: boolean }> = ({ ball, isNew }) => {
+  const isDot = ball === '0' || ball === '.';
+  const is4 = ball === '4';
+  const color = getTickerBallColor(ball);
+
+  return (
+    <motion.span
+      initial={isNew ? { x: 32, scale: 0.6, opacity: 0 } : false}
+      animate={{ x: 0, scale: 1, opacity: 1 }}
+      transition={{ type: 'spring', damping: 12, stiffness: 220 }}
+      className={`inline-flex items-center justify-center rounded-full font-black text-[9px] shrink-0 ${
+        isDot ? 'text-[#27E64B] border border-[#27E64B]/40' : is4 ? 'text-slate-950' : 'text-white'
+      }`}
+      style={{
+        width: 18,
+        height: 18,
+        background: color,
+        boxShadow: isDot ? '0 0 5px rgba(39,230,75,0.45)' : `0 0 4px ${color}99`,
+      }}
+    >
+      {isDot ? (
+        <SustainabilityTreeIcon size={11} color="#27E64B" />
+      ) : ball.length > 2 ? (
+        ball.slice(0, 2)
+      ) : (
+        ball
+      )}
+    </motion.span>
+  );
+};
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Separator

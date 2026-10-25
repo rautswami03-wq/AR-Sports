@@ -1,14 +1,43 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useBroadcastStore } from '../../store/useBroadcastStore';
+import { useBroadcastStore, MatchArchive, getSponsorLog, generateSponsorLogCsv } from '../../store/useBroadcastStore';
 import { OverlayStage } from './OverlayStage';
 import { EditMatchModal } from './EditMatchModal';
 import { TossMatchModal } from './TossMatchModal';
 import { ChangeBowlerModal } from './ChangeBowlerModal';
 import { OverlayType, EventAnimationType } from '../../types/cricket';
 import { PRESET_TEAMS, PRESET_TOURNAMENTS } from '../../theme/presetThemes';
-import { Radio, Tv, Zap, Palette, Layers, RefreshCw, Copy, Check, RotateCcw, Settings, Users, PlusCircle } from 'lucide-react';
+import { Radio, Tv, Zap, Palette, Layers, RefreshCw, Copy, Check, RotateCcw, Settings, Users, PlusCircle, Archive } from 'lucide-react';
 import { CricNavbar } from '../common/CricNavbar';
+
+const OverlayLivenessIndicator: React.FC = () => {
+  const overlayAckAt = useBroadcastStore((s) => s.overlayAckAt);
+  const [now, setNow] = useState(Date.now());
+
+  React.useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const isLive = Boolean(overlayAckAt && now - overlayAckAt < 5000);
+  const elapsedSec = overlayAckAt ? Math.max(0, Math.floor((now - overlayAckAt) / 1000)) : null;
+
+  if (isLive) {
+    return (
+      <div className="flex items-center gap-1.5 bg-emerald-950/80 border border-emerald-500/50 px-3 py-1 rounded-full text-xs font-bold text-emerald-400">
+        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+        OVERLAY LIVE
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-1.5 bg-rose-950/80 border border-rose-600 px-3 py-1 rounded-full text-xs font-bold text-rose-500 animate-pulse">
+      <span className="w-2 h-2 rounded-full bg-rose-500" />
+      ⚠ NO OVERLAY DATA{elapsedSec !== null ? ` (${elapsedSec}s)` : ''}
+    </div>
+  );
+};
 
 export const ControlStudio: React.FC = () => {
   const {
@@ -20,6 +49,8 @@ export const ControlStudio: React.FC = () => {
     isWsConnected,
     historyStack,
     tournamentId,
+    overlayAckAt,
+    syncErrorCount,
     setTournamentId,
     updateMatchSettings,
     toggleOverlay,
@@ -38,10 +69,14 @@ export const ControlStudio: React.FC = () => {
     setGraphType,
     updateTeamColors,
     resetMatchState,
+    archiveAndReset,
+    loadArchiveAsNewMatch,
+    matchArchive,
+    ballLog,
   } = useBroadcastStore();
 
   const [copiedUrl, setCopiedUrl] = useState(false);
-  const [selectedTab, setSelectedTab] = useState<'scorer' | 'overlays' | 'animations' | 'theme' | 'tourStats'>('scorer');
+  const [selectedTab, setSelectedTab] = useState<'scorer' | 'overlays' | 'animations' | 'theme' | 'tourStats' | 'archives'>('scorer');
   const [showEditModal, setShowEditModal] = useState(false);
   const [showTossModal, setShowTossModal] = useState(false);
   const [showObsGuideModal, setShowObsGuideModal] = useState(false);
@@ -84,29 +119,122 @@ export const ControlStudio: React.FC = () => {
   };
 
   const handleScoreClick = (runs: number) => {
-    if (extraWicket) {
-      addWicket();
-      setExtraWicket(false);
-      return;
-    }
+    let hasExtra = false;
 
     if (extraWide) {
       addExtra('WIDE', runs + 1);
       setExtraWide(false);
+      hasExtra = true;
     } else if (extraNoBall) {
       addExtra('NO_BALL', runs + 1);
       setExtraNoBall(false);
+      hasExtra = true;
     } else if (extraByes) {
       addExtra('BYE', runs);
       setExtraByes(false);
+      hasExtra = true;
     } else if (extraLegByes) {
       addExtra('LEG_BYE', runs);
       setExtraLegByes(false);
-    } else {
+      hasExtra = true;
+    }
+
+    if (!hasExtra && !extraWicket) {
       const isBoundary = runs === 4 || runs === 6;
       const boundaryType = runs === 4 ? 4 : runs === 6 ? 6 : undefined;
       addRuns(runs, isBoundary, boundaryType);
     }
+
+    if (extraWicket) {
+      addWicket();
+      setExtraWicket(false);
+    }
+  };
+
+  const handleExportCsv = () => {
+    const escapeCsv = (val: any) => {
+      if (val === null || val === undefined) return '';
+      const str = String(val);
+      if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
+        return `"${str.replace(/"/g, '""')}"`;
+      }
+      return str;
+    };
+
+    const headers = ['over', 'ball', 'batter', 'bowler', 'runs', 'extra', 'wicket', 'timestamp', 'event'];
+    const rows = (ballLog || []).map((entry) => [
+      escapeCsv(entry.over),
+      escapeCsv(entry.ball),
+      escapeCsv(entry.batter),
+      escapeCsv(entry.bowler),
+      escapeCsv(entry.runs),
+      escapeCsv(entry.extra ?? ''),
+      escapeCsv(entry.wicket ?? ''),
+      escapeCsv(entry.timestamp),
+      escapeCsv(entry.event ?? ''),
+    ].join(','));
+
+    const csvContent = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const matchId = (matchDetails as any)?.matchId || tournamentId || 'live_001';
+    const timestamp = Date.now();
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `match_${matchId}_${timestamp}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportArchivedCsv = (archive: MatchArchive) => {
+    const escapeCsv = (val: any) => {
+      if (val === null || val === undefined) return '';
+      const str = String(val);
+      if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
+        return `"${str.replace(/"/g, '""')}"`;
+      }
+      return str;
+    };
+
+    const headers = ['over', 'ball', 'batter', 'bowler', 'runs', 'extra', 'wicket', 'timestamp', 'event'];
+    const rows = (archive.ballLog || []).map((entry) => [
+      escapeCsv(entry.over),
+      escapeCsv(entry.ball),
+      escapeCsv(entry.batter),
+      escapeCsv(entry.bowler),
+      escapeCsv(entry.runs),
+      escapeCsv(entry.extra ?? ''),
+      escapeCsv(entry.wicket ?? ''),
+      escapeCsv(entry.timestamp),
+      escapeCsv(entry.event ?? ''),
+    ].join(','));
+
+    const csvContent = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `match_${archive.matchId}_${archive.date}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExportSponsorLogCsv = () => {
+    const log = getSponsorLog();
+    const csvContent = generateSponsorLogCsv(log);
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `sponsor_log_${Date.now()}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   const [voiceCommentaryEnabled, setVoiceCommentaryEnabled] = useState(false);
@@ -125,6 +253,9 @@ export const ControlStudio: React.FC = () => {
   // Keyboard Hotkeys listener for rapid live scoring
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.repeat) return;
+      if (selectedTab !== 'scorer') return;
+
       const activeEl = document.activeElement;
       if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.tagName === 'SELECT')) {
         return;
@@ -145,11 +276,9 @@ export const ControlStudio: React.FC = () => {
         speakCommentary('Three runs!');
       } else if (key === '4' || e.code === 'Numpad4') {
         handleScoreClick(4);
-        triggerAnimation('FOUR');
         speakCommentary('Shot! That is a FOUR!');
       } else if (key === '6' || e.code === 'Numpad6') {
         handleScoreClick(6);
-        triggerAnimation('SIX');
         speakCommentary('Huge hit! SIX runs into the stands!');
       } else if (key === 'w') {
         addWicket();
@@ -165,7 +294,7 @@ export const ControlStudio: React.FC = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [voiceCommentaryEnabled, extraWide, extraNoBall, extraByes, extraLegByes, extraWicket]);
+  }, [selectedTab, voiceCommentaryEnabled, extraWide, extraNoBall, extraByes, extraLegByes, extraWicket]);
 
   const overlayList: { id: OverlayType; label: string }[] = [
     { id: 'scoreBug', label: 'Live Score Bug' },
@@ -240,6 +369,16 @@ export const ControlStudio: React.FC = () => {
               {isWsConnected ? 'WS LIVE' : 'STANDALONE SYNC'}
             </span>
           </div>
+          <OverlayLivenessIndicator />
+          {syncErrorCount > 0 && (
+            <div
+              className="flex items-center gap-1.5 bg-red-950/90 border border-red-600 px-2.5 py-1 rounded-full text-xs font-bold text-red-400 shadow-sm"
+              title={`${syncErrorCount} sync error(s) encountered`}
+            >
+              <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
+              SYNC ERR: {syncErrorCount}
+            </div>
+          )}
         </div>
 
         {/* Actions */}
@@ -289,9 +428,9 @@ export const ControlStudio: React.FC = () => {
             </button>
           </div>
           <button
-            onClick={resetMatchState}
+            onClick={() => archiveAndReset()}
             className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-all"
-            title="Reset Match Data"
+            title="Archive & Reset Match"
           >
             <RefreshCw className="w-4 h-4" />
           </button>
@@ -424,6 +563,16 @@ export const ControlStudio: React.FC = () => {
             >
               <Palette className="w-4 h-4" /> Colors
             </button>
+            <button
+              onClick={() => setSelectedTab('archives')}
+              className={`flex-1 py-3 text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-1.5 border-b-2 transition-all ${
+                selectedTab === 'archives'
+                  ? 'border-amber-400 text-amber-400 bg-slate-900'
+                  : 'border-transparent text-slate-400 hover:text-white'
+              }`}
+            >
+              <Archive className="w-4 h-4" /> Archives ({matchArchive?.length || 0})
+            </button>
           </div>
 
 
@@ -532,9 +681,9 @@ export const ControlStudio: React.FC = () => {
                           className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-400 font-semibold"
                         >
                           <option value="">Select Bowler...</option>
-                          {bowlingTeam.batters.map((b) => (
-                            <option key={b.id} value={b.name}>
-                              {b.name}
+                          {bowlingTeam.bowlers.map((bw) => (
+                            <option key={bw.id || bw.name} value={bw.name}>
+                              {bw.name}
                             </option>
                           ))}
                         </select>
@@ -617,6 +766,13 @@ export const ControlStudio: React.FC = () => {
                     className="px-3 py-1.5 bg-red-600 hover:bg-red-500 text-white font-bold text-xs rounded shadow disabled:opacity-50"
                   >
                     UNDO
+                  </button>
+                  <button
+                    onClick={handleExportCsv}
+                    className="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs rounded shadow"
+                    title="Export ball-by-ball audit log to CSV"
+                  >
+                    Export CSV
                   </button>
                 </div>
 
@@ -754,9 +910,18 @@ export const ControlStudio: React.FC = () => {
             {selectedTab === 'overlays' && (
               <div className="space-y-5">
                 <div>
-                  <span className="text-xs font-black uppercase text-amber-400 tracking-wider block mb-2">
-                    OVERLAYS
-                  </span>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-black uppercase text-amber-400 tracking-wider">
+                      OVERLAYS
+                    </span>
+                    <button
+                      onClick={handleExportSponsorLogCsv}
+                      className="px-3 py-1.5 bg-emerald-700 hover:bg-emerald-600 text-white rounded text-xs font-bold shadow flex items-center gap-1.5"
+                      title="Export sponsor on-air compliance log as CSV"
+                    >
+                      Export Sponsor Log
+                    </button>
+                  </div>
                   <div className="flex flex-wrap gap-2">
                     {overlayList.map((item) => {
                       const isActive = activeOverlays[item.id];
@@ -1015,6 +1180,76 @@ export const ControlStudio: React.FC = () => {
                     </button>
                   ))}
                 </div>
+              </div>
+            )}
+
+            {selectedTab === 'archives' && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-black uppercase text-amber-400 tracking-wider">
+                    MATCH ARCHIVES ({matchArchive?.length || 0})
+                  </span>
+                  <button
+                    onClick={() => archiveAndReset()}
+                    className="px-3 py-1.5 bg-rose-700 hover:bg-rose-600 text-white font-bold text-xs rounded uppercase shadow flex items-center gap-1.5"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    Archive Current Match
+                  </button>
+                </div>
+
+                {(!matchArchive || matchArchive.length === 0) ? (
+                  <div className="bg-slate-950 p-6 rounded-xl border border-slate-800 text-center text-slate-400 text-xs font-semibold">
+                    No archived matches found in local storage.
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-slate-900 border-b border-slate-800 text-[10px] uppercase font-bold text-slate-400">
+                        <tr>
+                          <th className="py-2.5 px-3">Date</th>
+                          <th className="py-2.5 px-3">Teams</th>
+                          <th className="py-2.5 px-3">Result</th>
+                          <th className="py-2.5 px-3 text-right">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-800">
+                        {matchArchive.map((item) => (
+                          <tr key={item.matchId} className="hover:bg-slate-900/50 transition-colors">
+                            <td className="py-2.5 px-3 text-slate-300 font-mono whitespace-nowrap">
+                              {new Date(item.date).toLocaleDateString()} {new Date(item.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </td>
+                            <td className="py-2.5 px-3 font-semibold text-white whitespace-nowrap">
+                              {item.teamA?.shortName || item.teamA?.fullName} vs {item.teamB?.shortName || item.teamB?.fullName}
+                            </td>
+                            <td className="py-2.5 px-3 text-amber-300 font-medium">
+                              {item.result}
+                            </td>
+                            <td className="py-2.5 px-3 text-right whitespace-nowrap space-x-2">
+                              <button
+                                onClick={() => handleExportArchivedCsv(item)}
+                                className="px-2.5 py-1 bg-emerald-700 hover:bg-emerald-600 text-white rounded text-[11px] font-bold shadow"
+                                title="Export ball log as CSV"
+                              >
+                                Export CSV
+                              </button>
+                              <button
+                                onClick={() => {
+                                  loadArchiveAsNewMatch(item.matchId);
+                                  setSelectedTab('scorer');
+                                }}
+                                className="px-2.5 py-1 bg-cyan-700 hover:bg-cyan-600 text-white rounded text-[11px] font-bold shadow"
+                                title="Start new match with these teams and player rosters"
+                              >
+                                Load as New Match (same teams)
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
               </div>
             )}
           </div>

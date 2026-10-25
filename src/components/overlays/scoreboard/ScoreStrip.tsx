@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ScoreboardTheme } from '../../../theme/scoreboardThemes';
 import { injectGlobalKeyframes } from './AnimationEngine';
 
+import { SustainabilityTreeIcon } from '../OverProgressDots';
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Ball Chip — single colored ball dot
 // ─────────────────────────────────────────────────────────────────────────────
@@ -12,30 +14,37 @@ interface BallChipProps {
   isNew?: boolean;
 }
 
-function getBallStyle(ball: string): { bg: string; label: string } {
+function getBallStyle(ball: string): { bg: string; label: string; isDot: boolean } {
   switch (ball) {
-    case '6':  return { bg: 'var(--sb-ball-dot-6)', label: '6' };
-    case '4':  return { bg: 'var(--sb-ball-dot-4)', label: '4' };
-    case 'W':  return { bg: 'var(--sb-ball-dot-w)', label: 'W' };
-    case 'WD': return { bg: 'var(--sb-ball-dot-wd)', label: 'Wd' };
-    case 'NB': return { bg: 'var(--sb-ball-dot-nb)', label: 'Nb' };
-    case '0':  return { bg: 'var(--sb-ball-dot-0)', label: '•' };
-    default:   return { bg: 'var(--sb-ball-dot-1)', label: ball };
+    case '6':  return { bg: '#FF207C', label: '6', isDot: false }; // Electric Pink
+    case '4':  return { bg: '#FFDC35', label: '4', isDot: false }; // Coral Yellow
+    case 'W':  return { bg: 'var(--sb-ball-dot-w)', label: 'W', isDot: false };
+    case 'WD': return { bg: 'var(--sb-ball-dot-wd)', label: 'Wd', isDot: false };
+    case 'NB': return { bg: 'var(--sb-ball-dot-nb)', label: 'Nb', isDot: false };
+    case '0':
+    case '.':
+      return { bg: '#0a1f12', label: '', isDot: true }; // Sustainability Dot Ball
+    default:   return { bg: 'var(--sb-ball-dot-1)', label: ball, isDot: false };
   }
 }
 
 const BallChip: React.FC<BallChipProps> = ({ ball, isNew = false }) => {
-  const { bg, label } = getBallStyle(ball);
+  const { bg, label, isDot } = getBallStyle(ball);
 
   return (
     <motion.span
       initial={isNew ? { x: 40, scale: 0.6, opacity: 0 } : false}
       animate={{ x: 0, scale: 1, opacity: 1 }}
       transition={{ type: 'spring', damping: 12, stiffness: 200 }}
-      className="w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black text-white shrink-0"
-      style={{ background: bg, boxShadow: `0 0 6px ${bg}55` }}
+      className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-black shrink-0 ${
+        isDot ? 'text-[#27E64B] border border-[#27E64B]/40' : ball === '4' ? 'text-slate-950' : 'text-white'
+      }`}
+      style={{
+        background: bg,
+        boxShadow: isDot ? '0 0 6px rgba(39,230,75,0.45)' : `0 0 6px ${bg}55`,
+      }}
     >
-      {label}
+      {isDot ? <SustainabilityTreeIcon size={14} color="#27E64B" /> : label}
     </motion.span>
   );
 };

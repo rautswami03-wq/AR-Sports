@@ -20,12 +20,12 @@ export const CurrentRunRateOverlay: React.FC = () => {
         <div className="flex items-center gap-6">
           <div>
             <span className="text-slate-400 text-xs font-semibold block uppercase">CURRENT RUN RATE</span>
-            <span className="text-sky-400 font-black text-3xl">{crr}</span>
+            <span className="text-sky-400 font-black text-3xl font-numbers">{crr}</span>
           </div>
           <div className="h-10 w-[1px] bg-white/10" />
           <div>
             <span className="text-slate-400 text-xs font-semibold block uppercase">PROJECTED (20 OVERS)</span>
-            <span className="text-amber-400 font-black text-3xl">{projectedScore} RUNS</span>
+            <span className="text-amber-400 font-black text-3xl font-numbers">{projectedScore} RUNS</span>
           </div>
         </div>
       </div>
