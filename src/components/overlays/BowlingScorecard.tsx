@@ -143,7 +143,7 @@ export const BowlingScorecard: React.FC = () => {
     );
   }
 
-  if (layoutStyle === 'icc-navarasa' || layoutStyle === 'crickpro-elite') {
+  if (layoutStyle === 'icc-navarasa' || layoutStyle === 'ar-sports-elite') {
     return (
       <div className="absolute inset-0 flex items-center justify-center pointer-events-auto z-40 p-6 bg-black/60 backdrop-blur-sm font-sans" data-overlay="bowling-scorecard">
         <motion.div

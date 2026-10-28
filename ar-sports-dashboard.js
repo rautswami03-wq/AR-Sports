@@ -1,4 +1,4 @@
-// app.js - CrickPro Broadcast Overlays Logic
+// app.js - AR Sports Broadcast Overlays Logic
 
 // 1. Theme Registry (19 Themes)
 const themes = [

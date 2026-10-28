@@ -489,20 +489,20 @@ export const LandingPage: React.FC = () => {
           {/* Col 2: Products List */}
           <div>
             <h5 className="font-black text-slate-100 uppercase tracking-widest text-sm mb-4 border-b border-slate-800 pb-1.5">
-              CrickPro Suite Products
+              AR Sports Suite Products
             </h5>
             <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5 text-xs font-bold">
               {[
                 { name: 'Cricket Scoring App', desc: 'Ball-by-ball scoring with all formats.' },
-                { name: 'CrickPro Lite', desc: 'Casual, offline, local-first scoring + overlay.' },
+                { name: 'AR Sports Lite', desc: 'Casual, offline, local-first scoring + overlay.' },
                 { name: 'Cricket Streaming App', desc: 'Live stream, replay, and highlights.' },
                 { name: 'Cricket Highlight Generator', desc: 'Auto-generate clips, tag players.' },
                 { name: 'Cricket Score Overlay', desc: '50 panels, 17+ broadcast themes.' },
                 { name: 'Cricket League Website', desc: 'Build a professional league site.' },
                 { name: 'Cricket Web Dashboard', desc: 'Tournament + overlay management.' },
                 { name: 'TV Broadcast Solution', desc: 'Television-grade cricket production.' },
-                { name: 'CrickPro Broadcast', desc: 'Standalone TV-grade cricket production — no OBS.' },
-                { name: 'CrickPro TV', desc: 'Premium cricket streaming & tournament hosting.' }
+                { name: 'AR Sports Broadcast', desc: 'Standalone TV-grade cricket production — no OBS.' },
+                { name: 'AR Sports TV', desc: 'Premium cricket streaming & tournament hosting.' }
               ].map((prod) => (
                 <li key={prod.name} className="group">
                   <span className="text-slate-300 group-hover:text-cyan-400 transition-colors block font-black">

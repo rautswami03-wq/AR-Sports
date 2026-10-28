@@ -282,9 +282,9 @@ export const LiveScoreBug: React.FC = () => {
             <span>OVERS: {oversFormatted}</span>
           </div>
         </motion.div>
-      ) : layoutStyle === 'crickpro-elite' ? (
+      ) : layoutStyle === 'ar-sports-elite' ? (
         /* ------------------------------------------------------------------ */
-        /* 3. CRICKPRO ELITE OFFICIAL LAYOUT                                  */
+        /* 3. AR SPORTS ELITE OFFICIAL LAYOUT                                  */
         /* ------------------------------------------------------------------ */
         <motion.div
           initial={{ opacity: 0, y: 60 }}

@@ -1,5 +1,5 @@
 // =============================================================================
-// scoreboardThemes.ts — 19 complete scoreboard overlay themes matching CrickPro
+// scoreboardThemes.ts — 19 complete scoreboard overlay themes matching AR Sports
 // Used by ScoreboardOverlay.tsx and scoreboard-overlay.html
 // =============================================================================
 

@@ -17,7 +17,7 @@ export type LayoutStyle =
   | 'flat-bar'           // legacy
   | 'glass-box'          // legacy
   | 'cricscorer-broadcast'
-  | 'crickpro-elite';
+  | 'ar-sports-elite';
 
 export type AnimationVariant = 'explosive-gold' | 'neon-pulse' | 'smooth-slide' | 'glass-fade' | 'minimal-pop';
 
