@@ -1055,7 +1055,7 @@ export const THEME_ID_MAP: Record<string, string> = {
 };
 
 export function resolveThemeFromUrlOrStore(tournamentIdFromStore: string, tournamentName?: string): TournamentTheme {
-  if (typeof window === 'undefined') return PRESET_TOURNAMENTS['t20_asia24'];
+  if (typeof window === 'undefined') return PRESET_TOURNAMENTS['ipl25'] || PRESET_TOURNAMENTS['IPL'] || PRESET_TOURNAMENTS['t20_asia24'];
 
   const hash = window.location.hash || '';
   const search = window.location.search || '';
@@ -1094,8 +1094,8 @@ export function resolveThemeFromUrlOrStore(tournamentIdFromStore: string, tourna
     }
   }
 
-  // 5. Default fallback to T20 Emerging Asia Cup
-  return PRESET_TOURNAMENTS['t20_asia24'];
+  // 5. Default fallback to IPL 2025
+  return PRESET_TOURNAMENTS['ipl25'] || PRESET_TOURNAMENTS['IPL'] || PRESET_TOURNAMENTS['t20_asia24'];
 }
 
 export function getThemeByLeagueName(searchName: string): TournamentTheme {

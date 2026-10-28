@@ -6,6 +6,7 @@ import { subscribeToLiveMatch, publishLiveMatchState } from '../../services/fire
 import { THEME_ID_MAP } from '../../theme/presetThemes';
 
 // Overlays
+import { ScoreBug } from '../overlays/ScoreBug';
 import { LiveScoreBug } from '../overlays/LiveScoreBug';
 import { LowerThird } from '../overlays/LowerThird';
 import { BattingLowerThird } from '../overlays/BattingLowerThird';
@@ -227,12 +228,6 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
       );
       if (isExclusiveOverlayActive) return false;
 
-      // In standalone broadcast source (e.g. #/overlay in OBS/vMix):
-      // Hide the scoreboard until the match has been started, unless preview query is set
-      if (isStandaloneRoute && !matchDetails?.isMatchStarted && !params.get('preview')) {
-        return false;
-      }
-
       return Boolean(activeOverlays.scoreBug);
     }
 
@@ -246,7 +241,11 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
     >
       <AnimatePresence mode="sync">
         {/* Overlays */}
-        {isVisible('scoreBug') && <LiveScoreBug key="scoreBug" />}
+        {activeOverlays.scoreBug && isVisible('scoreBug') && (
+          <div className="absolute bottom-6 inset-x-0 z-40 flex items-center justify-center pointer-events-none">
+            <ScoreBug key="scoreBug" />
+          </div>
+        )}
         {isVisible('tournamentTitle') && <TournamentTitleOverlay key="tournamentTitle" />}
         {isVisible('battingLowerThird') && <LowerThird key="battingL3" type="batter" />}
         {isVisible('bowlingLowerThird') && <LowerThird key="bowlingL3" type="bowler" />}

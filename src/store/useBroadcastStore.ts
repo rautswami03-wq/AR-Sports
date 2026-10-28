@@ -410,8 +410,8 @@ const DEFAULT_TEAM_B: Team = {
 };
 
 const DEFAULT_MATCH_DETAILS: MatchDetails = {
-  title: 'CRICKET MATCH',
-  tournament: 'TOURNAMENT NAME',
+  title: 'IPL 2025',
+  tournament: 'TATA IPL 2025',
   stage: 'MATCH 1',
   venue: 'STADIUM VENUE',
   tossWinner: 'Team 1',
@@ -431,8 +431,8 @@ const DEFAULT_MATCH_DETAILS: MatchDetails = {
     batter2Balls: 0,
   },
   fallOfWickets: [],
-  matchStatusText: 'MATCH NOT STARTED YET',
-  isMatchStarted: false,
+  matchStatusText: 'LIVE',
+  isMatchStarted: true,
   pointsTable: [],
   topBatters: [],
   topBowlers: [],
@@ -509,7 +509,7 @@ function loadInitialState() {
           bowlingTeamId: parsed.bowlingTeamId || 'teamB',
           activeOverlays: parsed.activeOverlays || INITIAL_OVERLAYS,
           activeAnimation: parsed.activeAnimation || null,
-          tournamentId: parsed.tournamentId || 'tour_default',
+          tournamentId: parsed.tournamentId || 'ipl25',
           blitzSettings: (() => { try { const s = localStorage.getItem('ar_blitz_settings'); return s ? JSON.parse(s) : DEFAULT_BLITZ_SETTINGS; } catch { return DEFAULT_BLITZ_SETTINGS; } })(),
           ballLog: parsed.ballLog || [],
         };
@@ -526,7 +526,7 @@ function loadInitialState() {
     bowlingTeamId: 'teamB',
     activeOverlays: INITIAL_OVERLAYS,
     activeAnimation: null,
-    tournamentId: 'tour_default',
+    tournamentId: 'ipl25',
     blitzSettings: DEFAULT_BLITZ_SETTINGS,
     ballLog: [],
   };
