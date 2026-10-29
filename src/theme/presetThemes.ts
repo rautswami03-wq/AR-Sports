@@ -298,6 +298,52 @@ export const PRESET_TOURNAMENTS: Record<string, TournamentTheme> = {
     showOverDots: true,
     showTargetBar: true,
   },
+  cricastra: {
+    id: 'cricastra',
+    name: 'CRICASTRA FUTURISTIC BROADCAST',
+    headerGradient: 'linear-gradient(90deg, #030b19 0%, #008bff 50%, #e51970 100%)',
+    primaryAccent: '#008bff',
+    badgeBg: '#030b19',
+    teamLabelBg: '#030b19',
+    teamLabelColor: '#ffffff',
+    scoreColor: '#00f2ff',
+    scoreBoxBg: '#01050b',
+    battersBg: 'rgba(3,11,25,0.98)',
+    centerBoxBg: '#101724',
+    bowlerBg: '#08030a',
+    cardBg: '#030b19',
+    cardBorder: '2px solid #008bff',
+    scoreBugMainBg: 'bg-[#030b19]',
+    scoreBugAccentBg: 'bg-[#008bff]',
+    scoreBugTextColor: 'text-white',
+    layoutStyle: 'broadcast-full',
+    animationVariant: 'neon-pulse',
+    showOverDots: true,
+    showTargetBar: true,
+  },
+  hotstar: {
+    id: 'hotstar',
+    name: 'DISNEY+ HOTSTAR CRICKET LIVE',
+    headerGradient: 'linear-gradient(90deg, #0c1222 0%, #00529B 50%, #ff009d 100%)',
+    primaryAccent: '#ff009d',
+    badgeBg: '#0c1222',
+    teamLabelBg: '#0c1222',
+    teamLabelColor: '#ffffff',
+    scoreColor: '#000000',
+    scoreBoxBg: '#ffffff',
+    battersBg: 'rgba(12,18,34,0.95)',
+    centerBoxBg: '#000000',
+    bowlerBg: '#141d33',
+    cardBg: '#0c1222',
+    cardBorder: '2px solid #ff009d',
+    scoreBugMainBg: 'bg-[#0c1222]',
+    scoreBugAccentBg: 'bg-[#ff009d]',
+    scoreBugTextColor: 'text-white',
+    layoutStyle: 'broadcast-full',
+    animationVariant: 'smooth-slide',
+    showOverDots: true,
+    showTargetBar: true,
+  },
   asia_cup: {
     id: 'asia_cup',
     name: 'ASIA CUP CRICKET 2025',
@@ -1030,8 +1076,10 @@ export const THEME_ID_MAP: Record<string, string> = {
   '14': 'bbl_star',
   '15': 'ipl25',
   '16': 'cricpic',
-  '17': 'cwc23_diwali',
-  '18': 'bbl_white',
+  '17': 'hotstar',
+  '18': 'cricastra',
+  'cricastra': 'cricastra',
+  'hotstar': 'hotstar',
   '19': 'cwc_t20_2020',
   '20': 'icc_wc_vibrant',
   '21': 'super_fission',
@@ -1121,6 +1169,12 @@ export function getThemeByLeagueName(searchName: string): TournamentTheme {
       return PRESET_TOURNAMENTS['t20_asia24'];
     }
     return PRESET_TOURNAMENTS['asia_cup'];
+  }
+  if (normalized.includes('cricastra') || normalized.includes('astra')) {
+    return PRESET_TOURNAMENTS['cricastra'];
+  }
+  if (normalized.includes('hotstar') || normalized.includes('cricstar')) {
+    return PRESET_TOURNAMENTS['hotstar'];
   }
   if (normalized.includes('ipl 2025') || normalized.includes('ipl 25') || normalized.includes('ipl25')) {
     return PRESET_TOURNAMENTS['ipl25'];

@@ -7,6 +7,10 @@ import { THEME_ID_MAP } from '../../theme/presetThemes';
 
 // Overlays
 import { ScoreBug } from '../overlays/ScoreBug';
+import { T20EmergingAsiaCupOverlay } from '../overlays/T20EmergingAsiaCupOverlay';
+import { IPL25Overlay } from '../overlays/IPL25Overlay';
+import { CricAstraOverlay } from '../overlays/CricAstraOverlay';
+import { HotstarOverlay } from '../overlays/HotstarOverlay';
 import { LiveScoreBug } from '../overlays/LiveScoreBug';
 import { LowerThird } from '../overlays/LowerThird';
 import { BattingLowerThird } from '../overlays/BattingLowerThird';
@@ -69,7 +73,7 @@ interface OverlayStageProps {
 }
 
 export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
-  const { activeOverlays, activeAnimation, matchDetails } = useBroadcastStore();
+  const { activeOverlays, activeAnimation, matchDetails, tournamentId } = useBroadcastStore();
   const wsConnectedRef = useRef(false);
 
 
@@ -243,7 +247,17 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
         {/* Overlays */}
         {activeOverlays.scoreBug && isVisible('scoreBug') && (
           <div className="absolute bottom-6 inset-x-0 z-40 flex items-center justify-center pointer-events-none">
-            <ScoreBug key="scoreBug" />
+            {tournamentId === 't20_asia24' || tournamentId === '9' ? (
+              <T20EmergingAsiaCupOverlay key="t20AsiaCupScoreBug" />
+            ) : tournamentId === 'ipl25' || tournamentId === '15' ? (
+              <IPL25Overlay key="ipl25ScoreBug" />
+            ) : tournamentId === 'cricastra' || tournamentId === '18' ? (
+              <CricAstraOverlay key="cricastraScoreBug" />
+            ) : tournamentId === 'hotstar' || tournamentId === '17' ? (
+              <HotstarOverlay key="hotstarScoreBug" />
+            ) : (
+              <ScoreBug key="scoreBug" />
+            )}
           </div>
         )}
         {isVisible('tournamentTitle') && <TournamentTitleOverlay key="tournamentTitle" />}
