@@ -298,12 +298,13 @@ export const ControlStudio: React.FC = () => {
 
   const overlayList: { id: OverlayType; label: string }[] = [
     { id: 'scoreBug', label: 'Live Score Bug' },
-    { id: 'battingLowerThird', label: 'Batting Lower Third' },
-    { id: 'bowlingLowerThird', label: 'Bowling Lower Third' },
+    { id: 'battingLowerThird', label: 'Batting Lower Third (IPL)' },
+    { id: 'bowlingLowerThird', label: 'Bowling Lower Third (IPL)' },
+    { id: 'partnership', label: 'Partnership Lower Third (IPL)' },
+    { id: 'playerOfTheMatch', label: 'Man of the Match L3 (IPL)' },
     { id: 'battingScorecard', label: 'Batting Scorecard' },
     { id: 'bowlingScorecard', label: 'Bowling Scorecard' },
     { id: 'matchSummary', label: 'Match Summary' },
-    { id: 'partnership', label: 'Partnership' },
     { id: 'currentBatters', label: 'Current Batters' },
     { id: 'currentBowler', label: 'Current Bowler' },
     { id: 'requiredRunRate', label: 'Required Run Rate' },
@@ -942,6 +943,56 @@ export const ControlStudio: React.FC = () => {
                   </div>
                 </div>
 
+
+                {/* IPL Lower Thirds Quick Launch Row */}
+                <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
+                  <span className="text-xs font-black uppercase text-[#FF5A00] tracking-wider block mb-2 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-[#FF5A00] animate-pulse" />
+                    IPL 2025 LOWER THIRDS
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      onClick={() => toggleOverlay('battingLowerThird')}
+                      className={`px-3 py-1.5 rounded text-xs font-bold transition-all uppercase shadow ${
+                        activeOverlays.battingLowerThird
+                          ? 'bg-[#FF5A00] text-black font-black'
+                          : 'bg-slate-800 text-slate-200 hover:bg-slate-700 border border-slate-700'
+                      }`}
+                    >
+                      BATTER L3
+                    </button>
+                    <button
+                      onClick={() => toggleOverlay('bowlingLowerThird')}
+                      className={`px-3 py-1.5 rounded text-xs font-bold transition-all uppercase shadow ${
+                        activeOverlays.bowlingLowerThird
+                          ? 'bg-[#FF5A00] text-black font-black'
+                          : 'bg-slate-800 text-slate-200 hover:bg-slate-700 border border-slate-700'
+                      }`}
+                    >
+                      BOWLER L3
+                    </button>
+                    <button
+                      onClick={() => toggleOverlay('partnership')}
+                      className={`px-3 py-1.5 rounded text-xs font-bold transition-all uppercase shadow ${
+                        activeOverlays.partnership
+                          ? 'bg-[#FF5A00] text-black font-black'
+                          : 'bg-slate-800 text-slate-200 hover:bg-slate-700 border border-slate-700'
+                      }`}
+                    >
+                      PARTNERSHIP L3
+                    </button>
+                    <button
+                      onClick={() => toggleOverlay('playerOfTheMatch')}
+                      className={`px-3 py-1.5 rounded text-xs font-bold transition-all uppercase shadow ${
+                        activeOverlays.playerOfTheMatch
+                          ? 'bg-[#FF5A00] text-black font-black'
+                          : 'bg-slate-800 text-slate-200 hover:bg-slate-700 border border-slate-700'
+                      }`}
+                    >
+                      MAN OF THE MATCH L3
+                    </button>
+                  </div>
+                </div>
 
                 <div className="bg-slate-950 p-3.5 rounded-xl border border-slate-800">
                   <span className="text-xs font-bold uppercase text-slate-400 block mb-2">
