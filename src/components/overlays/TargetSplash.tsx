@@ -151,3 +151,4 @@ export const TargetSplash: React.FC<TargetSplashProps> = ({
     </div>
   );
 };
+

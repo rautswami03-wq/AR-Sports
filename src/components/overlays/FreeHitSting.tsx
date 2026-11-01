@@ -79,3 +79,4 @@ export const FreeHitSting: React.FC<FreeHitStingProps> = ({
     </div>
   );
 };
+
