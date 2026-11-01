@@ -4,6 +4,9 @@ import { useBroadcastStore } from '../../store/useBroadcastStore';
 import { resolveThemeFromUrlOrStore } from '../../theme/presetThemes';
 import { AsiaCupLeftCyanWings, AsiaCupRightYellowWings } from '../theme-graphics/AsiaCupGraphics';
 import { NavarasaVerticalRibbon } from '../theme-graphics/NavarasaGraphics';
+import { FreeHitSting } from '../overlays/FreeHitSting';
+import { WicketSting } from '../overlays/WicketSting';
+import { StingBase } from '../overlays/base/StingBase';
 
 export const IPLSuperAnimation: React.FC = () => {
   const { activeAnimation, teamA, teamB, battingTeamId, tournamentId, matchDetails } = useBroadcastStore();
@@ -214,6 +217,23 @@ export const IPLSuperAnimation: React.FC = () => {
         </motion.div>
       </motion.div>
     );
+  }
+
+  // FULL-WIDTH STRIPS: IPL 2025 Broadcast Stings for FOUR, SIX, WICKET, FREE HIT
+  if (activeAnimation === 'FREE_HIT') {
+    return <FreeHitSting />;
+  }
+
+  if (activeAnimation === 'WICKET') {
+    return <WicketSting />;
+  }
+
+  if (activeAnimation === 'FOUR') {
+    return <StingBase type="FOUR" text="FOUR" subText="CRUNCHING FOUR • 4 RUNS" />;
+  }
+
+  if (activeAnimation === 'SIX') {
+    return <StingBase type="SIX" text="MAXIMUM SIX" subText="OVER THE ROPES • 6 RUNS" />;
   }
 
   // ORIGINAL BROADCAST MOTION 3: Star Sports / IPL 3D Metallic Telecast Motion (Default)

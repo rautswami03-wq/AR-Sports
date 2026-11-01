@@ -25,18 +25,18 @@ export const BattingScorecardCard: React.FC<BattingScorecardCardProps> = ({ clas
 
   // Provide at least 8 rows for scorecard consistency
   const filledBatters = Array.from({ length: Math.max(8, batters.length) }, (_, i) => {
-    return (
-      batters[i] || {
-        id: `empty_${i}`,
-        name: i < batters.length ? batters[i].name : `Batter ${i + 1}`,
-        runs: 0,
-        balls: 0,
-        fours: 0,
-        sixes: 0,
-        isOut: false,
-        dismissal: '',
-      }
-    );
+    const existing = batters[i];
+    if (existing) return existing;
+    return {
+      id: `empty_${i}`,
+      name: `Batter ${i + 1}`,
+      runs: 0,
+      balls: 0,
+      fours: 0,
+      sixes: 0,
+      isOut: false,
+      dismissal: '',
+    };
   });
 
   return (
@@ -131,3 +131,4 @@ export const BattingScorecardCard: React.FC<BattingScorecardCardProps> = ({ clas
     </div>
   );
 };
+

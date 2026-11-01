@@ -40,8 +40,8 @@ export const BowlerLowerThird: React.FC<BowlerLowerThirdProps> = ({
     bowler.economy && bowler.economy > 0
       ? bowler.economy.toFixed(2)
       : totalBalls > 0
-      ? ((runs / totalBalls) * 6).toFixed(2)
-      : '0.00';
+        ? ((runs / totalBalls) * 6).toFixed(2)
+        : '0.00';
 
   // Approximate dot balls
   const dots = Math.max(0, Math.floor(totalBalls * 0.45));
@@ -111,3 +111,4 @@ export const BowlerLowerThird: React.FC<BowlerLowerThirdProps> = ({
     </LowerThirdBase>
   );
 };
+

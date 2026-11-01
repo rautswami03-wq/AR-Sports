@@ -34,6 +34,7 @@ import { RequiredRunRateOverlay } from '../overlays/RequiredRunRateOverlay';
 import { CurrentRunRateOverlay } from '../overlays/CurrentRunRateOverlay';
 import { FallOfWicketsOverlay } from '../overlays/FallOfWicketsOverlay';
 import { TargetOverlay } from '../overlays/TargetOverlay';
+import { TargetSplash } from '../overlays/TargetSplash';
 import { WinnerScreenOverlay } from '../overlays/WinnerScreenOverlay';
 import { PlayingXIOverlay } from '../overlays/PlayingXIOverlay';
 import { TossOverlay } from '../overlays/TossOverlay';
@@ -317,7 +318,13 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
         {isVisible('requiredRunRate') && <RequiredRunRateOverlay key="rrr" />}
         {isVisible('currentRunRate') && <CurrentRunRateOverlay key="crr" />}
         {isVisible('fallOfWickets') && <FallOfWicketsOverlay key="fow" />}
-        {isVisible('target') && <TargetOverlay key="target" />}
+        {isVisible('target') && (
+          tournamentId === 'ipl25' || tournamentId === '15' ? (
+            <TargetSplash key="target_ipl" />
+          ) : (
+            <TargetOverlay key="target" />
+          )
+        )}
         {isVisible('winnerScreen') && <WinnerScreenOverlay key="winnerScreen" />}
         {isVisible('playingXI') && (
           tournamentId === 'ipl25' || tournamentId === '15' ? (

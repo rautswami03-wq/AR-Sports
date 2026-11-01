@@ -100,3 +100,4 @@ export const ManOfTheMatchLowerThird: React.FC<ManOfTheMatchLowerThirdProps> = (
     </LowerThirdBase>
   );
 };
+

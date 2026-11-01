@@ -97,3 +97,4 @@ export const BatterLowerThird: React.FC<BatterLowerThirdProps> = ({
     </LowerThirdBase>
   );
 };
+

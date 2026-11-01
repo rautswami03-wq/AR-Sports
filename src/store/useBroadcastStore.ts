@@ -36,6 +36,12 @@ export interface MatchArchive {
 
 import { BlitzCustomSettings, DEFAULT_BLITZ_SETTINGS } from '../types/blitzSettings';
 
+export const FULL_WIDTH_STRIP_ANIMATIONS: EventAnimationType[] = ['FOUR', 'SIX', 'WICKET', 'FREE_HIT'];
+
+export const isFullWidthStripAnimation = (type?: EventAnimationType | null): boolean => {
+  return Boolean(type && FULL_WIDTH_STRIP_ANIMATIONS.includes(type));
+};
+
 export interface BroadcastStoreState {
   matchId: string;
   matchArchive: MatchArchive[];
@@ -66,6 +72,7 @@ export interface BroadcastStoreState {
   hideAllOverlays: () => void;
   triggerAnimation: (type: EventAnimationType, durationMs?: number) => void;
   clearAnimation: () => void;
+  isStripAnimation: (type?: EventAnimationType | null) => boolean;
   addRuns: (runs: number, isBoundary?: boolean, boundaryType?: 4 | 6) => void;
   addExtra: (type: 'WIDE' | 'NO_BALL' | 'BYE' | 'LEG_BYE', runs?: number) => void;
   addPenaltyRuns: (targetTeam: 'batting' | 'bowling' | 'teamA' | 'teamB', runs: number) => void;
@@ -765,7 +772,9 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
     });
   },
 
-  triggerAnimation: (type, durationMs = 3500) => {
+  isStripAnimation: (type) => isFullWidthStripAnimation(type ?? get().activeAnimation),
+
+  triggerAnimation: (type, durationMs) => {
     const { animationTimeoutId, activeAnimation } = get();
     if (animationTimeoutId) clearTimeout(animationTimeoutId);
 
@@ -776,11 +785,20 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
       return;
     }
 
+    const defaultDuration =
+      type === 'SIX' ? 4500 :
+      type === 'WICKET' ? 4500 :
+      type === 'FREE_HIT' ? 4000 :
+      type === 'FOUR' ? 3500 :
+      3500;
+
+    const timeoutDuration = durationMs ?? defaultDuration;
+
     const newTimeout = setTimeout(() => {
       set({ activeAnimation: null, animationTimeoutId: null });
       const currentState = get();
       postStateSync({ ...currentState, activeAnimation: null });
-    }, durationMs);
+    }, timeoutDuration);
 
     set({ activeAnimation: type, animationTimeoutId: newTimeout });
     postStateSync({ ...get(), activeAnimation: type });

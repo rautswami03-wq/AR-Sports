@@ -147,7 +147,7 @@ describe('IPL 2025 Lower Thirds Suite', () => {
     expect(screen.getAllByText('PARTNERSHIP').length).toBeGreaterThan(0);
     expect(screen.getAllByText('HARDIK PANDYA').length).toBeGreaterThan(0);
     expect(screen.getAllByText('TILAK VARMA').length).toBeGreaterThan(0);
-    expect(screen.getByText(/62/)).toBeDefined();
+    expect(screen.getAllByText(/62/).length).toBeGreaterThan(0);
   });
 
   it('renders ManOfTheMatchLowerThird with award title, batting, and bowling summaries', () => {
@@ -158,3 +158,4 @@ describe('IPL 2025 Lower Thirds Suite', () => {
     expect(screen.getByText('BOWLING')).toBeDefined();
   });
 });
+

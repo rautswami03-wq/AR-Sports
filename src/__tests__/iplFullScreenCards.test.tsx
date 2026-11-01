@@ -128,3 +128,4 @@ describe('IPL 2025 Full-Screen Cards Suite', () => {
     expect(screen.getByText('BOWLING STATS')).toBeDefined();
   });
 });
+

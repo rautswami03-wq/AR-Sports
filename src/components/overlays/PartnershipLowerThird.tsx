@@ -96,3 +96,4 @@ export const PartnershipLowerThird: React.FC<PartnershipLowerThirdProps> = ({
     </LowerThirdBase>
   );
 };
+

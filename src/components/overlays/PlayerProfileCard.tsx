@@ -53,8 +53,8 @@ export const PlayerProfileCard: React.FC<PlayerProfileCardProps> = ({
     bowl?.economy && bowl.economy > 0
       ? bowl.economy.toFixed(2)
       : totalBowledBalls > 0
-      ? ((runsConceded / totalBowledBalls) * 6).toFixed(2)
-      : '8.00';
+        ? ((runsConceded / totalBowledBalls) * 6).toFixed(2)
+        : '8.00';
 
   return (
     <div className={`fixed inset-0 flex items-center justify-center z-50 pointer-events-none p-4 ${className}`}>

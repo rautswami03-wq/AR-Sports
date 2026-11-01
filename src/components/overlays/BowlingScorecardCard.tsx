@@ -132,3 +132,4 @@ export const BowlingScorecardCard: React.FC<BowlingScorecardCardProps> = ({ clas
     </div>
   );
 };
+
