@@ -17,6 +17,11 @@ import { BatterLowerThird } from '../overlays/BatterLowerThird';
 import { BowlerLowerThird } from '../overlays/BowlerLowerThird';
 import { PartnershipLowerThird } from '../overlays/PartnershipLowerThird';
 import { ManOfTheMatchLowerThird } from '../overlays/ManOfTheMatchLowerThird';
+import { TeamsLineupCard } from '../overlays/TeamsLineupCard';
+import { BattingScorecardCard } from '../overlays/BattingScorecardCard';
+import { BowlingScorecardCard } from '../overlays/BowlingScorecardCard';
+import { MatchSummaryCard } from '../overlays/MatchSummaryCard';
+import { PlayerProfileCard } from '../overlays/PlayerProfileCard';
 import { BattingLowerThird } from '../overlays/BattingLowerThird';
 import { BowlingLowerThird } from '../overlays/BowlingLowerThird';
 import { BattingScorecard } from '../overlays/BattingScorecard';
@@ -279,9 +284,27 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
             <LowerThird key="bowlingL3" type="bowler" />
           )
         )}
-        {isVisible('battingScorecard') && <BattingScorecard key="battingCard" />}
-        {isVisible('bowlingScorecard') && <BowlingScorecard key="bowlingCard" />}
-        {isVisible('matchSummary') && <MatchSummary key="matchSummary" />}
+        {isVisible('battingScorecard') && (
+          tournamentId === 'ipl25' || tournamentId === '15' ? (
+            <BattingScorecardCard key="battingCard_ipl" />
+          ) : (
+            <BattingScorecard key="battingCard" />
+          )
+        )}
+        {isVisible('bowlingScorecard') && (
+          tournamentId === 'ipl25' || tournamentId === '15' ? (
+            <BowlingScorecardCard key="bowlingCard_ipl" />
+          ) : (
+            <BowlingScorecard key="bowlingCard" />
+          )
+        )}
+        {isVisible('matchSummary') && (
+          tournamentId === 'ipl25' || tournamentId === '15' ? (
+            <MatchSummaryCard key="matchSummary_ipl" />
+          ) : (
+            <MatchSummary key="matchSummary" />
+          )
+        )}
         {isVisible('partnership') && (
           tournamentId === 'ipl25' || tournamentId === '15' ? (
             <PartnershipLowerThird key="partnership_ipl" />
@@ -296,9 +319,21 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
         {isVisible('fallOfWickets') && <FallOfWicketsOverlay key="fow" />}
         {isVisible('target') && <TargetOverlay key="target" />}
         {isVisible('winnerScreen') && <WinnerScreenOverlay key="winnerScreen" />}
-        {isVisible('playingXI') && <PlayingXIOverlay key="playingXI" />}
+        {isVisible('playingXI') && (
+          tournamentId === 'ipl25' || tournamentId === '15' ? (
+            <TeamsLineupCard key="playingXI_ipl" />
+          ) : (
+            <PlayingXIOverlay key="playingXI" />
+          )
+        )}
         {isVisible('toss') && <TossOverlay key="toss" />}
-        {isVisible('playerStatistics') && <PlayerStatisticsOverlay key="playerStats" />}
+        {isVisible('playerStatistics') && (
+          tournamentId === 'ipl25' || tournamentId === '15' ? (
+            <PlayerProfileCard key="playerStats_ipl" />
+          ) : (
+            <PlayerStatisticsOverlay key="playerStats" />
+          )
+        )}
         {isVisible('bowlerStatistics') && <BowlerStatisticsOverlay key="bowlerStats" />}
         {isVisible('playerOfTheMatch') && (
           tournamentId === 'ipl25' || tournamentId === '15' ? (
