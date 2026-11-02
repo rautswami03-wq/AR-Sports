@@ -177,3 +177,4 @@ export const ManhattanChart: React.FC<ManhattanChartProps> = ({
     </div>
   );
 };
+

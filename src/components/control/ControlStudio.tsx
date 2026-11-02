@@ -49,9 +49,17 @@ export const ControlStudio: React.FC = () => {
     isWsConnected,
     historyStack,
     tournamentId,
+    teamABulkPaste,
+    teamBBulkPaste,
+    teamAName,
+    teamBName,
     overlayAckAt,
     syncErrorCount,
     setTournamentId,
+    setTeamABulkPaste,
+    setTeamBBulkPaste,
+    setTeamAName,
+    setTeamBName,
     updateMatchSettings,
     toggleOverlay,
     triggerAnimation,
@@ -100,8 +108,6 @@ export const ControlStudio: React.FC = () => {
   const [bowlerInput, setBowlerInput] = useState('');
   const [customAnimInput, setCustomAnimInput] = useState('');
   const [customDisplayInput, setCustomDisplayInput] = useState('');
-  const [team1BulkText, setTeam1BulkText] = useState('');
-  const [team2BulkText, setTeam2BulkText] = useState('');
 
 
   const [extraWide, setExtraWide] = useState(false);
@@ -852,29 +858,63 @@ export const ControlStudio: React.FC = () => {
 
 
                 <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3">
-                  <span className="text-xs font-black uppercase text-amber-400 block">
-                    ADD PLAYERS
-                  </span>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black uppercase text-amber-400 block">
+                      TEAMS & PLAYERS SETUP
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-bold uppercase">
+                      Changes persist across tabs
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 pb-3 border-b border-slate-800">
+                    <div>
+                      <label className="text-[11px] font-bold text-slate-300 block mb-1">
+                        Team 1 Name
+                      </label>
+                      <input
+                        type="text"
+                        value={teamAName || teamA.fullName}
+                        onChange={(e) => setTeamAName(e.target.value)}
+                        placeholder="Team 1 Name"
+                        className="w-full p-2 text-xs bg-slate-900 text-white rounded border border-slate-700 focus:outline-none focus:border-amber-400 font-bold"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[11px] font-bold text-slate-300 block mb-1">
+                        Team 2 Name
+                      </label>
+                      <input
+                        type="text"
+                        value={teamBName || teamB.fullName}
+                        onChange={(e) => setTeamBName(e.target.value)}
+                        placeholder="Team 2 Name"
+                        className="w-full p-2 text-xs bg-slate-900 text-white rounded border border-slate-700 focus:outline-none focus:border-amber-400 font-bold"
+                      />
+                    </div>
+                  </div>
+
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <span className="text-[11px] font-bold text-slate-300 block mb-1">
-                        {teamA.fullName} Players (Comma Separated)
+                        {teamA.fullName} Players (Comma or Newline Separated)
                       </span>
                       <textarea
                         rows={2}
-                        value={team1BulkText}
-                        onChange={(e) => setTeam1BulkText(e.target.value)}
+                        value={teamABulkPaste}
+                        onChange={(e) => setTeamABulkPaste(e.target.value)}
                         placeholder="Player 1, Player 2, Player 3..."
-                        className="w-full p-2 text-xs bg-slate-900 text-white rounded border border-slate-700 focus:outline-none"
+                        className="w-full p-2 text-xs bg-slate-900 text-white rounded border border-slate-700 focus:outline-none focus:border-cyan-400 font-sans"
                       />
                       <button
                         onClick={() => {
-                          if (team1BulkText) {
-                            bulkAddPlayers('teamA', team1BulkText.split(','));
-                            setTeam1BulkText('');
+                          const names = (teamABulkPaste || '').split(/[\n,]+/).map((s) => s.trim()).filter(Boolean);
+                          if (names.length > 0) {
+                            bulkAddPlayers('teamA', names);
+                            setTeamABulkPaste('');
                           }
                         }}
-                        className="mt-1.5 w-full py-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded uppercase"
+                        className="mt-1.5 w-full py-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded uppercase transition-colors"
                       >
                         ADD TO {teamA.shortName}
                       </button>
@@ -882,23 +922,24 @@ export const ControlStudio: React.FC = () => {
 
                     <div>
                       <span className="text-[11px] font-bold text-slate-300 block mb-1">
-                        {teamB.fullName} Players (Comma Separated)
+                        {teamB.fullName} Players (Comma or Newline Separated)
                       </span>
                       <textarea
                         rows={2}
-                        value={team2BulkText}
-                        onChange={(e) => setTeam2BulkText(e.target.value)}
+                        value={teamBBulkPaste}
+                        onChange={(e) => setTeamBBulkPaste(e.target.value)}
                         placeholder="Player 1, Player 2, Player 3..."
-                        className="w-full p-2 text-xs bg-slate-900 text-white rounded border border-slate-700 focus:outline-none"
+                        className="w-full p-2 text-xs bg-slate-900 text-white rounded border border-slate-700 focus:outline-none focus:border-cyan-400 font-sans"
                       />
                       <button
                         onClick={() => {
-                          if (team2BulkText) {
-                            bulkAddPlayers('teamB', team2BulkText.split(','));
-                            setTeam2BulkText('');
+                          const names = (teamBBulkPaste || '').split(/[\n,]+/).map((s) => s.trim()).filter(Boolean);
+                          if (names.length > 0) {
+                            bulkAddPlayers('teamB', names);
+                            setTeamBBulkPaste('');
                           }
                         }}
-                        className="mt-1.5 w-full py-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded uppercase"
+                        className="mt-1.5 w-full py-1 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded uppercase transition-colors"
                       >
                         ADD TO {teamB.shortName}
                       </button>

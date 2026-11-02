@@ -18,6 +18,7 @@ export const TossMatchModal: React.FC<TossMatchModalProps> = ({ isOpen, onClose 
     updateBowlerStats,
     setActivePairs,
     changeBowler,
+    bulkAddPlayers,
     startNewMatchWithTeams,
   } = useBroadcastStore();
 
@@ -98,12 +99,31 @@ export const TossMatchModal: React.FC<TossMatchModalProps> = ({ isOpen, onClose 
       currentInnings: 1,
     });
 
-    const freshStore = useBroadcastStore.getState();
     const isBattingFreshA = battingTeamId === freshTeamA.id || battingTeamId === 'teamA';
-    const activeBatting = isBattingFreshA ? freshStore.teamA : freshStore.teamB;
+    const activeBattingKey = isBattingFreshA ? 'teamA' : 'teamB';
+    const activeBatting = isBattingFreshA ? freshTeamA : freshTeamB;
 
-    const strikerObj = activeBatting.batters.find(b => b.name === strikerName) || activeBatting.batters[0];
-    const nonStrikerObj = activeBatting.batters.find(b => b.name === nonStrikerName) || activeBatting.batters[1];
+    const sName = (strikerName || '').trim();
+    const nsName = (nonStrikerName || '').trim();
+    const bName = (bowlerName || '').trim();
+
+    // Ensure striker and non-striker are in the batting roster
+    const missing: string[] = [];
+    if (sName && !activeBatting.batters.some((b) => b.name.toLowerCase() === sName.toLowerCase())) {
+      missing.push(sName);
+    }
+    if (nsName && nsName.toLowerCase() !== sName.toLowerCase() && !activeBatting.batters.some((b) => b.name.toLowerCase() === nsName.toLowerCase())) {
+      missing.push(nsName);
+    }
+    if (missing.length > 0) {
+      bulkAddPlayers(activeBattingKey, missing);
+    }
+
+    const currentStore = useBroadcastStore.getState();
+    const currentBatting = isBattingFreshA ? currentStore.teamA : currentStore.teamB;
+
+    const strikerObj = currentBatting.batters.find((b) => b.name.toLowerCase() === sName.toLowerCase()) || currentBatting.batters[0];
+    const nonStrikerObj = currentBatting.batters.find((b) => b.name.toLowerCase() === nsName.toLowerCase()) || currentBatting.batters[1];
 
     if (strikerObj && nonStrikerObj) {
       setActivePairs(strikerObj.id, nonStrikerObj.id);
@@ -111,8 +131,8 @@ export const TossMatchModal: React.FC<TossMatchModalProps> = ({ isOpen, onClose 
       updateBatterStats(strikerObj.id, { isStriker: true });
     }
 
-    if (bowlerName) {
-      changeBowler(bowlerName);
+    if (bName) {
+      changeBowler(bName);
     }
 
     onClose();
@@ -194,90 +214,57 @@ export const TossMatchModal: React.FC<TossMatchModalProps> = ({ isOpen, onClose 
                 <label className="block text-[10px] font-black uppercase text-cyan-200">Striker (*)</label>
                 <span className="text-[9px] text-cyan-300 font-bold uppercase">{battingTeam.shortName || 'BAT'}</span>
               </div>
-              <div className="relative">
-                <select
-                  value={strikerName}
-                  disabled={battingBatters.length === 0}
-                  onChange={(e) => setStrikerName(e.target.value)}
-                  className={`w-full px-3 py-2 pr-8 bg-slate-950 border border-slate-700 rounded-lg text-white font-bold text-xs focus:outline-none focus:border-cyan-400 appearance-none cursor-pointer ${
-                    battingBatters.length === 0 ? 'opacity-60 cursor-not-allowed text-slate-400' : ''
-                  }`}
-                >
-                  {battingBatters.length === 0 ? (
-                    <option value="" disabled>-- Paste players above first --</option>
-                  ) : (
-                    <>
-                      <option value="">Select Opening Striker...</option>
-                      {battingBatters.map((b) => (
-                        <option key={b.id} value={b.name}>
-                          {b.name}
-                        </option>
-                      ))}
-                    </>
-                  )}
-                </select>
-                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
-              </div>
+              <input
+                type="text"
+                value={strikerName}
+                onChange={(e) => setStrikerName(e.target.value)}
+                placeholder="Select or type striker..."
+                list="striker-options"
+                className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white font-bold text-xs focus:outline-none focus:border-cyan-400"
+              />
+              <datalist id="striker-options">
+                {battingBatters.map((b) => (
+                  <option key={b.id} value={b.name} />
+                ))}
+              </datalist>
             </div>
             <div>
               <div className="flex justify-between items-center mb-1">
                 <label className="block text-[10px] font-black uppercase text-cyan-200">Non-Striker</label>
                 <span className="text-[9px] text-cyan-300 font-bold uppercase">{battingTeam.shortName || 'BAT'}</span>
               </div>
-              <div className="relative">
-                <select
-                  value={nonStrikerName}
-                  disabled={battingBatters.length === 0}
-                  onChange={(e) => setNonStrikerName(e.target.value)}
-                  className={`w-full px-3 py-2 pr-8 bg-slate-950 border border-slate-700 rounded-lg text-white font-bold text-xs focus:outline-none focus:border-cyan-400 appearance-none cursor-pointer ${
-                    battingBatters.length === 0 ? 'opacity-60 cursor-not-allowed text-slate-400' : ''
-                  }`}
-                >
-                  {battingBatters.length === 0 ? (
-                    <option value="" disabled>-- Paste players above first --</option>
-                  ) : (
-                    <>
-                      <option value="">Select Non-Striker...</option>
-                      {battingBatters.map((b) => (
-                        <option key={b.id} value={b.name} disabled={b.name === strikerName}>
-                          {b.name} {b.name === strikerName ? '(Striker)' : ''}
-                        </option>
-                      ))}
-                    </>
-                  )}
-                </select>
-                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
-              </div>
+              <input
+                type="text"
+                value={nonStrikerName}
+                onChange={(e) => setNonStrikerName(e.target.value)}
+                placeholder="Select or type non-striker..."
+                list="nonstriker-options"
+                className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white font-bold text-xs focus:outline-none focus:border-cyan-400"
+              />
+              <datalist id="nonstriker-options">
+                {battingBatters.map((b) => (
+                  <option key={b.id} value={b.name} />
+                ))}
+              </datalist>
             </div>
             <div>
               <div className="flex justify-between items-center mb-1">
                 <label className="block text-[10px] font-black uppercase text-cyan-200">Bowler</label>
                 <span className="text-[9px] text-cyan-300 font-bold uppercase">{bowlingTeam.shortName || 'BOWL'}</span>
               </div>
-              <div className="relative">
-                <select
-                  value={bowlerName}
-                  disabled={bowlingCandidates.length === 0}
-                  onChange={(e) => setBowlerName(e.target.value)}
-                  className={`w-full px-3 py-2 pr-8 bg-slate-950 border border-slate-700 rounded-lg text-white font-bold text-xs focus:outline-none focus:border-cyan-400 appearance-none cursor-pointer ${
-                    bowlingCandidates.length === 0 ? 'opacity-60 cursor-not-allowed text-slate-400' : ''
-                  }`}
-                >
-                  {bowlingCandidates.length === 0 ? (
-                    <option value="" disabled>-- Paste players above first --</option>
-                  ) : (
-                    <>
-                      <option value="">Select Opening Bowler...</option>
-                      {bowlingCandidates.map((name, idx) => (
-                        <option key={idx} value={name}>
-                          {name}
-                        </option>
-                      ))}
-                    </>
-                  )}
-                </select>
-                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400 pointer-events-none" />
-              </div>
+              <input
+                type="text"
+                value={bowlerName}
+                onChange={(e) => setBowlerName(e.target.value)}
+                placeholder="Select or type bowler..."
+                list="bowler-options"
+                className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-lg text-white font-bold text-xs focus:outline-none focus:border-cyan-400"
+              />
+              <datalist id="bowler-options">
+                {bowlingCandidates.map((name, idx) => (
+                  <option key={idx} value={name} />
+                ))}
+              </datalist>
             </div>
           </div>
 

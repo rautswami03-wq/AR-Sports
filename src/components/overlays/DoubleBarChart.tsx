@@ -146,3 +146,4 @@ export const DoubleBarChart: React.FC<DoubleBarChartProps> = ({
     </div>
   );
 };
+

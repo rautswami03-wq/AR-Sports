@@ -196,3 +196,4 @@ describe('IPL 2025 Match Summary Charts Suite', () => {
     expect(screen.getByTestId('summary-table-view')).toBeDefined();
   });
 });
+

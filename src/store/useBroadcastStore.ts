@@ -64,6 +64,10 @@ export interface BroadcastStoreState {
   historyStack: HistorySnapshot[];
   blitzSettings: BlitzCustomSettings;
   ballLog: BallLogEntry[];
+  teamABulkPaste: string;
+  teamBBulkPaste: string;
+  teamAName: string;
+  teamBName: string;
   // Actions
   incrementSyncError?: () => void;
   setOverlayAck: (at: number) => void;
@@ -93,6 +97,10 @@ export interface BroadcastStoreState {
   updateTeamColors: (teamId: 'teamA' | 'teamB', primary: string, secondary: string, accent?: string) => void;
   setTournament: (tournamentId: string) => void;
   setTournamentId: (tournamentId: string) => void;
+  setTeamABulkPaste: (text: string) => void;
+  setTeamBBulkPaste: (text: string) => void;
+  setTeamAName: (name: string) => void;
+  setTeamBName: (name: string) => void;
   archiveAndReset: () => void;
   loadArchiveAsNewMatch: (archiveMatchId: string) => void;
   resetMatchState: () => void;
@@ -261,6 +269,7 @@ function buildCompactSyncPayload(state: any) {
       balls: state.teamA?.balls || 0,
       extras: state.teamA?.extras || 0,
       fallOfWickets: state.teamA?.fallOfWickets || [],
+      playingXI: state.teamA?.playingXI || [],
       batters: (state.teamA?.batters || []).map((b: any) => ({
         id: b.id,
         name: b.name,
@@ -298,6 +307,7 @@ function buildCompactSyncPayload(state: any) {
       balls: state.teamB?.balls || 0,
       extras: state.teamB?.extras || 0,
       fallOfWickets: state.teamB?.fallOfWickets || [],
+      playingXI: state.teamB?.playingXI || [],
       batters: (state.teamB?.batters || []).map((b: any) => ({
         id: b.id,
         name: b.name,
@@ -327,6 +337,10 @@ function buildCompactSyncPayload(state: any) {
     activeOverlays: state.activeOverlays,
     activeAnimation: state.activeAnimation,
     tournamentId: state.tournamentId,
+    teamABulkPaste: state.teamABulkPaste || '',
+    teamBBulkPaste: state.teamBBulkPaste || '',
+    teamAName: state.teamAName || state.teamA?.fullName || '',
+    teamBName: state.teamBName || state.teamB?.fullName || '',
     ballLog: state.ballLog || [],
   };
 }
@@ -517,6 +531,10 @@ function loadInitialState() {
           activeOverlays: parsed.activeOverlays || INITIAL_OVERLAYS,
           activeAnimation: parsed.activeAnimation || null,
           tournamentId: parsed.tournamentId || 'ipl25',
+          teamABulkPaste: parsed.teamABulkPaste || '',
+          teamBBulkPaste: parsed.teamBBulkPaste || '',
+          teamAName: parsed.teamAName || parsed.teamA?.fullName || DEFAULT_TEAM_A.fullName,
+          teamBName: parsed.teamBName || parsed.teamB?.fullName || DEFAULT_TEAM_B.fullName,
           blitzSettings: (() => { try { const s = localStorage.getItem('ar_blitz_settings'); return s ? JSON.parse(s) : DEFAULT_BLITZ_SETTINGS; } catch { return DEFAULT_BLITZ_SETTINGS; } })(),
           ballLog: parsed.ballLog || [],
         };
@@ -534,6 +552,10 @@ function loadInitialState() {
     activeOverlays: INITIAL_OVERLAYS,
     activeAnimation: null,
     tournamentId: 'ipl25',
+    teamABulkPaste: '',
+    teamBBulkPaste: '',
+    teamAName: DEFAULT_TEAM_A.fullName,
+    teamBName: DEFAULT_TEAM_B.fullName,
     blitzSettings: DEFAULT_BLITZ_SETTINGS,
     ballLog: [],
   };
@@ -659,6 +681,10 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
   activeAnimation: loadedState.activeAnimation,
   animationTimeoutId: null,
   tournamentId: loadedState.tournamentId,
+  teamABulkPaste: loadedState.teamABulkPaste || '',
+  teamBBulkPaste: loadedState.teamBBulkPaste || '',
+  teamAName: loadedState.teamAName || loadedState.teamA?.fullName || 'Team A',
+  teamBName: loadedState.teamBName || loadedState.teamB?.fullName || 'Team B',
   isWsConnected: false,
   historyStack: [],
   blitzSettings: DEFAULT_BLITZ_SETTINGS,
@@ -719,6 +745,10 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
       ...(newState.activeOverlays ? { activeOverlays: { ...state.activeOverlays, ...newState.activeOverlays } } : {}),
       ...(newState.activeAnimation !== undefined ? { activeAnimation: newState.activeAnimation } : {}),
       ...(newState.tournamentId ? { tournamentId: newState.tournamentId } : {}),
+      ...(newState.teamABulkPaste !== undefined ? { teamABulkPaste: newState.teamABulkPaste } : {}),
+      ...(newState.teamBBulkPaste !== undefined ? { teamBBulkPaste: newState.teamBBulkPaste } : {}),
+      ...(newState.teamAName ? { teamAName: newState.teamAName } : {}),
+      ...(newState.teamBName ? { teamBName: newState.teamBName } : {}),
       ...(newState.ballLog !== undefined ? { ballLog: newState.ballLog } : {}),
       ...(newState.matchArchive !== undefined ? { matchArchive: newState.matchArchive } : {}),
     }));
@@ -1353,7 +1383,9 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
         shortName: newShortName,
         logoUrl: details.logoUrl !== undefined ? details.logoUrl : state[targetTeam].logoUrl,
       };
-      const nextState = { [targetTeam]: updatedTeam };
+      const nextState: any = { [targetTeam]: updatedTeam };
+      if (targetTeam === 'teamA') nextState.teamAName = newFullName;
+      if (targetTeam === 'teamB') nextState.teamBName = newFullName;
       postStateSync({ ...state, ...nextState });
       return nextState;
     });
@@ -1431,20 +1463,31 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
   bulkAddPlayers: (targetTeam, playerNames) => {
     set((state) => {
       const team = state[targetTeam];
-      const newBatters = playerNames.map((name, i) => ({
+      const validNames = (playerNames || []).map((name) => name.trim()).filter((name) => name.length > 0);
+      if (validNames.length === 0) return {};
+
+      const isDefaultBatters = team.batters.length === 2 &&
+        team.batters.every((b) => b.name.startsWith('Striker ') && b.runs === 0 && b.balls === 0);
+
+      const existingNames = new Set(team.batters.map((b) => b.name.toLowerCase()));
+      const toAdd = isDefaultBatters ? validNames : validNames.filter((n) => !existingNames.has(n.toLowerCase()));
+
+      const newBatters = toAdd.map((name, i) => ({
         id: `p_${Date.now()}_${i}`,
-        name: name.trim(),
+        name,
         runs: 0,
         balls: 0,
         fours: 0,
         sixes: 0,
         isOut: false,
-        isStriker: false,
+        isStriker: isDefaultBatters ? i === 0 : false,
       }));
+
+      const finalBatters = isDefaultBatters ? newBatters : [...team.batters, ...newBatters];
       const updatedTeam = {
         ...team,
-        playingXI: playerNames.map((p) => p.trim()),
-        batters: [...team.batters, ...newBatters],
+        playingXI: validNames.length > 0 ? validNames : team.playingXI,
+        batters: finalBatters,
       };
       const nextState = { [targetTeam]: updatedTeam };
       postStateSync({ ...state, ...nextState });
@@ -1499,15 +1542,75 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
 
   setTournament: (tournamentId) => {
     set((state) => {
-      postStateSync({ ...state, tournamentId });
-      return { tournamentId };
+      const nextState = {
+        tournamentId,
+        teamA: state.teamA,
+        teamB: state.teamB,
+        teamAName: state.teamAName || state.teamA.fullName,
+        teamBName: state.teamBName || state.teamB.fullName,
+        teamABulkPaste: state.teamABulkPaste,
+        teamBBulkPaste: state.teamBBulkPaste,
+      };
+      postStateSync({ ...state, ...nextState });
+      return nextState;
     });
   },
 
   setTournamentId: (tournamentId) => {
     set((state) => {
-      postStateSync({ ...state, tournamentId });
-      return { tournamentId };
+      const nextState = {
+        tournamentId,
+        teamA: state.teamA,
+        teamB: state.teamB,
+        teamAName: state.teamAName || state.teamA.fullName,
+        teamBName: state.teamBName || state.teamB.fullName,
+        teamABulkPaste: state.teamABulkPaste,
+        teamBBulkPaste: state.teamBBulkPaste,
+      };
+      postStateSync({ ...state, ...nextState });
+      return nextState;
+    });
+  },
+
+  setTeamABulkPaste: (text) => {
+    set((state) => {
+      const nextState = { teamABulkPaste: text };
+      postStateSync({ ...state, ...nextState });
+      return nextState;
+    });
+  },
+
+  setTeamBBulkPaste: (text) => {
+    set((state) => {
+      const nextState = { teamBBulkPaste: text };
+      postStateSync({ ...state, ...nextState });
+      return nextState;
+    });
+  },
+
+  setTeamAName: (name) => {
+    set((state) => {
+      const trimmed = name.trim();
+      const shortName = trimmed
+        ? (trimmed.split(' ').map((w) => w[0]).join('').substring(0, 4).toUpperCase() || trimmed.substring(0, 3).toUpperCase())
+        : state.teamA.shortName;
+      const nextTeamA = { ...state.teamA, fullName: name, shortName };
+      const nextState = { teamAName: name, teamA: nextTeamA };
+      postStateSync({ ...state, ...nextState });
+      return nextState;
+    });
+  },
+
+  setTeamBName: (name) => {
+    set((state) => {
+      const trimmed = name.trim();
+      const shortName = trimmed
+        ? (trimmed.split(' ').map((w) => w[0]).join('').substring(0, 4).toUpperCase() || trimmed.substring(0, 3).toUpperCase())
+        : state.teamB.shortName;
+      const nextTeamB = { ...state.teamB, fullName: name, shortName };
+      const nextState = { teamBName: name, teamB: nextTeamB };
+      postStateSync({ ...state, ...nextState });
+      return nextState;
     });
   },
 
@@ -1532,6 +1635,10 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
       matchId: newMatchId,
       teamA: DEFAULT_TEAM_A,
       teamB: DEFAULT_TEAM_B,
+      teamAName: DEFAULT_TEAM_A.fullName,
+      teamBName: DEFAULT_TEAM_B.fullName,
+      teamABulkPaste: '',
+      teamBBulkPaste: '',
       matchDetails: DEFAULT_MATCH_DETAILS,
       activeOverlays: INITIAL_OVERLAYS,
       activeAnimation: null,
@@ -1587,6 +1694,10 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
         matchId: newMatchId,
         teamA: resetArchivedTeam(archived.teamA),
         teamB: resetArchivedTeam(archived.teamB),
+        teamAName: archived.teamA.fullName,
+        teamBName: archived.teamB.fullName,
+        teamABulkPaste: '',
+        teamBBulkPaste: '',
         battingTeamId: 'teamA',
         bowlingTeamId: 'teamB',
         matchDetails: {
@@ -1690,6 +1801,10 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
         matchId: generateMatchId(),
         teamA: resetTeam(state.teamA, teamAName, shortA),
         teamB: resetTeam(state.teamB, teamBName, shortB),
+        teamAName,
+        teamBName,
+        teamABulkPaste: '',
+        teamBBulkPaste: '',
         battingTeamId: 'teamA',
         bowlingTeamId: 'teamB',
         matchDetails: {

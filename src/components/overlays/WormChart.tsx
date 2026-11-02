@@ -189,3 +189,4 @@ export const WormChart: React.FC<WormChartProps> = ({
     </div>
   );
 };
+
