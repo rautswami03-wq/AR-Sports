@@ -833,13 +833,7 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
       return;
     }
 
-    const defaultDuration =
-      type === 'SIX' ? 3000 :
-      type === 'WICKET' ? 3000 :
-      type === 'FREE_HIT' ? 3000 :
-      type === 'FOUR' ? 3000 :
-      3000;
-
+    const defaultDuration = 3500;
     const timeoutDuration = durationMs ?? defaultDuration;
 
     const newTimeout = setTimeout(() => {
@@ -903,10 +897,8 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
         striker.balls += 1;
         
         if (runs === 4) {
-          setTimeout(() => get().triggerAnimation('FOUR'), 50);
           striker.fours = (striker.fours || 0) + 1;
         } else if (runs === 6) {
-          setTimeout(() => get().triggerAnimation('SIX'), 50);
           striker.sixes = (striker.sixes || 0) + 1;
         }
         if (boundaryType === 6 && runs !== 6) striker.sixes = (striker.sixes || 0) + 1;
@@ -980,10 +972,10 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
     if (prevRuns < 100 && newRuns >= 100) milestoneReached = 'CENTURY';
 
     if (milestoneReached) {
-      get().triggerAnimation(milestoneReached, 5000);
+      get().triggerAnimation(milestoneReached, 3500);
     } else {
-      if (boundaryType === 4) get().triggerAnimation('FOUR', 3500);
-      if (boundaryType === 6) get().triggerAnimation('SIX', 4500);
+      if (boundaryType === 4 || runs === 4) get().triggerAnimation('FOUR', 3500);
+      else if (boundaryType === 6 || runs === 6) get().triggerAnimation('SIX', 3500);
     }
   },
 
@@ -1101,8 +1093,8 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
       return nextState;
     });
 
-    if (extraType === 'WIDE') get().triggerAnimation('WIDE', 3000);
-    if (extraType === 'NO_BALL') get().triggerAnimation('NO_BALL', 3000);
+    if (extraType === 'WIDE') get().triggerAnimation('WIDE', 3500);
+    if (extraType === 'NO_BALL') get().triggerAnimation('NO_BALL', 3500);
   },
 
   addPenaltyRuns: (targetTeam, runs) => {
@@ -1251,32 +1243,32 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
       return nextState;
     });
 
-    get().triggerAnimation('WICKET', 3000);
+    get().triggerAnimation('WICKET', 3500);
   },
 
   undoLastBall: () => {
     set((state) => {
-      if (state.historyStack.length === 0) return state;
-      const history = [...state.historyStack];
-      const lastSnapshot = history.pop();
+      if (!state.historyStack || state.historyStack.length === 0) return state;
+      const lastSnapshot = state.historyStack[state.historyStack.length - 1];
       if (!lastSnapshot) return state;
+      const nextHistoryStack = state.historyStack.slice(0, -1);
 
       const nextBallLog = lastSnapshot.ballLog !== undefined
         ? lastSnapshot.ballLog
         : (state.ballLog && state.ballLog.length > 0 ? state.ballLog.slice(0, -1) : []);
 
-      const nextState = {
-        teamA: lastSnapshot.teamA,
-        teamB: lastSnapshot.teamB,
-        matchDetails: lastSnapshot.matchDetails,
+      const revertedState = {
+        teamA: JSON.parse(JSON.stringify(lastSnapshot.teamA)),
+        teamB: JSON.parse(JSON.stringify(lastSnapshot.teamB)),
+        matchDetails: JSON.parse(JSON.stringify(lastSnapshot.matchDetails)),
         battingTeamId: lastSnapshot.battingTeamId,
         bowlingTeamId: lastSnapshot.bowlingTeamId,
-        historyStack: history,
+        historyStack: nextHistoryStack,
         activeAnimation: null,
         ballLog: nextBallLog,
       };
-      postStateSync({ ...state, ...nextState });
-      return nextState;
+      postStateSync({ ...state, ...revertedState });
+      return revertedState;
     });
 
     if (typeof window !== 'undefined') {
@@ -1674,6 +1666,8 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
       teamB: DEFAULT_TEAM_B,
       teamAName: DEFAULT_TEAM_A.fullName,
       teamBName: DEFAULT_TEAM_B.fullName,
+      battingTeamId: 'teamA',
+      bowlingTeamId: 'teamB',
       teamABulkPaste: '',
       teamBBulkPaste: '',
       matchDetails: {

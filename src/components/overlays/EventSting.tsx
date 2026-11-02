@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useBroadcastStore } from '../../store/useBroadcastStore';
 
 export interface EventStingProps {
@@ -115,26 +115,28 @@ export const EventSting: React.FC<EventStingProps> = ({
   }, [onComplete]);
 
   return (
-    <div
-      className={`fixed top-1/2 left-0 w-full -translate-y-1/2 z-[100] select-none font-sans overflow-hidden flex items-center justify-center pointer-events-none drop-shadow-2xl ${className}`}
-      data-testid="event-sting"
-      data-event-type={themeKey}
-      style={{ fontFamily: "'Barlow Condensed', 'Roboto Condensed', sans-serif" }}
-    >
-      {/* ── Outer Aggressive High-Speed Motion Container ── */}
-      <motion.div
-        initial={{ x: '-100%', opacity: 0 }}
-        animate={{ x: '0%', opacity: 1 }}
-        exit={{ x: '100%', opacity: 0 }}
-        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-        className="relative w-full h-[150px] md:h-[180px] flex items-center justify-center overflow-hidden"
-        style={{
-          background: theme.bgGradient,
-          boxShadow: `0 0 50px ${theme.glowColor}, 0 20px 60px rgba(0,0,0,0.95)`,
-          borderTop: `4px solid ${theme.borderColor}`,
-          borderBottom: `4px solid ${theme.borderColor}`,
-        }}
+    <AnimatePresence mode="wait">
+      <div
+        key={themeKey + Date.now()}
+        className={`fixed top-1/2 left-0 w-full -translate-y-1/2 z-50 select-none font-sans overflow-hidden flex items-center justify-center pointer-events-none drop-shadow-2xl ${className}`}
+        data-testid="event-sting"
+        data-event-type={themeKey}
+        style={{ fontFamily: "'Barlow Condensed', 'Roboto Condensed', sans-serif" }}
       >
+        {/* ── Outer Aggressive High-Speed Motion Container ── */}
+        <motion.div
+          initial={{ x: '-100%', opacity: 0 }}
+          animate={{ x: '0%', opacity: 1 }}
+          exit={{ x: '100%', opacity: 0 }}
+          transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+          className="relative w-full h-[150px] md:h-[180px] flex items-center justify-center overflow-hidden"
+          style={{
+            background: theme.bgGradient,
+            boxShadow: `0 0 50px ${theme.glowColor}, 0 20px 60px rgba(0,0,0,0.95)`,
+            borderTop: `4px solid ${theme.borderColor}`,
+            borderBottom: `4px solid ${theme.borderColor}`,
+          }}
+        >
         {/* Subtle Diagonal Shimmer Sheen (Broadcast television laser grade) */}
         <div
           className="absolute inset-0 pointer-events-none opacity-25"
@@ -222,6 +224,7 @@ export const EventSting: React.FC<EventStingProps> = ({
         </div>
       </motion.div>
     </div>
+    </AnimatePresence>
   );
 };
 

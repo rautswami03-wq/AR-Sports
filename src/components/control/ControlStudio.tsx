@@ -116,7 +116,6 @@ export const ControlStudio: React.FC = () => {
     prevOversRef.current = battingTeam.overs;
   }, [battingTeam.overs]);
 
-  const [bowlerInput, setBowlerInput] = useState('');
   const [customAnimInput, setCustomAnimInput] = useState(matchDetails.customAnimationText || '');
   const [customDisplayInput, setCustomDisplayInput] = useState(matchDetails.customInputText || '');
 
@@ -647,35 +646,25 @@ export const ControlStudio: React.FC = () => {
                     RETIRE BATTER
                   </button>
                   <button
-                    onClick={() => {
-                      if (bowlerInput) {
-                        changeBowler(bowlerInput);
-                        setBowlerInput('');
-                      } else {
-                        setShowBowlerModal(true);
-                      }
-                    }}
+                    onClick={() => setShowBowlerModal(true)}
                     className="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-xs rounded shadow"
                   >
                     CHANGE BOWLER
                   </button>
-                  <input
-                    type="text"
-                    placeholder="New Bowler..."
-                    value={bowlerInput}
-                    onChange={(e) => setBowlerInput(e.target.value)}
-                    className="px-2.5 py-1 text-xs bg-slate-950 text-white border border-slate-700 rounded w-28 focus:outline-none"
-                  />
 
                   {/* Active Player Selectors */}
                   <div className="w-full bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-3 mt-4">
-                    <span className="text-xs font-black uppercase text-cyan-400 block">
+                    <span className="text-xs font-black uppercase text-cyan-400 block tracking-wider">
                       ACTIVE PLAYERS SELECTION
                     </span>
-                    <div className="grid grid-cols-3 gap-3">
-                      <div>
-                        <label className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Striker</label>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div className="flex flex-col">
+                        <label htmlFor="active-striker-select" className="text-[10px] font-bold text-slate-400 uppercase block mb-1">
+                          Striker ({battingTeam.shortName || 'BAT'})
+                        </label>
                         <select
+                          id="active-striker-select"
+                          aria-label="Striker"
                           value={striker?.id || ''}
                           onChange={(e) => {
                             const val = e.target.value;
@@ -683,7 +672,7 @@ export const ControlStudio: React.FC = () => {
                               setActivePairs(val, nonStriker?.id || '');
                             }
                           }}
-                          className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-400 font-semibold"
+                          className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400 font-semibold transition-colors"
                         >
                           <option value="">Select Striker...</option>
                           {battingTeam.batters.map((b) => (
@@ -692,11 +681,18 @@ export const ControlStudio: React.FC = () => {
                             </option>
                           ))}
                         </select>
+                        <div className="mt-1 text-xs font-bold text-amber-400 tracking-wide">
+                          {striker ? `${striker.runs} (${striker.balls}b)` : '0 (0b)'}
+                        </div>
                       </div>
 
-                      <div>
-                        <label className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Non-Striker</label>
+                      <div className="flex flex-col">
+                        <label htmlFor="active-nonstriker-select" className="text-[10px] font-bold text-slate-400 uppercase block mb-1">
+                          Non-Striker ({battingTeam.shortName || 'BAT'})
+                        </label>
                         <select
+                          id="active-nonstriker-select"
+                          aria-label="Non-Striker"
                           value={nonStriker?.id || ''}
                           onChange={(e) => {
                             const val = e.target.value;
@@ -704,7 +700,7 @@ export const ControlStudio: React.FC = () => {
                               setActivePairs(striker?.id || '', val);
                             }
                           }}
-                          className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-400 font-semibold"
+                          className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400 font-semibold transition-colors"
                         >
                           <option value="">Select Non-Striker...</option>
                           {battingTeam.batters.map((b) => (
@@ -713,9 +709,12 @@ export const ControlStudio: React.FC = () => {
                             </option>
                           ))}
                         </select>
+                        <div className="mt-1 text-xs font-bold text-slate-300 tracking-wide">
+                          {nonStriker ? `${nonStriker.runs} (${nonStriker.balls}b)` : '0 (0b)'}
+                        </div>
                       </div>
 
-                      <div>
+                      <div className="flex flex-col">
                         <label htmlFor="active-bowler-select" className="text-[10px] font-bold text-slate-400 uppercase block mb-1">
                           Active Bowler ({bowlingTeam.shortName || 'BOWL'})
                         </label>
@@ -729,7 +728,7 @@ export const ControlStudio: React.FC = () => {
                               changeBowler(val);
                             }
                           }}
-                          className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-400 font-semibold"
+                          className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-cyan-400 font-semibold transition-colors"
                         >
                           <option value="">Select Bowler...</option>
                           {bowlingTeam.bowlers
@@ -740,6 +739,11 @@ export const ControlStudio: React.FC = () => {
                               </option>
                             ))}
                         </select>
+                        <div className="mt-1 text-xs font-bold text-cyan-400 font-mono tracking-wide">
+                          {currentBowler
+                            ? `${currentBowler.wickets}-${currentBowler.runsConceded} (${currentBowler.overs}.${currentBowler.ballsInCurrentOver})`
+                            : '0-0 (0.0)'}
+                        </div>
                       </div>
                     </div>
                   </div>

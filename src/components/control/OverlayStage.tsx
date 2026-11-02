@@ -433,14 +433,21 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
         {Boolean(activeOverlays.watermark || forcedOverlay === 'watermark') && isVisible('watermark') && (
           <WatermarkOverlay key="watermark" />
         )}
+      </AnimatePresence>
 
-        {/* Animations - EventSting (FOUR, SIX, WICKET) & IPLSuperAnimation */}
+      {/* Animations - EventSting (FOUR, SIX, WICKET) & IPLSuperAnimation */}
+      <AnimatePresence mode="wait">
         {activeAnimation && (
-          activeAnimation === 'FOUR' || activeAnimation === 'SIX' || activeAnimation === 'WICKET' ? (
-            <EventSting key={`eventSting_${activeAnimation}`} type={activeAnimation} />
-          ) : (
-            <IPLSuperAnimation key="animIPLSuper" />
-          )
+          <div
+            key={activeAnimation + Date.now()}
+            className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center overflow-hidden"
+          >
+            {activeAnimation === 'FOUR' || activeAnimation === 'SIX' || activeAnimation === 'WICKET' ? (
+              <EventSting type={activeAnimation} />
+            ) : (
+              <IPLSuperAnimation />
+            )}
+          </div>
         )}
       </AnimatePresence>
     </div>
