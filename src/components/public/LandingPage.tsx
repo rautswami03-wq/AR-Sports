@@ -36,6 +36,7 @@ import { THEME_LINKS_DATA } from '../control/ThemeLinksPage';
 import { useBroadcastStore } from '../../store/useBroadcastStore';
 import { OverlayStage } from '../control/OverlayStage';
 import { FEATURE_CATEGORIES_DATA } from './landingFeaturesData';
+import { SuiteProducts } from './SuiteProducts';
 
 const COLOR_STYLES: Record<string, {
   bg: string;
@@ -215,6 +216,8 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
+      {/* 3 Core Suite Products */}
+      <SuiteProducts />
 
       {/* Navigation Tabs (Themes / Features / OBS Guide) */}
       <section id="themes-gallery" className="px-6 max-w-7xl mx-auto mb-16">
@@ -238,7 +241,7 @@ export const LandingPage: React.FC = () => {
                   : 'border-transparent text-slate-400 hover:text-slate-200'
               }`}
             >
-              <Layers className="w-4 h-4" /> Feature Highlights
+              <Layers className="w-4 h-4" /> Core Capabilities
             </button>
             <button
               onClick={() => setActiveTab('obs_setup')}
@@ -334,7 +337,7 @@ export const LandingPage: React.FC = () => {
         </section>
       )}
 
-      {/* Tab 2: Feature Highlights */}
+      {/* Tab 2: Core Capabilities */}
       {activeTab === 'features' && (
         <section className="px-6 max-w-7xl mx-auto mb-24 animate-fade-in space-y-20">
           {/* Header intro */}
@@ -486,31 +489,26 @@ export const LandingPage: React.FC = () => {
             </p>
           </div>
 
-          {/* Col 2: Products List */}
+          {/* Col 2: Core Products List */}
           <div>
             <h5 className="font-black text-slate-100 uppercase tracking-widest text-sm mb-4 border-b border-slate-800 pb-1.5">
-              AR Sports Suite Products
+              Core Products
             </h5>
-            <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5 text-xs font-bold">
+            <ul className="flex flex-col gap-y-3 text-xs font-bold">
               {[
-                { name: 'Cricket Scoring App', desc: 'Ball-by-ball scoring with all formats.' },
-                { name: 'AR Sports Lite', desc: 'Casual, offline, local-first scoring + overlay.' },
-                { name: 'Cricket Streaming App', desc: 'Live stream, replay, and highlights.' },
-                { name: 'Cricket Highlight Generator', desc: 'Auto-generate clips, tag players.' },
-                { name: 'Cricket Score Overlay', desc: '50 panels, 17+ broadcast themes.' },
-                { name: 'Cricket League Website', desc: 'Build a professional league site.' },
-                { name: 'Cricket Web Dashboard', desc: 'Tournament + overlay management.' },
-                { name: 'TV Broadcast Solution', desc: 'Television-grade cricket production.' },
-                { name: 'AR Sports Broadcast', desc: 'Standalone TV-grade cricket production — no OBS.' },
-                { name: 'AR Sports TV', desc: 'Premium cricket streaming & tournament hosting.' }
+                { name: 'Cricket Scoring App', desc: 'Ball-by-ball scoring with hotkeys', path: '/control' },
+                { name: 'Cricket Score Overlay', desc: '50 panels, broadcast themes for OBS', path: '/overlay' },
+                { name: 'Cricket Web Dashboard', desc: 'Tournament + overlay management', path: '/tournament' },
               ].map((prod) => (
                 <li key={prod.name} className="group">
-                  <span className="text-slate-300 group-hover:text-cyan-400 transition-colors block font-black">
-                    {prod.name}
-                  </span>
-                  <span className="text-[10px] text-slate-500 font-medium block">
-                    {prod.desc}
-                  </span>
+                  <Link to={prod.path} className="block">
+                    <span className="text-slate-300 group-hover:text-cyan-400 transition-colors block font-black">
+                      {prod.name}
+                    </span>
+                    <span className="text-[11px] text-slate-400 font-medium block">
+                      {prod.desc}
+                    </span>
+                  </Link>
                 </li>
               ))}
             </ul>

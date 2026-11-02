@@ -155,7 +155,7 @@ export const FEATURE_CATEGORIES_DATA: FeatureCategory[] = [
     title: '🎥 Live Streaming & Studio Production Engine',
     badge: 'Broadcast Studio',
     description:
-      'Enterprise live streaming pipeline featuring multi-destination RTMP broadcast, 60s instant replay buffer, AI highlights, multi-camera switching, and 48kHz audio capture.',
+      'Enterprise live streaming pipeline featuring multi-destination RTMP broadcast, 60s instant replay buffer, clip capture, multi-camera switching, and 48kHz audio capture.',
     headerColor: 'text-indigo-400',
     borderColor: 'border-indigo-500/20',
     features: [
@@ -190,13 +190,13 @@ export const FEATURE_CATEGORIES_DATA: FeatureCategory[] = [
         color: 'emerald'
       },
       {
-        id: 'auto-highlights',
-        badge: 'AI Highlight Reel',
-        title: 'Auto Highlights & Social Clips',
+        id: 'auto-clips',
+        badge: 'Event Clips Reel',
+        title: 'Auto Clip Bookmarks & Social Snippets',
         description:
-          'AI-assisted highlight assembly system that creates shareable video clips automatically. The engine bookmarks key match moments as they happen and compiles cinematic match packages ready for instant upload.',
+          'Automated moment assembly system that creates shareable video snippets automatically. The engine bookmarks key match moments as they happen and compiles match packages ready for instant upload.',
         bullets: [
-          'Filter highlights dynamically: All Wickets, All Sixes, Boundary Fours, or Century Milestones.',
+          'Filter key clips dynamically: All Wickets, All Sixes, Boundary Fours, or Century Milestones.',
           'Automated broadcast intros and outros rendered with final scores, team logos, and match summaries.',
           'Dual-aspect export: 16:9 widescreen for YouTube and 9:16 vertical shorts for Instagram & TikTok.',
           'Automated video timestamp generation for YouTube chapter markers and archived match VODs.'
@@ -520,7 +520,7 @@ export const FEATURE_CATEGORIES_DATA: FeatureCategory[] = [
         bullets: [
           'Modern block-based rich text editor supporting embedded scorecards, stats tables, and quotes.',
           'High-resolution image galleries with lightbox zoom and responsive mobile carousels.',
-          'Automated match report generation synthesizing key batting and bowling highlights into draft text.',
+          'Automated match report generation synthesizing key batting and bowling stats into draft text.',
           'Tagging system categorizing stories by tournament, team, award category, and season.'
         ],
         icon: 'Layers',
