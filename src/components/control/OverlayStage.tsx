@@ -421,6 +421,12 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
         {Boolean(activeOverlays.manhattan || forcedOverlay === 'manhattan') && isVisible('manhattan') && (
           <MatchCharts key="manhattan" view="bar" />
         )}
+        {Boolean(activeOverlays.worm || forcedOverlay === 'worm') && isVisible('worm') && (
+          <MatchCharts key="wormChart" view="line" />
+        )}
+        {Boolean(activeOverlays.lineGraph || forcedOverlay === 'lineGraph') && isVisible('lineGraph') && (
+          <MatchCharts key="lineGraph" view="line" />
+        )}
         {Boolean(activeOverlays.graph || forcedOverlay === 'graph') && isVisible('graph') && (
           <MatchCharts key="matchCharts" />
         )}
@@ -435,18 +441,14 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
         )}
       </AnimatePresence>
 
-      {/* Animations - EventSting (FOUR, SIX, WICKET) & IPLSuperAnimation */}
+      {/* Animations - EventSting (Broadcast Stings for all EventAnimationTypes) */}
       <AnimatePresence mode="wait">
         {activeAnimation && (
           <div
             key={activeAnimation + Date.now()}
             className="fixed inset-0 pointer-events-none z-50 flex items-center justify-center overflow-hidden"
           >
-            {activeAnimation === 'FOUR' || activeAnimation === 'SIX' || activeAnimation === 'WICKET' ? (
-              <EventSting type={activeAnimation} />
-            ) : (
-              <IPLSuperAnimation />
-            )}
+            <EventSting type={activeAnimation} />
           </div>
         )}
       </AnimatePresence>

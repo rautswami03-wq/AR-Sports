@@ -5,6 +5,7 @@ import { OverlayStage } from './OverlayStage';
 import { EditMatchModal } from './EditMatchModal';
 import { TossMatchModal } from './TossMatchModal';
 import { ChangeBowlerModal } from './ChangeBowlerModal';
+import { AdvancedMatchControls } from './AdvancedMatchControls';
 import { OverlayType, EventAnimationType } from '../../types/cricket';
 import { PRESET_TEAMS, PRESET_TOURNAMENTS } from '../../theme/presetThemes';
 import { Radio, Tv, Zap, Palette, Layers, RefreshCw, Copy, Check, RotateCcw, Settings, Users, PlusCircle, Archive, AlertTriangle, Lock, Unlock } from 'lucide-react';
@@ -1070,6 +1071,9 @@ export const ControlStudio: React.FC = () => {
                     </div>
                   </div>
                 </div>
+
+                {/* Advanced Match Controls & Extras */}
+                <AdvancedMatchControls onOpenBowlerModal={() => setShowBowlerModal(true)} defaultExpanded={false} />
               </div>
             )}
 

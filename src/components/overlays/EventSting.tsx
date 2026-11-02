@@ -55,6 +55,138 @@ const STING_THEMES: Record<string, StingThemeConfig> = {
     borderColor: '#FF5A00',
     watermark: 'WICKET • WICKET • WICKET • WICKET',
   },
+  FREE_HIT: {
+    title: 'FREE HIT',
+    badge: 'NO BALL PENALTY',
+    subText: 'SWING FOR THE FENCES • NO DISMISSAL ON BOWLER',
+    bgGradient:
+      'linear-gradient(90deg, #1C0000 0%, #990000 30%, #E65100 70%, #1C0000 100%)',
+    accentColor: '#FFEB3B',
+    glowColor: 'rgba(230, 81, 0, 0.9)',
+    borderColor: '#FFD600',
+    watermark: 'FREE HIT • FREE HIT • FREE HIT',
+  },
+  POWERPLAY: {
+    title: 'POWERPLAY',
+    badge: 'MANDATORY FIELD RESTRICTIONS',
+    subText: 'MAXIMUM 2 FIELDERS OUTSIDE 30-YARD CIRCLE',
+    bgGradient:
+      'linear-gradient(90deg, #021B3A 0%, #0369A1 50%, #021B3A 100%)',
+    accentColor: '#00F2FE',
+    glowColor: 'rgba(3, 105, 161, 0.85)',
+    borderColor: '#38BDF8',
+    watermark: 'POWERPLAY • POWERPLAY • POWERPLAY',
+  },
+  STRATEGIC_TIMEOUT: {
+    title: 'STRATEGIC TIMEOUT',
+    badge: 'TACTICAL BREAK',
+    subText: '2 MIN 30 SEC OFFICIAL STRATEGY WINDOW',
+    bgGradient:
+      'linear-gradient(90deg, #0F172A 0%, #1E293B 50%, #0F172A 100%)',
+    accentColor: '#38BDF8',
+    glowColor: 'rgba(56, 189, 248, 0.85)',
+    borderColor: '#0284C7',
+    watermark: 'TIMEOUT • TIMEOUT • TIMEOUT',
+  },
+  DRINKS_BREAK: {
+    title: 'DRINKS BREAK',
+    badge: 'OFFICIAL INTERVAL',
+    subText: 'PLAY SUSPENDED FOR REFRESHMENTS',
+    bgGradient:
+      'linear-gradient(90deg, #052E16 0%, #16A34A 50%, #052E16 100%)',
+    accentColor: '#4ADE80',
+    glowColor: 'rgba(22, 163, 74, 0.85)',
+    borderColor: '#86EFAC',
+    watermark: 'DRINKS • DRINKS • DRINKS',
+  },
+  END_OF_INNINGS: {
+    title: 'END OF INNINGS',
+    badge: 'INNINGS COMPLETE',
+    subText: 'TARGET SET • CHANGE OF INNINGS',
+    bgGradient:
+      'linear-gradient(90deg, #1E1B4B 0%, #4338CA 50%, #1E1B4B 100%)',
+    accentColor: '#FDE047',
+    glowColor: 'rgba(67, 56, 202, 0.85)',
+    borderColor: '#A855F7',
+    watermark: 'INNINGS BREAK • INNINGS BREAK',
+  },
+  MATCH_WINNER: {
+    title: 'MATCH WINNER',
+    badge: 'VICTORY',
+    subText: 'CHAMPIONSHIP PERFORMANCE • MATCH CONCLUDED',
+    bgGradient:
+      'linear-gradient(90deg, #451A03 0%, #D97706 50%, #451A03 100%)',
+    accentColor: '#FEF08A',
+    glowColor: 'rgba(217, 119, 6, 0.85)',
+    borderColor: '#FACC15',
+    watermark: 'CHAMPIONS • WINNERS • VICTORY',
+  },
+  FIFTY: {
+    title: 'HALF CENTURY',
+    badge: '50 MILESTONE',
+    subText: 'TREMENDOUS BATTING PERFORMANCE',
+    bgGradient:
+      'linear-gradient(90deg, #451A03 0%, #B45309 50%, #451A03 100%)',
+    accentColor: '#FEF08A',
+    glowColor: 'rgba(180, 83, 9, 0.85)',
+    borderColor: '#F59E0B',
+    watermark: 'FIFTY • 50 • FIFTY • 50',
+  },
+  CENTURY: {
+    title: 'HUNDRED (100)',
+    badge: 'CENTURY MILESTONE',
+    subText: 'MAJESTIC THREE FIGURES REACHED',
+    bgGradient:
+      'linear-gradient(90deg, #713F12 0%, #CA8A04 50%, #713F12 100%)',
+    accentColor: '#FFFFFF',
+    glowColor: 'rgba(202, 138, 4, 0.85)',
+    borderColor: '#FEF08A',
+    watermark: '100 • CENTURY • 100 • CENTURY',
+  },
+  HAT_TRICK: {
+    title: 'HAT-TRICK',
+    badge: 'TRIPLE STRIKE',
+    subText: '3 WICKETS IN 3 CONSECUTIVE BALLS',
+    bgGradient:
+      'linear-gradient(90deg, #2E1065 0%, #7C3AED 50%, #2E1065 100%)',
+    accentColor: '#FDE047',
+    glowColor: 'rgba(124, 58, 237, 0.85)',
+    borderColor: '#C084FC',
+    watermark: 'HAT TRICK • HAT TRICK • HAT TRICK',
+  },
+  TOUR_BOUNDARIES: {
+    title: 'BOUNDARY STATS',
+    badge: 'TOURNAMENT AGGREGATE',
+    subText: 'AGGRESSIVE STRIKE COUNT',
+    bgGradient:
+      'linear-gradient(90deg, #0F172A 0%, #334155 50%, #0F172A 100%)',
+    accentColor: '#38BDF8',
+    glowColor: 'rgba(56, 189, 248, 0.85)',
+    borderColor: '#64748B',
+    watermark: 'BOUNDARIES • STATS • DATA',
+  },
+  WIDE: {
+    title: 'WIDE BALL',
+    badge: 'EXTRA RUN',
+    subText: 'PENALTY EXTRA RUN AWARDED',
+    bgGradient:
+      'linear-gradient(90deg, #022C22 0%, #059669 50%, #022C22 100%)',
+    accentColor: '#A7F3D0',
+    glowColor: 'rgba(5, 150, 105, 0.85)',
+    borderColor: '#34D399',
+    watermark: 'WIDE • WIDE • WIDE • WIDE',
+  },
+  NO_BALL: {
+    title: 'NO BALL',
+    badge: 'ILLEGAL DELIVERY',
+    subText: 'EXTRA RUN + FREE HIT NEXT BALL',
+    bgGradient:
+      'linear-gradient(90deg, #431407 0%, #EA580C 50%, #431407 100%)',
+    accentColor: '#FEF08A',
+    glowColor: 'rgba(234, 88, 12, 0.85)',
+    borderColor: '#FB923C',
+    watermark: 'NO BALL • NO BALL • NO BALL',
+  },
 };
 
 export const EventSting: React.FC<EventStingProps> = ({

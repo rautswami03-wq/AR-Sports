@@ -105,6 +105,7 @@ export interface BroadcastStoreState {
   archiveAndReset: () => void;
   loadArchiveAsNewMatch: (archiveMatchId: string) => void;
   resetMatchState: () => void;
+  endMatch: () => void;
   startMatch: () => void;
   stopMatch: () => void;
   startNewMatchWithTeams: (teamAName: string, teamBName: string, tournamentName?: string) => void;
@@ -504,6 +505,9 @@ const INITIAL_OVERLAYS: Record<OverlayType, boolean> = {
   wagonWheel: false,
   pitchMap: false,
   manhattan: false,
+  worm: false,
+  lineGraph: false,
+  spider: false,
   commentator: false,
   watermark: false,
   manOfTheMatchCard: false,
@@ -1214,7 +1218,9 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
 
       if (bowlers[activeBowlerIndex]) {
         const bw = { ...bowlers[activeBowlerIndex] };
-        bw.wickets += 1;
+        if (!dismissalType.toLowerCase().includes('run out')) {
+          bw.wickets += 1;
+        }
         if (!isOffIllegalDelivery) {
           let bwBalls = bw.ballsInCurrentOver + 1;
           let bwOvers = bw.overs;
@@ -1873,6 +1879,7 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
 
       const newBattingTeamId = isAFirst ? 'teamB' : 'teamA';
       const newBowlingTeamId = isAFirst ? 'teamA' : 'teamB';
+      const secondBattingTeamKey = isAFirst ? 'teamB' : 'teamA';
 
       const markerEntry: BallLogEntry = {
         over: firstInningsBattingTeam.overs,
@@ -1884,9 +1891,16 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
         timestamp: Date.now(),
       };
 
+      const secondBattingTeam = {
+        ...state[secondBattingTeamKey],
+        overs: 0,
+        balls: 0,
+      };
+
       const nextState = {
         battingTeamId: newBattingTeamId,
         bowlingTeamId: newBowlingTeamId,
+        [secondBattingTeamKey]: secondBattingTeam,
         matchDetails: {
           ...state.matchDetails,
           currentInnings: 2 as const,
@@ -1899,6 +1913,10 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
       postStateSync({ ...state, ...nextState });
       return nextState;
     });
+  },
+
+  endMatch: () => {
+    get().archiveAndReset();
   },
 
   updatePlayerAvatar: (teamId: 'teamA' | 'teamB', playerType: 'batter' | 'bowler', playerId: string, avatarUrl: string) => {
