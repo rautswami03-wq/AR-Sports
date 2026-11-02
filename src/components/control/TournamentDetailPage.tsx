@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Plus, Trash2, Edit3, Link as LinkIcon, Share2, Check } from 'lucide-react';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
+import { Plus, Trash2, Edit3, Link as LinkIcon, Share2, Check, Trophy, BarChart2 } from 'lucide-react';
 import { CricNavbar } from '../common/CricNavbar';
 import { EditMatchModal } from './EditMatchModal';
 import { useBroadcastStore } from '../../store/useBroadcastStore';
+import { useTournamentStore, TournamentTeamStanding, calculatePointsTable, MatchRecordInput } from '../../store/useTournamentStore';
 
 export interface MatchItem {
   id: string;
@@ -21,6 +22,14 @@ export interface MatchItem {
   tossText: string;
   winner?: string;
   createdAt: string;
+  teamAScore?: number;
+  teamAWickets?: number;
+  teamAOvers?: number;
+  teamABalls?: number;
+  teamBScore?: number;
+  teamBWickets?: number;
+  teamBOvers?: number;
+  teamBBalls?: number;
 }
 
 export const DEFAULT_MATCHES: MatchItem[] = [
@@ -36,6 +45,14 @@ export const DEFAULT_MATCHES: MatchItem[] = [
     tossText: 'ASHTAVINAYAK SUPER KINGS WIN TOSS AND CHOOSE TO BOWL',
     winner: 'ASHTAVINAYAK INDIANS',
     createdAt: '2026-07-24',
+    teamAScore: 48,
+    teamAWickets: 2,
+    teamAOvers: 4,
+    teamABalls: 0,
+    teamBScore: 36,
+    teamBWickets: 4,
+    teamBOvers: 4,
+    teamBBalls: 0,
   },
   {
     id: 'match_002',
@@ -49,6 +66,14 @@ export const DEFAULT_MATCHES: MatchItem[] = [
     tossText: 'ASHTAVINAYAK ROYALS CHALLENGERS WIN TOSS AND CHOOSE TO BOWL',
     winner: 'ASHTAVINAYAK KINGS',
     createdAt: '2026-07-24',
+    teamAScore: 52,
+    teamAWickets: 1,
+    teamAOvers: 4,
+    teamABalls: 0,
+    teamBScore: 40,
+    teamBWickets: 3,
+    teamBOvers: 4,
+    teamBBalls: 0,
   },
   {
     id: 'match_003',
@@ -75,14 +100,33 @@ export const DEFAULT_MATCHES: MatchItem[] = [
     tossText: 'ASHTAVINAYAK SUPER KINGS WIN TOSS AND CHOOSE TO BOWL',
     winner: 'ASHTAVINAYAK SUPER KINGS',
     createdAt: '2026-07-24',
+    teamAScore: 32,
+    teamAWickets: 4,
+    teamAOvers: 4,
+    teamABalls: 0,
+    teamBScore: 33,
+    teamBWickets: 1,
+    teamBOvers: 3,
+    teamBBalls: 2,
   },
 ];
 
-export const TournamentDetailPage: React.FC = () => {
+export interface TournamentDetailPageProps {
+  isPublicView?: boolean;
+}
+
+export const TournamentDetailPage: React.FC<TournamentDetailPageProps> = ({
+  isPublicView: propIsPublicView,
+}) => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const [activeTab, setActiveTab] = useState<'matches' | 'details'>('matches');
+  const isPublicView = Boolean(
+    propIsPublicView || (location && location.pathname.includes('/public/tournament'))
+  );
+
+  const [activeTab, setActiveTab] = useState<'matches' | 'table' | 'details'>('matches');
   const [matches, setMatches] = useState<MatchItem[]>(() => {
     if (typeof window !== 'undefined') {
       try {
@@ -97,6 +141,8 @@ export const TournamentDetailPage: React.FC = () => {
 
   const [tournamentName, setTournamentName] = useState('Asthavinayak Premier League');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [dashboardCopied, setDashboardCopied] = useState(false);
+  const [standings, setStandings] = useState<TournamentTeamStanding[]>([]);
 
   useEffect(() => {
     if (!id || typeof window === 'undefined') return;
@@ -204,6 +250,40 @@ export const TournamentDetailPage: React.FC = () => {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  const handleShareDashboard = () => {
+    const origin = typeof window !== 'undefined' ? window.location.origin : '';
+    const tourId = id || '0d840fa0-a9f4-45c2-990c-a265c4cb4sda';
+    const shareUrl = `${origin}/#/public/tournament/${tourId}`;
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(shareUrl);
+      setDashboardCopied(true);
+      setTimeout(() => setDashboardCopied(false), 2500);
+    }
+  };
+
+  useEffect(() => {
+    const tourId = id || '0d840fa0-a9f4-45c2-990c-a265c4cb4sda';
+    const matchInputs: MatchRecordInput[] = filteredMatches.map((m) => ({
+      ...m,
+      overs: m.overs || 4,
+    }));
+    const computed = useTournamentStore.getState().recalculatePointsTable(tourId, matchInputs);
+    setStandings(computed);
+
+    const handleSync = () => {
+      const refreshed = useTournamentStore.getState().recalculatePointsTable(tourId);
+      setStandings(refreshed);
+    };
+
+    window.addEventListener('storage', handleSync);
+    window.addEventListener('ar_sports_tournament_update', handleSync);
+
+    return () => {
+      window.removeEventListener('storage', handleSync);
+      window.removeEventListener('ar_sports_tournament_update', handleSync);
+    };
+  }, [id, matches]);
+
   const handleLaunchMatch = (match: MatchItem) => {
     useBroadcastStore.getState().startNewMatchWithTeams(match.teamA, match.teamB, tournamentName);
     useBroadcastStore.getState().updateMatchSettings({
@@ -221,16 +301,44 @@ export const TournamentDetailPage: React.FC = () => {
 
       {/* Main Container */}
       <main className="max-w-5xl mx-auto py-8 px-4 flex flex-col items-center">
-        {/* Breadcrumb Header */}
-        <div className="w-full flex items-center justify-between mb-8">
-          <Link to="/tournament" className="text-cyan-400 font-bold hover:text-cyan-300 flex items-center gap-1 text-sm uppercase">
-            ← BACK TO TOURNAMENTS
-          </Link>
-          <span className="text-slate-400 font-bold text-sm uppercase">{tournamentName}</span>
+        {/* Breadcrumb & Top Actions Header */}
+        <div className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+          <div className="flex items-center gap-3">
+            {!isPublicView && (
+              <Link to="/tournament" className="text-cyan-400 font-bold hover:text-cyan-300 flex items-center gap-1 text-sm uppercase">
+                ← BACK TO TOURNAMENTS
+              </Link>
+            )}
+            <span className="text-slate-300 font-black text-sm uppercase">{tournamentName}</span>
+            {isPublicView && (
+              <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-400/30">
+                Public Fan View
+              </span>
+            )}
+          </div>
+
+          {/* Share Dashboard Button */}
+          <button
+            onClick={handleShareDashboard}
+            className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 hover:from-blue-500 hover:to-cyan-500 text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-[0_0_20px_rgba(37,99,235,0.45)] border border-blue-400/40 transition-all transform hover:scale-105 active:scale-95"
+            data-testid="share-dashboard-btn"
+          >
+            {dashboardCopied ? (
+              <>
+                <Check className="w-4 h-4 text-emerald-300" />
+                <span>Dashboard Link Copied!</span>
+              </>
+            ) : (
+              <>
+                <Share2 className="w-4 h-4" />
+                <span>Share Dashboard</span>
+              </>
+            )}
+          </button>
         </div>
 
-        {/* Tab Navigation: Matches | Details */}
-        <div className="flex items-center gap-12 mb-8 text-xl font-black uppercase tracking-wider">
+        {/* Tab Navigation: Matches | Points Table | Details */}
+        <div className="flex items-center gap-8 md:gap-12 mb-8 text-lg md:text-xl font-black uppercase tracking-wider">
           <button
             onClick={() => setActiveTab('matches')}
             className={`pb-1 border-b-2 transition-all ${
@@ -239,7 +347,19 @@ export const TournamentDetailPage: React.FC = () => {
                 : 'text-slate-400 border-transparent hover:text-slate-200'
             }`}
           >
-            Matches
+            Matches ({filteredMatches.length})
+          </button>
+          <button
+            onClick={() => setActiveTab('table')}
+            className={`pb-1 border-b-2 transition-all flex items-center gap-2 ${
+              activeTab === 'table'
+                ? 'text-white border-cyan-400'
+                : 'text-slate-400 border-transparent hover:text-slate-200'
+            }`}
+            data-testid="points-table-tab"
+          >
+            <Trophy className="w-5 h-5 text-amber-400" />
+            Points Table
           </button>
           <button
             onClick={() => setActiveTab('details')}
@@ -255,24 +375,28 @@ export const TournamentDetailPage: React.FC = () => {
 
         {activeTab === 'matches' && (
           <div className="w-full flex flex-col items-center">
-            {/* Teal Glow CREATE MATCH Button */}
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="bg-gradient-to-r from-cyan-600 via-teal-500 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-black text-sm px-10 py-3 rounded-2xl shadow-[0_0_30px_rgba(6,182,212,0.6)] border border-cyan-300/40 uppercase tracking-widest transition-all transform hover:scale-105 mb-8"
-            >
-              CREATE MATCH
-            </button>
+            {/* Teal Glow CREATE MATCH Button (Hidden in Public Spectator View) */}
+            {!isPublicView && (
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="bg-gradient-to-r from-cyan-600 via-teal-500 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-black text-sm px-10 py-3 rounded-2xl shadow-[0_0_30px_rgba(6,182,212,0.6)] border border-cyan-300/40 uppercase tracking-widest transition-all transform hover:scale-105 mb-8"
+              >
+                CREATE MATCH
+              </button>
+            )}
 
             {/* List of Matches Cards */}
             {filteredMatches.length === 0 ? (
               <div className="text-center py-12 px-6 bg-slate-900/60 border border-slate-800 rounded-3xl w-full max-w-lg space-y-4">
                 <p className="text-slate-400 font-bold text-sm uppercase">No matches created for this tournament yet.</p>
-                <button
-                  onClick={() => setShowCreateModal(true)}
-                  className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black px-6 py-2.5 rounded-xl uppercase text-xs shadow-lg"
-                >
-                  + CREATE FIRST MATCH
-                </button>
+                {!isPublicView && (
+                  <button
+                    onClick={() => setShowCreateModal(true)}
+                    className="bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black px-6 py-2.5 rounded-xl uppercase text-xs shadow-lg"
+                  >
+                    + CREATE FIRST MATCH
+                  </button>
+                )}
               </div>
             ) : (
               <div className="w-full space-y-5">
@@ -311,23 +435,27 @@ export const TournamentDetailPage: React.FC = () => {
                       MATCH PAGE
                     </button>
 
-                    {/* Delete Icon */}
-                    <button
-                      onClick={() => handleDeleteMatch(match.id)}
-                      className="p-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl shadow transition-all"
-                      title="Delete Match"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    {/* Delete Icon (Admin only) */}
+                    {!isPublicView && (
+                      <button
+                        onClick={() => handleDeleteMatch(match.id)}
+                        className="p-2.5 bg-red-600 hover:bg-red-500 text-white rounded-xl shadow transition-all"
+                        title="Delete Match"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
 
-                    {/* Edit Icon */}
-                    <button
-                      onClick={() => setEditingMatch(match)}
-                      className="p-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl shadow transition-all"
-                      title="Edit Match"
-                    >
-                      <Edit3 className="w-4 h-4" />
-                    </button>
+                    {/* Edit Icon (Admin only) */}
+                    {!isPublicView && (
+                      <button
+                        onClick={() => setEditingMatch(match)}
+                        className="p-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl shadow transition-all"
+                        title="Edit Match"
+                      >
+                        <Edit3 className="w-4 h-4" />
+                      </button>
+                    )}
 
                     {/* Share / Copy Link Icon */}
                     <button
@@ -344,6 +472,107 @@ export const TournamentDetailPage: React.FC = () => {
           )}
         </div>
       )}
+
+        {/* POINTS TABLE TAB */}
+        {activeTab === 'table' && (
+          <div className="w-full bg-slate-900/90 border border-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-4">
+              <div>
+                <h3 className="text-xl md:text-2xl font-black uppercase text-white flex items-center gap-2">
+                  <Trophy className="w-6 h-6 text-amber-400" />
+                  <span>Official Points Table & Standings</span>
+                </h3>
+                <p className="text-xs text-slate-400 font-semibold mt-0.5">
+                  Sorted by: 1st Points (PTS Descending) • 2nd Net Run Rate (NRR Descending)
+                </p>
+              </div>
+              <div className="text-right">
+                <span className="text-[11px] font-mono font-bold text-cyan-400 uppercase tracking-widest bg-cyan-950/60 px-3 py-1 rounded-lg border border-cyan-500/30">
+                  Quota: {filteredMatches[0]?.overs || 4} Ov / Inngs
+                </span>
+              </div>
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse" data-testid="points-table">
+                <thead>
+                  <tr className="text-[11px] uppercase tracking-wider text-slate-400 border-b border-white/10 font-black">
+                    <th className="py-3 px-3 text-center w-12">POS</th>
+                    <th className="py-3 px-4">TEAM</th>
+                    <th className="py-3 px-3 text-center">P</th>
+                    <th className="py-3 px-3 text-center text-emerald-400">W</th>
+                    <th className="py-3 px-3 text-center text-rose-400">L</th>
+                    <th className="py-3 px-3 text-center text-amber-300">T</th>
+                    <th className="py-3 px-3 text-right">NRR</th>
+                    <th className="py-3 px-4 text-right text-amber-400 font-black text-sm">PTS</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5 font-semibold text-sm">
+                  {standings.length === 0 ? (
+                    <tr>
+                      <td colSpan={8} className="text-center py-12 text-slate-400 font-bold uppercase text-xs">
+                        No completed match results in this tournament yet. When matches are archived in ControlStudio, the Points Table updates instantly.
+                      </td>
+                    </tr>
+                  ) : (
+                    standings.map((team, idx) => {
+                      const isQualified = idx < 2;
+                      return (
+                        <tr
+                          key={team.teamId || team.teamName}
+                          className={`transition-colors ${
+                            isQualified ? 'bg-emerald-500/10 hover:bg-emerald-500/15' : 'hover:bg-white/5'
+                          }`}
+                          data-testid={`points-table-row-${team.teamName}`}
+                        >
+                          <td className="py-3.5 px-3 text-center font-black">
+                            <span
+                              className={`inline-flex items-center justify-center w-6 h-6 rounded-full text-xs ${
+                                isQualified ? 'bg-emerald-500 text-slate-950 font-black' : 'text-slate-400'
+                              }`}
+                            >
+                              {idx + 1}
+                            </span>
+                          </td>
+                          <td className="py-3.5 px-4 font-black text-white">
+                            <div className="flex items-center gap-2.5">
+                              <span>{team.teamName}</span>
+                              {isQualified && (
+                                <span className="text-[9px] font-black uppercase px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                                  QUALIFIED
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="py-3.5 px-3 text-center text-slate-300">{team.played}</td>
+                          <td className="py-3.5 px-3 text-center font-bold text-emerald-400">{team.won}</td>
+                          <td className="py-3.5 px-3 text-center font-bold text-rose-400">{team.lost}</td>
+                          <td className="py-3.5 px-3 text-center text-amber-300">{team.tied}</td>
+                          <td
+                            className={`py-3.5 px-3 text-right font-mono font-bold ${
+                              team.nrr > 0 ? 'text-emerald-400' : team.nrr < 0 ? 'text-rose-400' : 'text-slate-300'
+                            }`}
+                          >
+                            {team.nrrFormatted}
+                          </td>
+                          <td className="py-3.5 px-4 text-right font-black text-amber-400 text-base">
+                            {team.points}
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Note footer */}
+            <div className="pt-3 border-t border-white/5 flex flex-col sm:flex-row sm:items-center justify-between text-[11px] text-slate-400 font-medium gap-2">
+              <span>• Net Run Rate (NRR) = (Runs Scored / Overs Faced) - (Runs Conceded / Overs Bowled)</span>
+              <span>• Teams bowled out face the match's full quota of overs</span>
+            </div>
+          </div>
+        )}
 
         {activeTab === 'details' && (
           <div className="w-full bg-slate-900 border border-slate-800 p-8 rounded-3xl shadow-xl space-y-4">

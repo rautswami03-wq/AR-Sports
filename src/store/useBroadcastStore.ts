@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { EventAnimationType, MatchDetails, OverlayType, Team } from '../types/cricket';
 import { PRESET_TEAMS } from '../theme/presetThemes';
 import { publishLiveMatchState } from '../services/firebase';
+import { useTournamentStore } from './useTournamentStore';
 
 export interface BallLogEntry {
   over: number;
@@ -1647,6 +1648,25 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
     const updatedArchive = [archiveEntry, ...(state.matchArchive || [])];
     saveMatchArchive(updatedArchive);
 
+    // Instantly update Points Table in useTournamentStore
+    let updatedPointsTable = state.matchDetails.pointsTable || [];
+    try {
+      useTournamentStore.getState().recordArchivedMatch(archiveEntry);
+      const tourId = archiveEntry.matchDetails.tournamentId || archiveEntry.matchDetails.tournament || 'default_tournament';
+      const standings = useTournamentStore.getState().getStandings(tourId);
+      if (standings.length > 0) {
+        updatedPointsTable = standings.map((s) => ({
+          teamId: s.teamId,
+          shortName: s.shortName,
+          played: s.played,
+          won: s.won,
+          lost: s.lost,
+          nrr: s.nrrFormatted,
+          points: s.points,
+        }));
+      }
+    } catch {}
+
     const newMatchId = generateMatchId();
     const defaultState = {
       matchId: newMatchId,
@@ -1656,7 +1676,10 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
       teamBName: DEFAULT_TEAM_B.fullName,
       teamABulkPaste: '',
       teamBBulkPaste: '',
-      matchDetails: DEFAULT_MATCH_DETAILS,
+      matchDetails: {
+        ...DEFAULT_MATCH_DETAILS,
+        pointsTable: updatedPointsTable,
+      },
       activeOverlays: INITIAL_OVERLAYS,
       activeAnimation: null,
       historyStack: [],

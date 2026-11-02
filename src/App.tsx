@@ -50,6 +50,7 @@ export default function App() {
       <Route path="/tournament" element={<TournamentPage />} />
       <Route path="/matches" element={<TournamentPage />} />
       <Route path="/tournament/:id" element={<TournamentDetailPage />} />
+      <Route path="/public/tournament/:id" element={<TournamentDetailPage isPublicView={true} />} />
       <Route path="/tournament/:tourId/match/:id" element={<TourMatchPage />} />
       <Route path="/match/:id" element={<TourMatchPage />} />
       <Route path="/theme_links" element={<ThemeLinksPage />} />

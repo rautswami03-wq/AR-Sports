@@ -64,6 +64,7 @@ export interface Team {
 export interface MatchDetails {
   title: string;
   tournament: string;
+  tournamentId?: string;
   stage: string;
   venue: string;
   tossWinner: string;
