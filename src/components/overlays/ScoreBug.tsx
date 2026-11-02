@@ -39,24 +39,24 @@ export const ScoreBug: React.FC<ScoreBugProps> = ({ className = '' }) => {
       <div
         className="relative"
         style={{
-          filter: 'drop-shadow(0 0 10px rgba(5, 112, 240, 0.8)) drop-shadow(0 4px 14px rgba(0,0,0,0.85))',
+          filter: 'drop-shadow(0 0 14px rgba(5, 112, 240, 0.75)) drop-shadow(0 6px 18px rgba(0,0,0,0.85))',
         }}
       >
-        {/* 2px glowing Blue Fire (#0570F0) accent border along kite perimeter */}
+        {/* 2px glowing Blue Fire (#0570F0) and Cyan accent border along kite perimeter */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
             clipPath: 'polygon(0% 0%, 95% 0%, 100% 50%, 95% 100%, 0% 100%, 5% 50%)',
-            background: 'linear-gradient(135deg, #0570F0 0%, #00F2FE 40%, rgba(5, 112, 240, 0.5) 75%, transparent 100%)',
+            background: 'linear-gradient(135deg, #0570F0 0%, #00F2FE 40%, rgba(255, 220, 53, 0.6) 75%, transparent 100%)',
           }}
         />
 
-        {/* Glowing Accent Top Line (2px Blue Fire #0570F0) */}
+        {/* Glowing Accent Top Line (IPL 2025 Gold/Orange to Cyan fiery sweep) */}
         <div
-          className="absolute top-0 left-0 right-[5%] h-[2px] z-20 pointer-events-none"
+          className="absolute top-0 left-0 right-[5%] h-[2.5px] z-20 pointer-events-none"
           style={{
-            background: 'linear-gradient(90deg, #0570F0 0%, #00F2FE 45%, #0570F0 80%, transparent 100%)',
-            boxShadow: '0 0 10px #0570F0, 0 0 4px #00F2FE',
+            background: 'linear-gradient(90deg, #FF5A00 0%, #FFB703 20%, #FFDC35 40%, #00F2FE 75%, transparent 100%)',
+            boxShadow: '0 0 10px #FFB703, 0 0 4px #00F2FE',
           }}
         />
 
@@ -70,14 +70,22 @@ export const ScoreBug: React.FC<ScoreBugProps> = ({ className = '' }) => {
           }}
         />
 
-        {/* Main body of the kite shape with dynamic team color linear gradient */}
+        {/* Main body of the kite shape with dynamic team color IPL-style smooth fade gradient */}
         <div
           className="relative flex items-center h-[76px] px-8 pl-12 pr-14 overflow-hidden"
           style={{
             clipPath: 'polygon(0% 0%, 95% 0%, 100% 50%, 95% 100%, 0% 100%, 5% 50%)',
-            background: `linear-gradient(110deg, ${primaryColor} 0%, ${hexToRgba(primaryColor, 0.65)} 35%, rgba(6, 12, 28, 0.92) 70%, rgba(3, 7, 18, 0.98) 100%)`,
+            background: `linear-gradient(105deg, ${primaryColor} 0%, ${hexToRgba(primaryColor, 0.88)} 18%, ${hexToRgba(primaryColor, 0.45)} 34%, rgba(11, 19, 43, 0.92) 58%, rgba(7, 11, 25, 0.98) 100%)`,
           }}
         >
+          {/* Top-half broadcast glass gloss shine */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background: 'linear-gradient(180deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.02) 45%, rgba(0, 0, 0, 0.35) 100%)',
+            }}
+          />
+
           {/* Subtle angled ignition sheen texture */}
           <div
             className="absolute inset-0 pointer-events-none opacity-20"

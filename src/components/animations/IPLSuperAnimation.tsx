@@ -7,6 +7,7 @@ import { NavarasaVerticalRibbon } from '../theme-graphics/NavarasaGraphics';
 import { FreeHitSting } from '../overlays/FreeHitSting';
 import { WicketSting } from '../overlays/WicketSting';
 import { StingBase } from '../overlays/base/StingBase';
+import { EventSting } from '../overlays/EventSting';
 
 export const IPLSuperAnimation: React.FC = () => {
   const { activeAnimation, teamA, teamB, battingTeamId, tournamentId, matchDetails } = useBroadcastStore();
@@ -225,15 +226,15 @@ export const IPLSuperAnimation: React.FC = () => {
   }
 
   if (activeAnimation === 'WICKET') {
-    return <WicketSting />;
+    return <EventSting type="WICKET" />;
   }
 
   if (activeAnimation === 'FOUR') {
-    return <StingBase type="FOUR" text="FOUR" subText="CRUNCHING FOUR • 4 RUNS" />;
+    return <EventSting type="FOUR" />;
   }
 
   if (activeAnimation === 'SIX') {
-    return <StingBase type="SIX" text="MAXIMUM SIX" subText="OVER THE ROPES • 6 RUNS" />;
+    return <EventSting type="SIX" />;
   }
 
   // ORIGINAL BROADCAST MOTION 3: Star Sports / IPL 3D Metallic Telecast Motion (Default)

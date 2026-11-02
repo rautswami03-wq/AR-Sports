@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useBroadcastStore } from '../../store/useBroadcastStore';
+import { OverlayType } from '../../types/cricket';
 import { AsiaCupLeftCyanWings, AsiaCupRightYellowWings } from '../theme-graphics/AsiaCupGraphics';
 
 import { hexToRgba, getContrastTextColor } from '../../theme/presetThemes';
@@ -53,18 +54,44 @@ export interface TargetLowerThirdData {
 export interface LowerThirdProps {
   type: 'batter' | 'bowler' | 'partnership' | 'target';
   data?: BatterLowerThirdData | BowlerLowerThirdData | PartnershipLowerThirdData | TargetLowerThirdData;
+  autoHide?: boolean;
+  durationMs?: number;
 }
 
 const slideAnimation = {
-  initial: { opacity: 0, y: 80 },
+  initial: { opacity: 0, y: 120 },
   animate: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: 80 },
-  transition: { duration: 0.3, ease: 'easeOut' as const },
+  exit: { opacity: 0, y: 120 },
+  transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] as const },
 };
 
-export const LowerThird: React.FC<LowerThirdProps> = ({ type, data }) => {
+export const LowerThird: React.FC<LowerThirdProps> = ({
+  type,
+  data,
+  autoHide = true,
+  durationMs = 5000,
+}) => {
   const store = useBroadcastStore();
   const { teamA, teamB, battingTeamId, matchDetails } = store;
+
+  // Auto-hide after 5 seconds (5000ms) to ensure clean OBS broadcast operation
+  useEffect(() => {
+    if (!autoHide) return;
+    const overlayKey: OverlayType =
+      type === 'batter'
+        ? 'battingLowerThird'
+        : type === 'bowler'
+        ? 'bowlingLowerThird'
+        : type === 'partnership'
+        ? 'partnership'
+        : 'target';
+
+    const timer = setTimeout(() => {
+      useBroadcastStore.getState().toggleOverlay(overlayKey, false);
+    }, durationMs);
+
+    return () => clearTimeout(timer);
+  }, [type, autoHide, durationMs]);
 
   const isTeamA = battingTeamId === teamA.id || battingTeamId === teamA.shortName || battingTeamId === 'teamA';
   const battingTeam = isTeamA ? teamA : teamB;

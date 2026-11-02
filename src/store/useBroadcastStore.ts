@@ -611,6 +611,14 @@ const FULL_CARD_OVERLAYS: OverlayType[] = [
   'topBowlers',
 ];
 
+const LOWER_THIRD_OVERLAYS: OverlayType[] = [
+  'battingLowerThird',
+  'bowlingLowerThird',
+  'partnership',
+  'playerOfTheMatch',
+  'replayLowerThird',
+];
+
 export function computeMatchResult(state: {
   teamA: Team;
   teamB: Team;
@@ -769,6 +777,15 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
         });
       }
 
+      // Exclusive Lower-Third Mode: Prevent multiple lower thirds from bleeding into each other!
+      if (willBeActive && LOWER_THIRD_OVERLAYS.includes(type)) {
+        LOWER_THIRD_OVERLAYS.forEach((l3Key) => {
+          if (l3Key !== type) {
+            updated[l3Key] = false;
+          }
+        });
+      }
+
       // Sponsor compliance logging
       if (type === 'sponsorGraphics') {
         const currentlyActive = Boolean(state.activeOverlays?.sponsorGraphics);
@@ -816,11 +833,11 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
     }
 
     const defaultDuration =
-      type === 'SIX' ? 4500 :
-      type === 'WICKET' ? 4500 :
-      type === 'FREE_HIT' ? 4000 :
-      type === 'FOUR' ? 3500 :
-      3500;
+      type === 'SIX' ? 3000 :
+      type === 'WICKET' ? 3000 :
+      type === 'FREE_HIT' ? 3000 :
+      type === 'FOUR' ? 3000 :
+      3000;
 
     const timeoutDuration = durationMs ?? defaultDuration;
 
@@ -1233,7 +1250,7 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
       return nextState;
     });
 
-    get().triggerAnimation('WICKET', 4500);
+    get().triggerAnimation('WICKET', 3000);
   },
 
   undoLastBall: () => {

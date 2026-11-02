@@ -7,6 +7,7 @@ import { THEME_ID_MAP } from '../../theme/presetThemes';
 
 // Overlays
 import { ScoreBug } from '../overlays/ScoreBug';
+import { EventSting } from '../overlays/EventSting';
 import { T20EmergingAsiaCupOverlay } from '../overlays/T20EmergingAsiaCupOverlay';
 import { IPL25Overlay } from '../overlays/IPL25Overlay';
 import { CricAstraOverlay } from '../overlays/CricAstraOverlay';
@@ -228,21 +229,35 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
     // If explicitly turned off in activeOverlays, always respect it
     if (activeOverlays[type] === false) return false;
 
-    // For the main bottom scoreboard (scoreBug)
-    if (type === 'scoreBug') {
-      // Auto-hide scoreBug if another full-screen overlay or card is active
-      const isExclusiveOverlayActive = Boolean(
-        activeOverlays.battingScorecard ||
-        activeOverlays.bowlingScorecard ||
-        activeOverlays.matchSummary ||
-        activeOverlays.playingXI ||
-        activeOverlays.tournamentTitle ||
-        activeOverlays.winnerScreen ||
-        activeOverlays.manOfTheMatchCard
-      );
-      if (isExclusiveOverlayActive) return false;
+    // Check if any full-card overlay is active
+    const isFullCardActive = Boolean(
+      activeOverlays.battingScorecard ||
+      activeOverlays.bowlingScorecard ||
+      activeOverlays.matchSummary ||
+      activeOverlays.playingXI ||
+      activeOverlays.tournamentTitle ||
+      activeOverlays.winnerScreen ||
+      activeOverlays.manOfTheMatchCard ||
+      activeOverlays.pointsTable ||
+      activeOverlays.toss
+    );
 
+    // ScoreBug: Auto-hide if another full-screen overlay or card is active
+    if (type === 'scoreBug') {
+      if (isFullCardActive) return false;
       return Boolean(activeOverlays.scoreBug);
+    }
+
+    // Lower Thirds: Suppress if full-screen overlay or card is active to avoid visual bleeding
+    if (
+      isFullCardActive &&
+      (type === 'battingLowerThird' ||
+       type === 'bowlingLowerThird' ||
+       type === 'partnership' ||
+       type === 'replayLowerThird' ||
+       type === 'playerOfTheMatch')
+    ) {
+      return false;
     }
 
     return Boolean(activeOverlays[type]);
@@ -254,9 +269,9 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
       style={{ transform: scale !== 1 ? `scale(${scale})` : undefined }}
     >
       <AnimatePresence mode="sync">
-        {/* Overlays */}
-        {activeOverlays.scoreBug && isVisible('scoreBug') && (
-          <div className="absolute bottom-6 inset-x-0 z-40 flex items-center justify-center pointer-events-none">
+        {/* Overlays - Strictly Wrapped Conditional Rendering to Prevent Bleed */}
+        {Boolean(activeOverlays.scoreBug || forcedOverlay === 'scoreBug') && isVisible('scoreBug') && (
+          <div key="scoreBugWrapper" className="absolute bottom-6 inset-x-0 z-40 flex items-center justify-center pointer-events-none">
             {tournamentId === 't20_asia24' || tournamentId === '9' ? (
               <T20EmergingAsiaCupOverlay key="t20AsiaCupScoreBug" />
             ) : tournamentId === 'ipl25' || tournamentId === '15' ? (
@@ -270,105 +285,163 @@ export const OverlayStage: React.FC<OverlayStageProps> = ({ scale = 1 }) => {
             )}
           </div>
         )}
-        {isVisible('tournamentTitle') && <TournamentTitleOverlay key="tournamentTitle" />}
-        {isVisible('battingLowerThird') && (
+        {Boolean(activeOverlays.tournamentTitle || forcedOverlay === 'tournamentTitle') && isVisible('tournamentTitle') && (
+          <TournamentTitleOverlay key="tournamentTitle" />
+        )}
+        {Boolean(activeOverlays.battingLowerThird || forcedOverlay === 'battingLowerThird') && isVisible('battingLowerThird') && (
           tournamentId === 'ipl25' || tournamentId === '15' ? (
             <BatterLowerThird key="battingL3_ipl" />
           ) : (
             <LowerThird key="battingL3" type="batter" />
           )
         )}
-        {isVisible('bowlingLowerThird') && (
+        {Boolean(activeOverlays.bowlingLowerThird || forcedOverlay === 'bowlingLowerThird') && isVisible('bowlingLowerThird') && (
           tournamentId === 'ipl25' || tournamentId === '15' ? (
             <BowlerLowerThird key="bowlingL3_ipl" />
           ) : (
             <LowerThird key="bowlingL3" type="bowler" />
           )
         )}
-        {isVisible('battingScorecard') && (
+        {Boolean(activeOverlays.battingScorecard || forcedOverlay === 'battingScorecard') && isVisible('battingScorecard') && (
           tournamentId === 'ipl25' || tournamentId === '15' ? (
             <BattingScorecardCard key="battingCard_ipl" />
           ) : (
             <BattingScorecard key="battingCard" />
           )
         )}
-        {isVisible('bowlingScorecard') && (
+        {Boolean(activeOverlays.bowlingScorecard || forcedOverlay === 'bowlingScorecard') && isVisible('bowlingScorecard') && (
           tournamentId === 'ipl25' || tournamentId === '15' ? (
             <BowlingScorecardCard key="bowlingCard_ipl" />
           ) : (
             <BowlingScorecard key="bowlingCard" />
           )
         )}
-        {isVisible('matchSummary') && (
+        {Boolean(activeOverlays.matchSummary || forcedOverlay === 'matchSummary') && isVisible('matchSummary') && (
           tournamentId === 'ipl25' || tournamentId === '15' ? (
             <MatchSummaryCard key="matchSummary_ipl" />
           ) : (
             <MatchSummary key="matchSummary" />
           )
         )}
-        {isVisible('partnership') && (
+        {Boolean(activeOverlays.partnership || forcedOverlay === 'partnership') && isVisible('partnership') && (
           tournamentId === 'ipl25' || tournamentId === '15' ? (
             <PartnershipLowerThird key="partnership_ipl" />
           ) : (
             <LowerThird key="partnership" type="partnership" />
           )
         )}
-        {isVisible('currentBatters') && <CurrentBattersOverlay key="currentBatters" />}
-        {isVisible('currentBowler') && <CurrentBowlerOverlay key="currentBowler" />}
-        {isVisible('requiredRunRate') && <RequiredRunRateOverlay key="rrr" />}
-        {isVisible('currentRunRate') && <CurrentRunRateOverlay key="crr" />}
-        {isVisible('fallOfWickets') && <FallOfWicketsOverlay key="fow" />}
-        {isVisible('target') && (
+        {Boolean(activeOverlays.currentBatters || forcedOverlay === 'currentBatters') && isVisible('currentBatters') && (
+          <CurrentBattersOverlay key="currentBatters" />
+        )}
+        {Boolean(activeOverlays.currentBowler || forcedOverlay === 'currentBowler') && isVisible('currentBowler') && (
+          <CurrentBowlerOverlay key="currentBowler" />
+        )}
+        {Boolean(activeOverlays.requiredRunRate || forcedOverlay === 'requiredRunRate') && isVisible('requiredRunRate') && (
+          <RequiredRunRateOverlay key="rrr" />
+        )}
+        {Boolean(activeOverlays.currentRunRate || forcedOverlay === 'currentRunRate') && isVisible('currentRunRate') && (
+          <CurrentRunRateOverlay key="crr" />
+        )}
+        {Boolean(activeOverlays.fallOfWickets || forcedOverlay === 'fallOfWickets') && isVisible('fallOfWickets') && (
+          <FallOfWicketsOverlay key="fow" />
+        )}
+        {Boolean(activeOverlays.target || forcedOverlay === 'target') && isVisible('target') && (
           tournamentId === 'ipl25' || tournamentId === '15' ? (
             <TargetSplash key="target_ipl" />
           ) : (
             <TargetOverlay key="target" />
           )
         )}
-        {isVisible('winnerScreen') && <WinnerScreenOverlay key="winnerScreen" />}
-        {isVisible('playingXI') && (
+        {Boolean(activeOverlays.winnerScreen || forcedOverlay === 'winnerScreen') && isVisible('winnerScreen') && (
+          <WinnerScreenOverlay key="winnerScreen" />
+        )}
+        {Boolean(activeOverlays.playingXI || forcedOverlay === 'playingXI') && isVisible('playingXI') && (
           tournamentId === 'ipl25' || tournamentId === '15' ? (
             <TeamsLineupCard key="playingXI_ipl" />
           ) : (
             <PlayingXIOverlay key="playingXI" />
           )
         )}
-        {isVisible('toss') && <TossOverlay key="toss" />}
-        {isVisible('playerStatistics') && (
+        {Boolean(activeOverlays.toss || forcedOverlay === 'toss') && isVisible('toss') && (
+          <TossOverlay key="toss" />
+        )}
+        {Boolean(activeOverlays.playerStatistics || forcedOverlay === 'playerStatistics') && isVisible('playerStatistics') && (
           tournamentId === 'ipl25' || tournamentId === '15' ? (
             <PlayerProfileCard key="playerStats_ipl" />
           ) : (
             <PlayerStatisticsOverlay key="playerStats" />
           )
         )}
-        {isVisible('bowlerStatistics') && <BowlerStatisticsOverlay key="bowlerStats" />}
-        {isVisible('playerOfTheMatch') && (
+        {Boolean(activeOverlays.bowlerStatistics || forcedOverlay === 'bowlerStatistics') && isVisible('bowlerStatistics') && (
+          <BowlerStatisticsOverlay key="bowlerStats" />
+        )}
+        {Boolean(activeOverlays.playerOfTheMatch || forcedOverlay === 'playerOfTheMatch') && isVisible('playerOfTheMatch') && (
           tournamentId === 'ipl25' || tournamentId === '15' ? (
             <ManOfTheMatchLowerThird key="potm_ipl" />
           ) : (
             <PlayerOfTheMatchOverlay key="potm" />
           )
         )}
-        {isVisible('playerOfTheTournament') && <PlayerOfTheTournamentOverlay key="pott" />}
-        {isVisible('topBatters') && <TopBattersOverlay key="topBatters" />}
-        {isVisible('topBowlers') && <TopBowlersOverlay key="topBowlers" />}
-        {isVisible('pointsTable') && <PointsTableOverlay key="pointsTable" />}
-        {isVisible('sponsorGraphics') && <SponsorGraphicsOverlay key="sponsors" />}
-        {isVisible('countdown') && <CountdownOverlay key="countdown" />}
-        {isVisible('replayLowerThird') && <ReplayLowerThird key="replay" />}
-        {isVisible('superOver') && <SuperOverOverlay key="superOver" />}
-        {isVisible('wagonWheel') && <WagonWheelOverlay key="wagonWheel" />}
-        {isVisible('manOfTheMatchCard') && <ManOfTheMatchCardOverlay key="momCard" />}
-        {isVisible('decision') && <DecisionOverlay key="decision" />}
-        {isVisible('pitchMap') && <PitchMapOverlay key="pitchMap" />}
-        {isVisible('manhattan') && <MatchCharts key="manhattan" view="bar" />}
-        {isVisible('graph') && <MatchCharts key="matchCharts" />}
-        {isVisible('winPredictor') && <WinPredictorOverlay key="winPredictor" />}
-        {isVisible('commentator') && <CommentatorOverlay key="commentator" />}
-        {isVisible('watermark') && <WatermarkOverlay key="watermark" />}
+        {Boolean(activeOverlays.playerOfTheTournament || forcedOverlay === 'playerOfTheTournament') && isVisible('playerOfTheTournament') && (
+          <PlayerOfTheTournamentOverlay key="pott" />
+        )}
+        {Boolean(activeOverlays.topBatters || forcedOverlay === 'topBatters') && isVisible('topBatters') && (
+          <TopBattersOverlay key="topBatters" />
+        )}
+        {Boolean(activeOverlays.topBowlers || forcedOverlay === 'topBowlers') && isVisible('topBowlers') && (
+          <TopBowlersOverlay key="topBowlers" />
+        )}
+        {Boolean(activeOverlays.pointsTable || forcedOverlay === 'pointsTable') && isVisible('pointsTable') && (
+          <PointsTableOverlay key="pointsTable" />
+        )}
+        {Boolean(activeOverlays.sponsorGraphics || forcedOverlay === 'sponsorGraphics') && isVisible('sponsorGraphics') && (
+          <SponsorGraphicsOverlay key="sponsors" />
+        )}
+        {Boolean(activeOverlays.countdown || forcedOverlay === 'countdown') && isVisible('countdown') && (
+          <CountdownOverlay key="countdown" />
+        )}
+        {Boolean(activeOverlays.replayLowerThird || forcedOverlay === 'replayLowerThird') && isVisible('replayLowerThird') && (
+          <ReplayLowerThird key="replay" />
+        )}
+        {Boolean(activeOverlays.superOver || forcedOverlay === 'superOver') && isVisible('superOver') && (
+          <SuperOverOverlay key="superOver" />
+        )}
+        {Boolean(activeOverlays.wagonWheel || forcedOverlay === 'wagonWheel') && isVisible('wagonWheel') && (
+          <WagonWheelOverlay key="wagonWheel" />
+        )}
+        {Boolean(activeOverlays.manOfTheMatchCard || forcedOverlay === 'manOfTheMatchCard') && isVisible('manOfTheMatchCard') && (
+          <ManOfTheMatchCardOverlay key="momCard" />
+        )}
+        {Boolean(activeOverlays.decision || forcedOverlay === 'decision') && isVisible('decision') && (
+          <DecisionOverlay key="decision" />
+        )}
+        {Boolean(activeOverlays.pitchMap || forcedOverlay === 'pitchMap') && isVisible('pitchMap') && (
+          <PitchMapOverlay key="pitchMap" />
+        )}
+        {Boolean(activeOverlays.manhattan || forcedOverlay === 'manhattan') && isVisible('manhattan') && (
+          <MatchCharts key="manhattan" view="bar" />
+        )}
+        {Boolean(activeOverlays.graph || forcedOverlay === 'graph') && isVisible('graph') && (
+          <MatchCharts key="matchCharts" />
+        )}
+        {Boolean(activeOverlays.winPredictor || forcedOverlay === 'winPredictor') && isVisible('winPredictor') && (
+          <WinPredictorOverlay key="winPredictor" />
+        )}
+        {Boolean(activeOverlays.commentator || forcedOverlay === 'commentator') && isVisible('commentator') && (
+          <CommentatorOverlay key="commentator" />
+        )}
+        {Boolean(activeOverlays.watermark || forcedOverlay === 'watermark') && isVisible('watermark') && (
+          <WatermarkOverlay key="watermark" />
+        )}
 
-        {/* Animations - Unified IPL Super Animation Engine */}
-        {activeAnimation && <IPLSuperAnimation key="animIPLSuper" />}
+        {/* Animations - EventSting (FOUR, SIX, WICKET) & IPLSuperAnimation */}
+        {activeAnimation && (
+          activeAnimation === 'FOUR' || activeAnimation === 'SIX' || activeAnimation === 'WICKET' ? (
+            <EventSting key={`eventSting_${activeAnimation}`} type={activeAnimation} />
+          ) : (
+            <IPLSuperAnimation key="animIPLSuper" />
+          )
+        )}
       </AnimatePresence>
     </div>
   );

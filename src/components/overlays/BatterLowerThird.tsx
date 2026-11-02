@@ -1,17 +1,29 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { LowerThirdBase } from './base/LowerThirdBase';
 import { useBroadcastStore } from '../../store/useBroadcastStore';
 
 export interface BatterLowerThirdProps {
   className?: string;
   batterId?: string;
+  autoHide?: boolean;
+  durationMs?: number;
 }
 
 export const BatterLowerThird: React.FC<BatterLowerThirdProps> = ({
   className = '',
   batterId,
+  autoHide = true,
+  durationMs = 5000,
 }) => {
   const { teamA, teamB, battingTeamId } = useBroadcastStore();
+
+  useEffect(() => {
+    if (!autoHide) return;
+    const timer = setTimeout(() => {
+      useBroadcastStore.getState().toggleOverlay('battingLowerThird', false);
+    }, durationMs);
+    return () => clearTimeout(timer);
+  }, [autoHide, durationMs]);
 
   const isTeamA =
     battingTeamId === teamA.id ||
