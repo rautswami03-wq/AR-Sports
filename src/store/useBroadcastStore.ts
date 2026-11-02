@@ -65,6 +65,7 @@ export interface BroadcastStoreState {
   historyStack: HistorySnapshot[];
   blitzSettings: BlitzCustomSettings;
   ballLog: BallLogEntry[];
+  isInningsBreak: boolean;
   teamABulkPaste: string;
   teamBBulkPaste: string;
   teamAName: string;
@@ -344,6 +345,7 @@ function buildCompactSyncPayload(state: any) {
     teamAName: state.teamAName || state.teamA?.fullName || '',
     teamBName: state.teamBName || state.teamB?.fullName || '',
     ballLog: state.ballLog || [],
+    isInningsBreak: state.isInningsBreak || false,
   };
 }
 
@@ -542,6 +544,7 @@ function loadInitialState() {
           teamBName: parsed.teamBName || parsed.teamB?.fullName || DEFAULT_TEAM_B.fullName,
           blitzSettings: (() => { try { const s = localStorage.getItem('ar_blitz_settings'); return s ? JSON.parse(s) : DEFAULT_BLITZ_SETTINGS; } catch { return DEFAULT_BLITZ_SETTINGS; } })(),
           ballLog: parsed.ballLog || [],
+          isInningsBreak: parsed.isInningsBreak || false,
         };
       }
     } catch {}
@@ -563,6 +566,7 @@ function loadInitialState() {
     teamBName: DEFAULT_TEAM_B.fullName,
     blitzSettings: DEFAULT_BLITZ_SETTINGS,
     ballLog: [],
+    isInningsBreak: false,
   };
 }
 
@@ -704,6 +708,7 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
   overlayAckAt: 0,
   syncErrorCount: 0,
   ballLog: loadedState.ballLog || [],
+  isInningsBreak: false,
 
   incrementSyncError: () => set((state) => ({ syncErrorCount: (state.syncErrorCount || 0) + 1 })),
   setOverlayAck: (at) => set({ overlayAckAt: at }),
@@ -764,6 +769,7 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
       ...(newState.teamBName ? { teamBName: newState.teamBName } : {}),
       ...(newState.ballLog !== undefined ? { ballLog: newState.ballLog } : {}),
       ...(newState.matchArchive !== undefined ? { matchArchive: newState.matchArchive } : {}),
+      ...(newState.isInningsBreak !== undefined ? { isInningsBreak: newState.isInningsBreak } : {}),
     }));
     isReceivingBroadcast = false;
   },
@@ -859,6 +865,13 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
 
   addRuns: (runs, isBoundary = false, boundaryType) => {
     set((state) => {
+      // End of Innings hard stop
+      const bk = isBattingTeamA(state) ? 'teamA' : 'teamB';
+      if (((state[bk].overs * 6) + state[bk].balls) >= (state.matchDetails.totalOvers * 6)) {
+        if (!state.isInningsBreak) set({ isInningsBreak: true });
+        return state;
+      }
+
       const snapshot = getSnapshot(state);
       const newHistory = [...state.historyStack, snapshot].slice(-30);
 
@@ -985,6 +998,13 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
 
   addExtra: (extraType, extraRuns = 1) => {
     set((state) => {
+      // End of Innings hard stop
+      const bk = isBattingTeamA(state) ? 'teamA' : 'teamB';
+      if (((state[bk].overs * 6) + state[bk].balls) >= (state.matchDetails.totalOvers * 6)) {
+        if (!state.isInningsBreak) set({ isInningsBreak: true });
+        return state;
+      }
+
       const snapshot = getSnapshot(state);
       const newHistory = [...state.historyStack, snapshot].slice(-30);
 
@@ -1125,6 +1145,13 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
 
   addWicket: (dismissalType = 'c & b Bowler') => {
     set((state) => {
+      // End of Innings hard stop
+      const bk = isBattingTeamA(state) ? 'teamA' : 'teamB';
+      if (((state[bk].overs * 6) + state[bk].balls) >= (state.matchDetails.totalOvers * 6)) {
+        if (!state.isInningsBreak) set({ isInningsBreak: true });
+        return state;
+      }
+
       const isTeamA = isBattingTeamA(state);
       const battingTeamKey = isTeamA ? 'teamA' : 'teamB';
       const bowlingTeamKey = isTeamA ? 'teamB' : 'teamA';
@@ -1901,6 +1928,7 @@ export const useBroadcastStore = create<BroadcastStoreState>((set, get) => ({
         battingTeamId: newBattingTeamId,
         bowlingTeamId: newBowlingTeamId,
         [secondBattingTeamKey]: secondBattingTeam,
+        isInningsBreak: false,
         matchDetails: {
           ...state.matchDetails,
           currentInnings: 2 as const,

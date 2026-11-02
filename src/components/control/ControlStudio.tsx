@@ -82,6 +82,8 @@ export const ControlStudio: React.FC = () => {
     loadArchiveAsNewMatch,
     matchArchive,
     ballLog,
+    isInningsBreak,
+    startSecondInnings,
   } = useBroadcastStore();
 
   const [copiedUrl, setCopiedUrl] = useState(false);
@@ -836,46 +838,51 @@ export const ControlStudio: React.FC = () => {
 
 
                 <div className="flex items-center gap-4 bg-slate-950 p-2.5 rounded-lg border border-slate-800 text-xs font-bold">
-                  <label className="flex items-center gap-1.5 cursor-pointer text-slate-300">
+                  <label className={`flex items-center gap-1.5 cursor-pointer text-slate-300 ${isInningsBreak ? 'opacity-40 pointer-events-none' : ''}`}>
                     <input
                       type="checkbox"
                       checked={extraWide}
+                      disabled={isInningsBreak}
                       onChange={(e) => setExtraWide(e.target.checked)}
                       className="w-4 h-4 accent-amber-400"
                     />
                     Wide
                   </label>
-                  <label className="flex items-center gap-1.5 cursor-pointer text-slate-300">
+                  <label className={`flex items-center gap-1.5 cursor-pointer text-slate-300 ${isInningsBreak ? 'opacity-40 pointer-events-none' : ''}`}>
                     <input
                       type="checkbox"
                       checked={extraNoBall}
+                      disabled={isInningsBreak}
                       onChange={(e) => setExtraNoBall(e.target.checked)}
                       className="w-4 h-4 accent-rose-400"
                     />
                     No Ball
                   </label>
-                  <label className="flex items-center gap-1.5 cursor-pointer text-slate-300">
+                  <label className={`flex items-center gap-1.5 cursor-pointer text-slate-300 ${isInningsBreak ? 'opacity-40 pointer-events-none' : ''}`}>
                     <input
                       type="checkbox"
                       checked={extraByes}
+                      disabled={isInningsBreak}
                       onChange={(e) => setExtraByes(e.target.checked)}
                       className="w-4 h-4 accent-sky-400"
                     />
                     Byes
                   </label>
-                  <label className="flex items-center gap-1.5 cursor-pointer text-slate-300">
+                  <label className={`flex items-center gap-1.5 cursor-pointer text-slate-300 ${isInningsBreak ? 'opacity-40 pointer-events-none' : ''}`}>
                     <input
                       type="checkbox"
                       checked={extraLegByes}
+                      disabled={isInningsBreak}
                       onChange={(e) => setExtraLegByes(e.target.checked)}
                       className="w-4 h-4 accent-indigo-400"
                     />
                     Leg Byes
                   </label>
-                  <label className="flex items-center gap-1.5 cursor-pointer text-amber-400">
+                  <label className={`flex items-center gap-1.5 cursor-pointer text-amber-400 ${isInningsBreak ? 'opacity-40 pointer-events-none' : ''}`}>
                     <input
                       type="checkbox"
                       checked={extraWicket}
+                      disabled={isInningsBreak}
                       onChange={(e) => setExtraWicket(e.target.checked)}
                       className="w-4 h-4 accent-red-600"
                     />
@@ -892,9 +899,12 @@ export const ControlStudio: React.FC = () => {
                     {[0, 1, 2, 3, 4, 5, 6].map((num) => (
                       <button
                         key={num}
+                        disabled={isInningsBreak}
                         onClick={() => handleScoreClick(num)}
                         className={`py-3.5 rounded-lg font-black text-xl shadow-md transition-all active:scale-95 border ${
-                          num === 4
+                          isInningsBreak
+                            ? 'bg-slate-700 text-slate-500 cursor-not-allowed border-slate-600 opacity-60'
+                            : num === 4
                             ? 'bg-amber-500 hover:bg-amber-400 text-slate-950 border-amber-300'
                             : num === 6
                             ? 'bg-purple-600 hover:bg-purple-500 text-white border-purple-400'
@@ -1587,6 +1597,48 @@ export const ControlStudio: React.FC = () => {
                 {copiedUrl ? 'Copied URL!' : 'Copy Overlay URL'}
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* End of Innings Break Modal */}
+      {isInningsBreak && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in font-sans">
+          <div className="w-full max-w-lg bg-gradient-to-br from-slate-900 via-slate-950 to-indigo-900 border-2 border-amber-400 rounded-3xl p-8 text-white shadow-2xl space-y-6 text-center">
+            {/* Trophy / Icon */}
+            <div className="flex justify-center mb-2">
+              <div className="w-16 h-16 rounded-full bg-amber-500/20 border-2 border-amber-400 flex items-center justify-center shadow-lg">
+                <span className="text-4xl font-black text-amber-300">🏆</span>
+              </div>
+            </div>
+
+            <h1 className="text-4xl font-black text-amber-300 uppercase tracking-wider drop-shadow-lg">
+              1ST INNINGS COMPLETE
+            </h1>
+
+            <div className="w-20 h-1 bg-amber-500 mx-auto rounded-full" />
+
+            <p className="text-lg font-bold text-white/90">
+              Target: <span className="text-amber-400 font-black text-2xl">{battingTeam.score + 1}</span>
+            </p>
+
+            <div className="bg-slate-950/60 border border-slate-800 rounded-xl p-4 text-sm text-slate-300">
+              <div className="flex justify-between gap-4">
+                <span className="text-slate-400">{battingTeam.fullName || battingTeam.shortName}: <strong className="text-white">{battingTeam.score}/{battingTeam.wickets}</strong></span>
+                <span className="text-slate-400">{bowlingTeam.fullName || bowlingTeam.shortName}: <strong className="text-white">{bowlingTeam.score}/{bowlingTeam.wickets}</strong></span>
+              </div>
+            </div>
+
+            <button
+              onClick={() => startSecondInnings()}
+              className="w-full py-4 bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-slate-950 font-black text-xl rounded-2xl uppercase tracking-widest shadow-2xl transition-all active:scale-95 border border-white/20 animate-pulse"
+            >
+              ▶ START 2ND INNINGS
+            </button>
+
+            <p className="text-xs text-slate-500 mt-2">
+              The second innings will begin with teams swapping — the chasing team needs <strong className="text-amber-400">{battingTeam.score + 1}</strong> runs to win.
+            </p>
           </div>
         </div>
       )}
