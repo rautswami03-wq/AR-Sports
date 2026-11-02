@@ -7,7 +7,7 @@ import { TossMatchModal } from './TossMatchModal';
 import { ChangeBowlerModal } from './ChangeBowlerModal';
 import { OverlayType, EventAnimationType } from '../../types/cricket';
 import { PRESET_TEAMS, PRESET_TOURNAMENTS } from '../../theme/presetThemes';
-import { Radio, Tv, Zap, Palette, Layers, RefreshCw, Copy, Check, RotateCcw, Settings, Users, PlusCircle, Archive } from 'lucide-react';
+import { Radio, Tv, Zap, Palette, Layers, RefreshCw, Copy, Check, RotateCcw, Settings, Users, PlusCircle, Archive, AlertTriangle, Lock, Unlock } from 'lucide-react';
 import { CricNavbar } from '../common/CricNavbar';
 
 const OverlayLivenessIndicator: React.FC = () => {
@@ -90,9 +90,21 @@ export const ControlStudio: React.FC = () => {
   const [showObsGuideModal, setShowObsGuideModal] = useState(false);
   const [showBowlerModal, setShowBowlerModal] = useState(false);
   const [isOverEndModal, setIsOverEndModal] = useState(false);
+  const [showNameChangeWarningModal, setShowNameChangeWarningModal] = useState(false);
+  const [pendingTeamChange, setPendingTeamChange] = useState<{ team: 'teamA' | 'teamB'; newName: string } | null>(null);
+  const [isTeamNameUnlocked, setIsTeamNameUnlocked] = useState(false);
 
   const battingTeam = battingTeamId === teamA.id ? teamA : teamB;
   const bowlingTeam = battingTeamId === teamA.id ? teamB : teamA;
+
+  const isMatchActive = Boolean(
+    matchDetails.isMatchStarted && (
+      teamA.overs > 0 || teamA.balls > 0 ||
+      teamB.overs > 0 || teamB.balls > 0 ||
+      teamA.score > 0 || teamB.score > 0 ||
+      (ballLog && ballLog.length > 0)
+    )
+  );
 
   // Auto trigger bowler selection modal when an over completes
   const prevOversRef = React.useRef(battingTeam.overs);
@@ -104,10 +116,9 @@ export const ControlStudio: React.FC = () => {
     prevOversRef.current = battingTeam.overs;
   }, [battingTeam.overs]);
 
-
   const [bowlerInput, setBowlerInput] = useState('');
-  const [customAnimInput, setCustomAnimInput] = useState('');
-  const [customDisplayInput, setCustomDisplayInput] = useState('');
+  const [customAnimInput, setCustomAnimInput] = useState(matchDetails.customAnimationText || '');
+  const [customDisplayInput, setCustomDisplayInput] = useState(matchDetails.customInputText || '');
 
 
   const [extraWide, setExtraWide] = useState(false);
@@ -261,6 +272,9 @@ export const ControlStudio: React.FC = () => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.repeat) return;
       if (selectedTab !== 'scorer') return;
+      if (showEditModal || showTossModal || showBowlerModal || showNameChangeWarningModal || showObsGuideModal) {
+        return;
+      }
 
       const activeEl = document.activeElement;
       if (activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.tagName === 'SELECT')) {
@@ -269,38 +283,64 @@ export const ControlStudio: React.FC = () => {
 
       const key = e.key.toLowerCase();
       if (key === '0' || e.code === 'Numpad0') {
+        if (e.repeat) return;
         handleScoreClick(0);
         speakCommentary('Dot ball.');
       } else if (key === '1' || e.code === 'Numpad1') {
+        if (e.repeat) return;
         handleScoreClick(1);
         speakCommentary('Single run.');
       } else if (key === '2' || e.code === 'Numpad2') {
+        if (e.repeat) return;
         handleScoreClick(2);
         speakCommentary('Two runs taken!');
       } else if (key === '3' || e.code === 'Numpad3') {
+        if (e.repeat) return;
         handleScoreClick(3);
         speakCommentary('Three runs!');
       } else if (key === '4' || e.code === 'Numpad4') {
+        if (e.repeat) return;
         handleScoreClick(4);
         speakCommentary('Shot! That is a FOUR!');
+      } else if (key === '5' || e.code === 'Numpad5') {
+        if (e.repeat) return;
+        handleScoreClick(5);
+        speakCommentary('Five runs!');
       } else if (key === '6' || e.code === 'Numpad6') {
+        if (e.repeat) return;
         handleScoreClick(6);
         speakCommentary('Huge hit! SIX runs into the stands!');
       } else if (key === 'w') {
+        if (e.repeat) return;
         addWicket();
         triggerAnimation('WICKET');
         speakCommentary('OUT! Wicket falls!');
       } else if (key === 'u') {
+        if (e.repeat) return;
         undoLastBall();
         speakCommentary('Undoing last ball.');
       } else if (key === 'b') {
+        if (e.repeat) return;
         toggleOverlay('scoreBug');
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedTab, voiceCommentaryEnabled, extraWide, extraNoBall, extraByes, extraLegByes, extraWicket]);
+  }, [
+    selectedTab,
+    voiceCommentaryEnabled,
+    extraWide,
+    extraNoBall,
+    extraByes,
+    extraLegByes,
+    extraWicket,
+    showEditModal,
+    showTossModal,
+    showBowlerModal,
+    showNameChangeWarningModal,
+    showObsGuideModal,
+  ]);
 
   const overlayList: { id: OverlayType; label: string }[] = [
     { id: 'scoreBug', label: 'Live Score Bug' },
@@ -676,8 +716,12 @@ export const ControlStudio: React.FC = () => {
                       </div>
 
                       <div>
-                        <label className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Active Bowler</label>
+                        <label htmlFor="active-bowler-select" className="text-[10px] font-bold text-slate-400 uppercase block mb-1">
+                          Active Bowler ({bowlingTeam.shortName || 'BOWL'})
+                        </label>
                         <select
+                          id="active-bowler-select"
+                          aria-label="Active Bowler"
                           value={currentBowler?.name || ''}
                           onChange={(e) => {
                             const val = e.target.value;
@@ -688,11 +732,13 @@ export const ControlStudio: React.FC = () => {
                           className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1.5 text-xs text-white focus:outline-none focus:border-cyan-400 font-semibold"
                         >
                           <option value="">Select Bowler...</option>
-                          {bowlingTeam.bowlers.map((bw) => (
-                            <option key={bw.id || bw.name} value={bw.name}>
-                              {bw.name}
-                            </option>
-                          ))}
+                          {bowlingTeam.bowlers
+                            .filter((bw) => bw.name && bw.name.trim().length > 0)
+                            .map((bw) => (
+                              <option key={bw.id || bw.name} value={bw.name}>
+                                {bw.name} ({bw.overs}.{bw.ballsInCurrentOver} ov, {bw.wickets}-{bw.runsConceded})
+                              </option>
+                            ))}
                         </select>
                       </div>
                     </div>
@@ -869,27 +915,101 @@ export const ControlStudio: React.FC = () => {
 
                   <div className="grid grid-cols-2 gap-3 pb-3 border-b border-slate-800">
                     <div>
-                      <label className="text-[11px] font-bold text-slate-300 block mb-1">
-                        Team 1 Name
-                      </label>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-[11px] font-bold text-slate-300">
+                          Team 1 Name
+                        </label>
+                        {isMatchActive && !isTeamNameUnlocked && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setPendingTeamChange({ team: 'teamA', newName: teamAName || teamA.fullName });
+                              setShowNameChangeWarningModal(true);
+                            }}
+                            className="text-[10px] text-amber-400 hover:text-amber-300 flex items-center gap-1 font-bold"
+                          >
+                            <Lock className="w-3 h-3" /> Locked (In Match)
+                          </button>
+                        )}
+                        {isMatchActive && isTeamNameUnlocked && (
+                          <span className="text-[10px] text-emerald-400 flex items-center gap-1 font-bold">
+                            <Unlock className="w-3 h-3" /> Unlocked
+                          </span>
+                        )}
+                      </div>
                       <input
                         type="text"
                         value={teamAName || teamA.fullName}
-                        onChange={(e) => setTeamAName(e.target.value)}
+                        readOnly={isMatchActive && !isTeamNameUnlocked}
+                        onClick={() => {
+                          if (isMatchActive && !isTeamNameUnlocked) {
+                            setPendingTeamChange({ team: 'teamA', newName: teamAName || teamA.fullName });
+                            setShowNameChangeWarningModal(true);
+                          }
+                        }}
+                        onChange={(e) => {
+                          if (isMatchActive && !isTeamNameUnlocked) {
+                            setPendingTeamChange({ team: 'teamA', newName: e.target.value });
+                            setShowNameChangeWarningModal(true);
+                          } else {
+                            setTeamAName(e.target.value);
+                          }
+                        }}
                         placeholder="Team 1 Name"
-                        className="w-full p-2 text-xs bg-slate-900 text-white rounded border border-slate-700 focus:outline-none focus:border-amber-400 font-bold"
+                        className={`w-full p-2 text-xs bg-slate-900 text-white rounded border focus:outline-none font-bold ${
+                          isMatchActive && !isTeamNameUnlocked
+                            ? 'border-amber-500/50 cursor-pointer bg-slate-950/80 text-amber-200'
+                            : 'border-slate-700 focus:border-amber-400'
+                        }`}
                       />
                     </div>
                     <div>
-                      <label className="text-[11px] font-bold text-slate-300 block mb-1">
-                        Team 2 Name
-                      </label>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="text-[11px] font-bold text-slate-300">
+                          Team 2 Name
+                        </label>
+                        {isMatchActive && !isTeamNameUnlocked && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setPendingTeamChange({ team: 'teamB', newName: teamBName || teamB.fullName });
+                              setShowNameChangeWarningModal(true);
+                            }}
+                            className="text-[10px] text-amber-400 hover:text-amber-300 flex items-center gap-1 font-bold"
+                          >
+                            <Lock className="w-3 h-3" /> Locked (In Match)
+                          </button>
+                        )}
+                        {isMatchActive && isTeamNameUnlocked && (
+                          <span className="text-[10px] text-emerald-400 flex items-center gap-1 font-bold">
+                            <Unlock className="w-3 h-3" /> Unlocked
+                          </span>
+                        )}
+                      </div>
                       <input
                         type="text"
                         value={teamBName || teamB.fullName}
-                        onChange={(e) => setTeamBName(e.target.value)}
+                        readOnly={isMatchActive && !isTeamNameUnlocked}
+                        onClick={() => {
+                          if (isMatchActive && !isTeamNameUnlocked) {
+                            setPendingTeamChange({ team: 'teamB', newName: teamBName || teamB.fullName });
+                            setShowNameChangeWarningModal(true);
+                          }
+                        }}
+                        onChange={(e) => {
+                          if (isMatchActive && !isTeamNameUnlocked) {
+                            setPendingTeamChange({ team: 'teamB', newName: e.target.value });
+                            setShowNameChangeWarningModal(true);
+                          } else {
+                            setTeamBName(e.target.value);
+                          }
+                        }}
                         placeholder="Team 2 Name"
-                        className="w-full p-2 text-xs bg-slate-900 text-white rounded border border-slate-700 focus:outline-none focus:border-amber-400 font-bold"
+                        className={`w-full p-2 text-xs bg-slate-900 text-white rounded border focus:outline-none font-bold ${
+                          isMatchActive && !isTeamNameUnlocked
+                            ? 'border-amber-500/50 cursor-pointer bg-slate-950/80 text-amber-200'
+                            : 'border-slate-700 focus:border-amber-400'
+                        }`}
                       />
                     </div>
                   </div>
@@ -1359,6 +1479,58 @@ export const ControlStudio: React.FC = () => {
         }}
         isOverEnd={isOverEndModal}
       />
+
+      {/* Match Started Team Name Edit Warning Modal */}
+      {showNameChangeWarningModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in font-sans">
+          <div className="w-full max-w-md bg-slate-900 border-2 border-amber-500 rounded-3xl p-6 text-white shadow-2xl space-y-4">
+            <div className="flex items-center gap-2.5 text-amber-400 font-black text-sm uppercase tracking-wide">
+              <AlertTriangle className="w-5 h-5 text-amber-400 shrink-0" />
+              <span>Match In Progress — Name Edit Lock</span>
+            </div>
+
+            <p className="text-xs text-slate-300 leading-relaxed font-medium">
+              This match has already started and live scoring is underway ({teamA.fullName}: {teamA.score}/{teamA.wickets} vs {teamB.fullName}: {teamB.score}/{teamB.wickets}).
+              Changing team names mid-match will alter live broadcast overlay tickers, tournament tables, and ball-by-ball logs.
+            </p>
+
+            <div className="bg-amber-500/10 border border-amber-500/30 p-3 rounded-xl text-amber-300 text-xs font-bold">
+              Are you sure you want to unlock and change the team name?
+            </div>
+
+            <div className="flex items-center justify-end gap-3 pt-2 border-t border-slate-800">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowNameChangeWarningModal(false);
+                  setPendingTeamChange(null);
+                }}
+                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl uppercase transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsTeamNameUnlocked(true);
+                  setShowNameChangeWarningModal(false);
+                  if (pendingTeamChange) {
+                    if (pendingTeamChange.team === 'teamA') {
+                      setTeamAName(pendingTeamChange.newName);
+                    } else {
+                      setTeamBName(pendingTeamChange.newName);
+                    }
+                    setPendingTeamChange(null);
+                  }
+                }}
+                className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black rounded-xl uppercase shadow transition-colors"
+              >
+                Unlock & Allow Edit
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* OBS Setup Guide Modal */}
       {showObsGuideModal && (

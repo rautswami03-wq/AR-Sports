@@ -28,11 +28,19 @@ export const EditMatchModal: React.FC<EditMatchModalProps> = ({ isOpen, onClose 
   const [groupNo, setGroupNo] = useState(matchDetails.groupNo || 1);
   const [strikerPhoto, setStrikerPhoto] = useState(striker?.avatarUrl || '');
   const [bowlerPhoto, setBowlerPhoto] = useState(currentBowler?.avatarUrl || '');
+  const [showWarningModal, setShowWarningModal] = useState(false);
+
+  const isMatchActive = Boolean(
+    matchDetails.isMatchStarted && (
+      teamA.overs > 0 || teamA.balls > 0 ||
+      teamB.overs > 0 || teamB.balls > 0 ||
+      teamA.score > 0 || teamB.score > 0
+    )
+  );
 
   if (!isOpen) return null;
 
-  const handleUpdate = (e: React.FormEvent) => {
-    e.preventDefault();
+  const executeSave = () => {
     updateTeamDetails('teamA', { fullName: team1Name });
     updateTeamDetails('teamB', { fullName: team2Name });
     updateMatchSettings({
@@ -50,7 +58,18 @@ export const EditMatchModal: React.FC<EditMatchModalProps> = ({ isOpen, onClose 
     if (currentBowler && bowlerPhoto) {
       updatePlayerAvatar(bowlingTeamKey, 'bowler', currentBowler.id, bowlerPhoto);
     }
+    setShowWarningModal(false);
     onClose();
+  };
+
+  const handleUpdate = (e: React.FormEvent) => {
+    e.preventDefault();
+    const hasNameChanged = team1Name.trim() !== (teamA.fullName || '').trim() || team2Name.trim() !== (teamB.fullName || '').trim();
+    if (isMatchActive && hasNameChanged) {
+      setShowWarningModal(true);
+      return;
+    }
+    executeSave();
   };
 
   return (
@@ -233,6 +252,35 @@ export const EditMatchModal: React.FC<EditMatchModalProps> = ({ isOpen, onClose 
             </button>
           </div>
         </form>
+
+        {showWarningModal && (
+          <div className="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="w-full max-w-sm bg-slate-900 border-2 border-amber-500 rounded-2xl p-5 text-white shadow-2xl space-y-3 text-left">
+              <h3 className="text-sm font-black text-amber-400 uppercase tracking-wider flex items-center gap-2">
+                ⚠️ Match in Progress Warning
+              </h3>
+              <p className="text-xs text-slate-300 leading-relaxed font-medium">
+                Scoring is already in progress for this match. Changing team names mid-match affects historical ball records and live stream overlays.
+              </p>
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setShowWarningModal(false)}
+                  className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-lg uppercase"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={executeSave}
+                  className="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black rounded-lg uppercase"
+                >
+                  Confirm Change
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
